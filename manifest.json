@@ -1,0 +1,24 @@
+{
+  "name": "每日教学反馈生成器",
+  "short_name": "教学反馈",
+  "description": "每日教学反馈生成工具，填写课堂信息后一键生成格式统一的教学反馈",
+  "start_url": "./daily-teaching-feedback.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0f4f8",
+  "theme_color": "#2d9d78",
+  "icons": [
+    {
+      "src": "assets/app-icon.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/app-icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
