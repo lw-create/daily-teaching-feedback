@@ -476,8 +476,8 @@
     background: #fff;
     border: 1.5px solid var(--rule);
     border-radius: var(--radius-sm);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    z-index: 9999;
     max-height: 200px;
     overflow-y: auto;
   }
@@ -1024,7 +1024,7 @@
   <div class="tab-panel active" id="panel-manual">
 
   <!-- Info inputs -->
-  <div class="card">
+  <div class="card" id="infoCard" style="position:relative;z-index:10;">
     <div class="info-grid">
       <div class="field">
         <label>日期</label>
@@ -2100,6 +2100,7 @@
         }
         studentInput.value = item.dataset.name;
         studentDropdown.classList.remove('show');
+        if (infoCardEl) infoCardEl.style.zIndex = '10';
         saveData();
       });
     });
@@ -2210,15 +2211,19 @@
     if (e.key === 'Enter') studentMgrAddBtn.click();
   });
 
+  var infoCardEl = document.getElementById('infoCard');
+
   studentDropdownBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     renderStudentDropdown();
-    studentDropdown.classList.toggle('show');
+    var isShown = studentDropdown.classList.toggle('show');
+    infoCardEl.style.zIndex = isShown ? '50' : '10';
   });
 
   document.addEventListener('click', function(e) {
     if (!studentDropdown.contains(e.target) && e.target !== studentDropdownBtn) {
       studentDropdown.classList.remove('show');
+      infoCardEl.style.zIndex = '10';
     }
   });
 
