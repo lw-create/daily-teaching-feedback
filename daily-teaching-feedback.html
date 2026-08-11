@@ -901,6 +901,213 @@
     transition: all 0.15s;
   }
   .student-export-btn:hover { background: rgba(74,144,217,0.1); }
+
+  /* Overview panel styles */
+  .ov-student-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ov-student-item:last-child { border-bottom: none; }
+  .ov-student-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+  .ov-student-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .ov-student-tag {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(74,144,217,0.08);
+    color: var(--accent2);
+  }
+  .ov-student-tag.score-tag {
+    background: rgba(45,157,120,0.08);
+    color: var(--accent);
+  }
+  .ov-student-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .ov-score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  .ov-score-table th {
+    text-align: left;
+    padding: 6px 8px;
+    background: rgba(45,157,120,0.06);
+    color: var(--accent);
+    font-weight: 600;
+    border-bottom: 1.5px solid var(--rule);
+    white-space: nowrap;
+  }
+  .ov-score-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink);
+  }
+  .ov-score-table tr:last-child td { border-bottom: none; }
+  .ov-feedback-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ov-feedback-item:last-child { border-bottom: none; }
+  .ov-feedback-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 0.76rem;
+  }
+  .ov-feedback-date {
+    font-weight: 600;
+    color: var(--accent2);
+  }
+  .ov-feedback-student {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .ov-feedback-subject {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .ov-feedback-text {
+    font-size: 0.78rem;
+    color: var(--ink);
+    line-height: 1.5;
+    padding-left: 4px;
+  }
+  .ov-empty {
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding: 12px 0;
+    text-align: center;
+  }
+
+  /* Exam manager */
+  .exam-mgr-toggle {
+    font-size: 0.76rem;
+    color: var(--accent2);
+    cursor: pointer;
+    user-select: none;
+  }
+  .exam-mgr-panel {
+    display: none;
+    margin-bottom: 10px;
+  }
+  .exam-mgr-panel.show { display: block; }
+  .exam-mgr-add-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .exam-mgr-add-row input {
+    padding: 5px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-family: inherit;
+  }
+  .exam-mgr-list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .exam-mgr-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.78rem;
+  }
+  .exam-mgr-item:last-child { border-bottom: none; }
+  .exam-mgr-item-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .exam-mgr-item-name {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .exam-mgr-item-date {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .exam-mgr-del {
+    padding: 2px 6px;
+    border: none;
+    background: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  /* Batch score entry */
+  .batch-score-section {
+    margin-top: 8px;
+  }
+  .batch-exam-select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+  .batch-score-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.78rem;
+  }
+  .batch-score-row:last-child { border-bottom: none; }
+  .batch-score-name {
+    flex: 1;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .batch-score-name .bs-meta {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .batch-score-input {
+    width: 70px;
+    padding: 3px 6px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    text-align: center;
+  }
+  .batch-score-input.has-value {
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .batch-score-saved {
+    font-size: 0.68rem;
+    color: var(--accent);
+    margin-left: 4px;
+  }
+
   .mgr-profile-btn {
     padding: 2px 8px;
     border: 1px solid var(--rule);
@@ -1534,8 +1741,8 @@
       AI提示语
     </button>
     <button class="tab" id="tab-save">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3V15M12 15L7 10M12 15L17 10M5 21H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      保存到手机
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" stroke="currentColor" stroke-width="1.5"/></svg>
+      学生总览
     </button>
   </div>
 
@@ -1806,76 +2013,51 @@
     </div>
   </div><!-- /panel-prompt -->
 
-  <!-- Tab Panel: Save to Phone -->
+  <!-- Tab Panel: Student Overview -->
   <div class="tab-panel" id="panel-save">
-    <div class="card">
-      <p class="prompt-intro" style="font-size:0.9rem;color:var(--ink);font-weight:600;margin-bottom:16px;">把这个工具放到手机桌面上，以后点开就能用，像 App 一样方便。</p>
+    <div class="card" id="overviewStudentCard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">学生名单</span>
+        <button class="student-export-btn" id="overviewExportBtn" type="button">导出名单</button>
+      </div>
+      <div id="overviewStudentList"></div>
+    </div>
 
-      <!-- Step 1: Download -->
-      <div style="margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <span class="step-num">1</span>
-          <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">把文件发送到手机上</span>
-        </div>
-        <div style="font-size:0.82rem;color:var(--muted);line-height:1.7;padding-left:30px;">
-          通过以下任一方式把文件传到手机：<br>
-          <strong>方式一：</strong>用微信"文件传输助手"发送文件<br>
-          <strong>方式二：</strong>发邮件附件给自己，手机上下载<br>
-          <strong>方式三：</strong>用 QQ / 钉钉等传文件工具发送
-        </div>
+    <div class="card" id="overviewScoreCard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">考试成绩</span>
+        <span class="exam-mgr-toggle" id="examMgrToggle">管理考试</span>
       </div>
 
-      <!-- Step 2: Open in browser -->
-      <div style="margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <span class="step-num">2</span>
-          <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">用手机浏览器打开文件</span>
+      <!-- Exam manager -->
+      <div class="exam-mgr-panel" id="examMgrPanel">
+        <div class="exam-mgr-add-row">
+          <input type="text" id="examMgrNameInput" placeholder="考试名称，如：期中考试" style="flex:1;">
+          <input type="date" id="examMgrDateInput" style="width:130px;">
+          <button class="course-add-btn" id="examMgrAddBtn" type="button">+ 新建</button>
         </div>
-        <div style="font-size:0.82rem;color:var(--muted);line-height:1.7;padding-left:30px;">
-          在手机上找到下载的文件，选择<strong>用浏览器打开</strong>（不要用微信内置浏览器打开，否则无法添加到桌面）
-        </div>
+        <div class="exam-mgr-list" id="examMgrList"></div>
       </div>
 
-      <!-- Step 3: Add to home screen -->
-      <div style="margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-          <span class="step-num">3</span>
-          <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">添加到桌面</span>
+      <!-- Batch score entry -->
+      <div class="batch-score-section" id="batchScoreSection">
+        <div class="batch-score-row">
+          <select id="batchExamSelect" class="batch-exam-select">
+            <option value="">选择考试...</option>
+          </select>
         </div>
+        <div id="batchScoreList"></div>
       </div>
+    </div>
 
-      <!-- iOS instructions -->
-      <div style="border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;margin-bottom:14px;">
-        <div style="background:rgba(45,157,120,0.06);padding:10px 14px;font-size:0.85rem;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
-          苹果 iPhone / iPad（用 Safari 打开）
-        </div>
-        <div style="padding:12px 14px;font-size:0.82rem;color:var(--ink);line-height:1.85;">
-          ① 在 Safari 中打开本页面<br>
-          ② 点击底部中间的 <strong>分享按钮</strong>（方框+向上箭头）<br>
-          ③ 在菜单中找到并点击 <strong>"添加到主屏幕"</strong><br>
-          ④ 点击右上角 <strong>"添加"</strong>，完成！
-        </div>
+    <div class="card" id="overviewFeedbackCard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">教学反馈记录</span>
+        <select id="overviewFeedbackDate" style="font-size:0.76rem;padding:3px 8px;border:1px solid var(--rule);border-radius:5px;">
+          <option value="">全部日期</option>
+        </select>
       </div>
-
-      <!-- Android instructions -->
-      <div style="border:1.5px solid var(--rule);border-radius:10px;overflow:hidden;margin-bottom:14px;">
-        <div style="background:rgba(74,144,217,0.06);padding:10px 14px;font-size:0.85rem;font-weight:700;color:var(--accent2);display:flex;align-items:center;gap:6px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.21.83L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
-          安卓手机（用 Chrome 打开）
-        </div>
-        <div style="padding:12px 14px;font-size:0.82rem;color:var(--ink);line-height:1.85;">
-          ① 在 Chrome 中打开本页面<br>
-          ② 点击右上角 <strong>三个点菜单</strong>（⋮）<br>
-          ③ 找到并点击 <strong>"添加到主屏幕"</strong><br>
-          ④ 点击 <strong>"添加"</strong>，完成！
-        </div>
-      </div>
-
-      <!-- Tip -->
-      <div style="padding:12px 14px;background:rgba(232,146,60,0.08);border-radius:8px;font-size:0.8rem;color:var(--warn);line-height:1.7;">
-        <strong>小提示：</strong>添加到桌面后，图标会显示为"教学反馈"，点开就是全屏界面，和真正的 App 一样使用。每次填写的数据会自动保存在手机里，不用担心丢失。
-      </div>
+      <div id="overviewFeedbackList"></div>
     </div>
   </div><!-- /panel-save -->
 
@@ -3170,18 +3352,28 @@
     // Exam scores section
     html += '<div class="sp-section-title">考试成绩记录</div>';
 
-    // Add form
-    html += '<div class="sp-add-row">';
-    html += '<input type="text" class="sp-exam-name" id="spExamName" placeholder="考试名称，如：期中考试">';
-    html += '<input type="text" class="sp-exam-score" id="spExamScore" placeholder="分数">';
-    html += '<input type="date" class="sp-exam-date" id="spExamDate" value="' + todayStr + '">';
-    html += '<button class="course-add-btn" id="spAddScoreBtn" type="button">+ 添加</button>';
-    html += '</div>';
+    var exams = getExams();
+
+    // Add form - use exam selector if exams exist, otherwise show create exam hint
+    if (exams.length > 0) {
+      html += '<div class="sp-add-row">';
+      html += '<select class="sp-exam-select" id="spExamSelect" style="flex:1;padding:5px 8px;border:1px solid var(--rule);border-radius:5px;font-size:0.8rem;font-family:inherit;">';
+      exams.forEach(function(e, idx) {
+        var label = e.name + ' (' + e.date + ')';
+        html += '<option value="' + e.id + '"' + (idx === 0 ? ' selected' : '') + '>' + escapeHtml(label) + '</option>';
+      });
+      html += '</select>';
+      html += '<input type="text" class="sp-exam-score" id="spExamScore" placeholder="分数" style="width:80px;">';
+      html += '<button class="course-add-btn" id="spAddScoreBtn" type="button">+ 添加</button>';
+      html += '</div>';
+    } else {
+      html += '<div class="sp-empty" style="margin-bottom:8px;">请先在"学生总览"中创建考试</div>';
+    }
 
     // Score list
     html += '<div class="sp-score-list" id="spScoreList">';
     if (scores.length === 0) {
-      html += '<div class="sp-empty">暂无考试记录，在上方添加第一条成绩</div>';
+      html += '<div class="sp-empty">暂无考试记录</div>';
     } else {
       scores.forEach(function(sc) {
         html += '<div class="sp-score-item" data-score-id="' + escapeHtml(sc.id || '') + '">';
@@ -3200,39 +3392,58 @@
 
     // Bind add score button
     var spAddScoreBtn = document.getElementById('spAddScoreBtn');
-    spAddScoreBtn.addEventListener('click', function() {
-      var examName = document.getElementById('spExamName').value.trim();
-      var score = document.getElementById('spExamScore').value.trim();
-      var date = document.getElementById('spExamDate').value.trim();
-      if (!examName) { showToast('请输入考试名称'); return; }
-      if (!score) { showToast('请输入分数'); return; }
+    if (spAddScoreBtn) {
+      spAddScoreBtn.addEventListener('click', function() {
+        var examId = document.getElementById('spExamSelect').value;
+        var score = document.getElementById('spExamScore').value.trim();
+        if (!examId) { showToast('请选择考试'); return; }
+        if (!score) { showToast('请输入分数'); return; }
 
-      var students = getStudents();
-      for (var i = 0; i < students.length; i++) {
-        if (students[i].id === currentProfileStudentId) {
-          if (!students[i].scores) students[i].scores = [];
-          students[i].scores.push({
-            id: 'e' + Date.now() + Math.random().toString(36).slice(2, 6),
-            examName: examName,
-            score: score,
-            date: date
-          });
-          saveStudents(students);
-          break;
+        var exams = getExams();
+        var exam = exams.find(function(e) { return e.id === examId; });
+        if (!exam) { showToast('考试不存在'); return; }
+
+        var students = getStudents();
+        for (var i = 0; i < students.length; i++) {
+          if (students[i].id === currentProfileStudentId) {
+            if (!students[i].scores) students[i].scores = [];
+            // Check if score for this exam already exists
+            var existing = false;
+            for (var j = 0; j < students[i].scores.length; j++) {
+              if (students[i].scores[j].examId === examId) {
+                students[i].scores[j].score = score;
+                students[i].scores[j].examName = exam.name;
+                students[i].scores[j].date = exam.date;
+                existing = true;
+                break;
+              }
+            }
+            if (!existing) {
+              students[i].scores.push({
+                id: 'e' + Date.now() + Math.random().toString(36).slice(2, 6),
+                examId: examId,
+                examName: exam.name,
+                score: score,
+                date: exam.date
+              });
+            }
+            saveStudents(students);
+            break;
+          }
         }
-      }
-      renderStudentProfile();
-      renderStudentMgrList();
-      showToast('已添加成绩：' + examName);
-    });
-
-    // Enter key on add form inputs
-    ['spExamName', 'spExamScore', 'spExamDate'].forEach(function(id) {
-      var el = document.getElementById(id);
-      el.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') spAddScoreBtn.click();
+        renderStudentProfile();
+        renderStudentMgrList();
+        showToast('已添加成绩：' + exam.name);
       });
-    });
+
+      // Enter key on score input
+      var spScoreInput = document.getElementById('spExamScore');
+      if (spScoreInput) {
+        spScoreInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') spAddScoreBtn.click();
+        });
+      }
+    }
 
     // Bind delete score buttons
     document.querySelectorAll('#spScoreList .sp-score-del').forEach(function(btn) {
@@ -3262,16 +3473,46 @@
 
   // --- Export student list (CSV) ---
   studentExportBtn.addEventListener('click', function() {
+    exportStudentListWithScores();
+  });
+
+  // --- Export student list with scores (used by overview panel) ---
+  function exportStudentListWithScores() {
     var students = getStudents();
     if (students.length === 0) { showToast('暂无学生可导出'); return; }
-    var rows = ['\ufeff姓名,年级,班级,考试次数'];
-    students.forEach(function(s) {
-      var name = (s.name || '').replace(/,/g, '，');
-      var grade = (s.grade || '').replace(/,/g, '，');
-      var className = (s.className || '').replace(/,/g, '，');
-      var count = (s.scores && s.scores.length) || 0;
-      rows.push(name + ',' + grade + ',' + className + ',' + count);
+    var exams = getExams();
+
+    // Build header row: 姓名, 年级, 班级, [each exam name], 考试次数
+    var header = ['姓名', '年级', '班级'];
+    exams.forEach(function(e) {
+      header.push(e.name + '(' + e.date + ')');
     });
+    header.push('考试次数');
+
+    var rows = ['\ufeff' + header.map(csvEscape).join(',')];
+
+    students.forEach(function(s) {
+      var row = [
+        csvEscape(s.name || ''),
+        csvEscape(s.grade || ''),
+        csvEscape(s.className || '')
+      ];
+      exams.forEach(function(e) {
+        var score = '';
+        if (s.scores) {
+          for (var i = 0; i < s.scores.length; i++) {
+            if (s.scores[i].examId === e.id) {
+              score = s.scores[i].score || '';
+              break;
+            }
+          }
+        }
+        row.push(csvEscape(score));
+      });
+      row.push(csvEscape(String((s.scores && s.scores.length) || 0)));
+      rows.push(row.join(','));
+    });
+
     var csv = rows.join('\n');
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     var url = URL.createObjectURL(blob);
@@ -3279,7 +3520,7 @@
     var y = now.getFullYear();
     var m = String(now.getMonth() + 1).padStart(2, '0');
     var d = String(now.getDate()).padStart(2, '0');
-    var filename = '学生名单_' + y + m + d + '.csv';
+    var filename = '学生名单_含成绩_' + y + m + d + '.csv';
     var a = document.createElement('a');
     a.href = url;
     a.download = filename;
@@ -3288,7 +3529,7 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     showToast('已导出：' + filename);
-  });
+  }
 
   // --- Data backup: export & import ---
   var exportBtn = document.getElementById('exportBtn');
@@ -3301,7 +3542,8 @@
     'teaching_students',
     'teaching_courses',
     'teaching_feedback',
-    'teaching_history'
+    'teaching_history',
+    'teaching_exams'
   ];
 
   function getTodayBackupKeys() {
@@ -3326,7 +3568,7 @@
         feedbackCount += arr.length;
       } catch(e) {}
     });
-    dataBackupInfo.textContent = '当前数据：' + studentCount + '名学生 · ' + courseCount + '节课程 · ' + feedbackCount + '条反馈记录';
+    dataBackupInfo.textContent = '当前数据：' + studentCount + '名学生 · ' + courseCount + '节课程 · ' + getExams().length + '次考试 · ' + feedbackCount + '条反馈记录';
   }
 
   exportBtn.addEventListener('click', function() {
@@ -3801,6 +4043,346 @@
   tabPrompt.addEventListener('click', function() { switchTab(tabPrompt, panelPrompt); });
   tabSave.addEventListener('click', function() {
     switchTab(tabSave, panelSave);
+    renderOverview();
+  });
+
+  // ====== Centralized exam management ======
+  function getExams() {
+    try {
+      return JSON.parse(localStorage.getItem('teaching_exams') || '[]');
+    } catch(e) { return []; }
+  }
+
+  function saveExams(exams) {
+    try { localStorage.setItem('teaching_exams', JSON.stringify(exams)); } catch(e) {}
+  }
+
+  function addExam(name, date) {
+    var exams = getExams();
+    var id = 'exam_' + date + '_' + Date.now();
+    exams.push({ id: id, name: name, date: date, createdAt: Date.now() });
+    // Sort by date descending (newest first)
+    exams.sort(function(a, b) {
+      if (a.date > b.date) return -1;
+      if (a.date < b.date) return 1;
+      return 0;
+    });
+    saveExams(exams);
+    return id;
+  }
+
+  function deleteExam(examId) {
+    var exams = getExams().filter(function(e) { return e.id !== examId; });
+    saveExams(exams);
+    // Also remove scores referencing this exam from all students
+    var students = getStudents();
+    students.forEach(function(s) {
+      if (s.scores) {
+        s.scores = s.scores.filter(function(sc) { return sc.examId !== examId; });
+      }
+    });
+    saveStudents(students);
+  }
+
+  // ====== Overview panel rendering ======
+  var overviewStudentList = document.getElementById('overviewStudentList');
+  var overviewExportBtn = document.getElementById('overviewExportBtn');
+  var examMgrToggle = document.getElementById('examMgrToggle');
+  var examMgrPanel = document.getElementById('examMgrPanel');
+  var examMgrNameInput = document.getElementById('examMgrNameInput');
+  var examMgrDateInput = document.getElementById('examMgrDateInput');
+  var examMgrAddBtn = document.getElementById('examMgrAddBtn');
+  var examMgrList = document.getElementById('examMgrList');
+  var batchExamSelect = document.getElementById('batchExamSelect');
+  var batchScoreList = document.getElementById('batchScoreList');
+  var overviewFeedbackDate = document.getElementById('overviewFeedbackDate');
+  var overviewFeedbackList = document.getElementById('overviewFeedbackList');
+
+  // Set today's date as default for exam date input
+  (function() {
+    var t = new Date();
+    examMgrDateInput.value = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+  })();
+
+  function renderOverview() {
+    renderOverviewStudents();
+    renderExamMgrList();
+    renderBatchScoreEntry();
+    renderOverviewFeedback();
+    renderFeedbackDateFilter();
+  }
+
+  function renderOverviewStudents() {
+    var students = getStudents();
+    var exams = getExams();
+    if (students.length === 0) {
+      overviewStudentList.innerHTML = '<div class="ov-empty">还没有添加学生</div>';
+      return;
+    }
+    var html = '';
+    students.forEach(function(s) {
+      var tags = '';
+      if (s.grade) tags += '<span class="ov-student-tag">' + escapeHtml(s.grade) + '</span>';
+      if (s.className) tags += '<span class="ov-student-tag">' + escapeHtml(s.className) + '</span>';
+      // Show latest score if any
+      if (s.scores && s.scores.length > 0) {
+        var latestScore = s.scores[s.scores.length - 1];
+        tags += '<span class="ov-student-tag score-tag">' + escapeHtml(latestScore.score || '-') + '分</span>';
+      }
+      html += '<div class="ov-student-item">';
+      html += '<div class="ov-student-info">';
+      html += '<span class="ov-student-name">' + escapeHtml(s.name) + '</span>';
+      html += tags;
+      html += '</div>';
+      html += '<div class="ov-student-actions">';
+      html += '<button class="mgr-profile-btn" data-student-id="' + s.id + '">档案</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+    overviewStudentList.innerHTML = html;
+
+    // Bind profile buttons
+    overviewStudentList.querySelectorAll('.mgr-profile-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        openStudentProfile(btn.dataset.studentId);
+      });
+    });
+  }
+
+  function renderExamMgrList() {
+    var exams = getExams();
+    if (exams.length === 0) {
+      examMgrList.innerHTML = '<div style="font-size:0.76rem;color:var(--muted);padding:4px 0;">还没有创建考试</div>';
+      return;
+    }
+    var html = '';
+    exams.forEach(function(e) {
+      html += '<div class="exam-mgr-item">';
+      html += '<div class="exam-mgr-item-info">';
+      html += '<span class="exam-mgr-item-name">' + escapeHtml(e.name) + '</span>';
+      html += '<span class="exam-mgr-item-date">' + escapeHtml(e.date) + '</span>';
+      html += '</div>';
+      html += '<button class="exam-mgr-del" data-exam-id="' + e.id + '">✕</button>';
+      html += '</div>';
+    });
+    examMgrList.innerHTML = html;
+
+    examMgrList.querySelectorAll('.exam-mgr-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (!confirm('确定删除这次考试？相关成绩也会一并删除。')) return;
+        deleteExam(btn.dataset.examId);
+        renderOverview();
+        showToast('已删除考试');
+      });
+    });
+  }
+
+  function renderBatchScoreEntry() {
+    var exams = getExams();
+    var students = getStudents();
+
+    // Populate exam select
+    var selectHtml = '<option value="">选择考试...</option>';
+    exams.forEach(function(e, idx) {
+      var label = e.name + ' (' + e.date + ')';
+      selectHtml += '<option value="' + e.id + '"' + (idx === 0 ? ' selected' : '') + '>' + escapeHtml(label) + '</option>';
+    });
+    batchExamSelect.innerHTML = selectHtml;
+
+    if (exams.length === 0) {
+      batchScoreList.innerHTML = '<div class="ov-empty">请先在上方"管理考试"中创建考试</div>';
+      return;
+    }
+    if (students.length === 0) {
+      batchScoreList.innerHTML = '<div class="ov-empty">还没有学生，请先在"手动填写"中添加学生</div>';
+      return;
+    }
+
+    var selectedExamId = batchExamSelect.value || (exams.length > 0 ? exams[0].id : '');
+    renderBatchScoreRows(selectedExamId);
+  }
+
+  function renderBatchScoreRows(examId) {
+    var students = getStudents();
+    var html = '';
+    students.forEach(function(s) {
+      // Find existing score for this exam
+      var existingScore = '';
+      if (s.scores) {
+        for (var i = 0; i < s.scores.length; i++) {
+          if (s.scores[i].examId === examId) {
+            existingScore = s.scores[i].score || '';
+            break;
+          }
+        }
+      }
+      var metaParts = [];
+      if (s.grade) metaParts.push(s.grade);
+      if (s.className) metaParts.push(s.className);
+      var meta = metaParts.length ? '<span class="bs-meta">' + escapeHtml(metaParts.join(' · ')) + '</span>' : '';
+
+      html += '<div class="batch-score-row" data-student-id="' + s.id + '">';
+      html += '<span class="batch-score-name">' + escapeHtml(s.name) + meta + '</span>';
+      html += '<input type="text" class="batch-score-input' + (existingScore ? ' has-value' : '') + '" value="' + escapeHtml(existingScore) + '" placeholder="分数" data-student-id="' + s.id + '">';
+      html += '<span class="batch-score-saved" style="display:none;">✓</span>';
+      html += '</div>';
+    });
+    batchScoreList.innerHTML = html;
+
+    // Bind input change events
+    batchScoreList.querySelectorAll('.batch-score-input').forEach(function(input) {
+      input.addEventListener('change', function() {
+        saveBatchScore(examId, input.dataset.studentId, input.value.trim());
+      });
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          saveBatchScore(examId, input.dataset.studentId, input.value.trim());
+          // Focus next input
+          var allInputs = batchScoreList.querySelectorAll('.batch-score-input');
+          var currentIdx = Array.prototype.indexOf.call(allInputs, input);
+          if (currentIdx < allInputs.length - 1) {
+            allInputs[currentIdx + 1].focus();
+          }
+        }
+      });
+    });
+  }
+
+  function saveBatchScore(examId, studentId, scoreValue) {
+    if (!examId || !studentId) return;
+    var exams = getExams();
+    var exam = exams.find(function(e) { return e.id === examId; });
+    if (!exam) return;
+
+    var students = getStudents();
+    for (var i = 0; i < students.length; i++) {
+      if (students[i].id === studentId) {
+        if (!students[i].scores) students[i].scores = [];
+        // Find existing score for this exam
+        var found = false;
+        for (var j = 0; j < students[i].scores.length; j++) {
+          if (students[i].scores[j].examId === examId) {
+            if (scoreValue) {
+              students[i].scores[j].score = scoreValue;
+              students[i].scores[j].examName = exam.name;
+              students[i].scores[j].date = exam.date;
+            } else {
+              students[i].scores.splice(j, 1);
+            }
+            found = true;
+            break;
+          }
+        }
+        if (!found && scoreValue) {
+          students[i].scores.push({
+            id: 'e' + Date.now() + Math.random().toString(36).slice(2, 6),
+            examId: examId,
+            examName: exam.name,
+            score: scoreValue,
+            date: exam.date
+          });
+        }
+        saveStudents(students);
+        break;
+      }
+    }
+    // Update input style
+    var input = batchScoreList.querySelector('.batch-score-input[data-student-id="' + studentId + '"]');
+    if (input) {
+      if (scoreValue) {
+        input.classList.add('has-value');
+        var saved = input.parentElement.querySelector('.batch-score-saved');
+        if (saved) {
+          saved.style.display = 'inline';
+          setTimeout(function() { saved.style.display = 'none'; }, 1500);
+        }
+      } else {
+        input.classList.remove('has-value');
+      }
+    }
+  }
+
+  // Exam select change
+  batchExamSelect.addEventListener('change', function() {
+    renderBatchScoreRows(batchExamSelect.value);
+  });
+
+  // Exam manager toggle
+  examMgrToggle.addEventListener('click', function() {
+    examMgrPanel.classList.toggle('show');
+    if (examMgrPanel.classList.contains('show')) {
+      renderExamMgrList();
+    }
+  });
+
+  // Add new exam
+  examMgrAddBtn.addEventListener('click', function() {
+    var name = examMgrNameInput.value.trim();
+    var date = examMgrDateInput.value;
+    if (!name) { showToast('请输入考试名称'); return; }
+    if (!date) { showToast('请选择考试日期'); return; }
+    addExam(name, date);
+    examMgrNameInput.value = '';
+    renderExamMgrList();
+    renderBatchScoreEntry();
+    showToast('已创建考试：' + name);
+  });
+
+  // Enter key on exam name
+  examMgrNameInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') examMgrAddBtn.click();
+  });
+
+  // Feedback date filter
+  function renderFeedbackDateFilter() {
+    var dateKeys = getTodayBackupKeys();
+    var dates = [];
+    dateKeys.forEach(function(k) {
+      var d = k.replace('teaching_today_', '');
+      if (dates.indexOf(d) === -1) dates.push(d);
+    });
+    dates.sort(function(a, b) { return b < a ? -1 : b > a ? 1 : 0; });
+    var currentVal = overviewFeedbackDate.value;
+    var html = '<option value="">全部日期</option>';
+    dates.forEach(function(d) {
+      html += '<option value="' + d + '"' + (d === currentVal ? ' selected' : '') + '>' + formatDateDisplay(d) + '</option>';
+    });
+    overviewFeedbackDate.innerHTML = html;
+  }
+
+  overviewFeedbackDate.addEventListener('change', renderOverviewFeedback);
+
+  function renderOverviewFeedback() {
+    var filterDate = overviewFeedbackDate.value;
+    var records = getAllFeedbackRecords();
+    if (filterDate) {
+      records = records.filter(function(r) { return r.date === filterDate; });
+    }
+    if (records.length === 0) {
+      overviewFeedbackList.innerHTML = '<div class="ov-empty">暂无教学反馈记录</div>';
+      return;
+    }
+    // Show most recent first
+    records.reverse();
+    var html = '';
+    records.forEach(function(r) {
+      html += '<div class="ov-feedback-item">';
+      html += '<div class="ov-feedback-header">';
+      html += '<span class="ov-feedback-date">' + formatDateDisplay(r.date) + '</span>';
+      html += '<span class="ov-feedback-student">' + escapeHtml(r.student) + '</span>';
+      if (r.subject) html += '<span class="ov-feedback-subject">' + escapeHtml(r.subject) + '</span>';
+      if (r.courses) html += '<span class="ov-feedback-subject">' + escapeHtml(r.courses) + '</span>';
+      html += '</div>';
+      html += '<div class="ov-feedback-text">' + escapeHtml(r.text) + '</div>';
+      html += '</div>';
+    });
+    overviewFeedbackList.innerHTML = html;
+  }
+
+  // Overview export button
+  overviewExportBtn.addEventListener('click', function() {
+    exportStudentListWithScores();
   });
 
   // --- Copy prompt ---
