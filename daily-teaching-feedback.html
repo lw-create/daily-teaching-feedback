@@ -14,7 +14,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%232d9d78'/%3E%3Cpath d='M160 140h132c26 0 48 22 48 48v136c0 26-22 48-48 48H160c-26 0-48-22-48-48V188c0-26 22-48 48-48z' fill='white' opacity='0.95'/%3E%3Cpath d='M190 260l34 34 64-64' stroke='%232d9d78' stroke-width='20' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%232d9d78'/%3E%3Cpath d='M160 140h132c26 0 48 22 48 48v136c0 26-22 48-48 48H160c-26 0-48-22-48-48V188c0-26 22-48 48-48z' fill='white' opacity='0.95'/%3E%3Cpath d='M190 260l34 34 64-64' stroke='%232d9d78' stroke-width='20' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
-<link rel="manifest" href='data:application/manifest+json,{"name":"每日教学反馈生成器","short_name":"教学反馈","start_url":".","display":"standalone","orientation":"portrait","background_color":"%23f0f4f8","theme_color":"%232d9d78","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27512%27 height=%27512%27 viewBox=%270 0 512 512%27%3E%3Crect width=%27512%27 height=%27512%27 rx=%2796%27 fill=%27%232d9d78%27/%3E%3Cpath d=%27M160 140h132c26 0 48 22 48 48v136c0 26-22 48-48 48H160c-26 0-48-22-48-48V188c0-26 22-48 48-48z%27 fill=%27white%27 opacity=%270.95%27/%3E%3Cpath d=%27M190 260l34 34 64-64%27 stroke=%27%232d9d78%27 stroke-width=%2720%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27 fill=%27none%27/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
+<link rel="manifest" href="manifest.json">
 <style>
   :root {
     --bg: #f0f4f8;
@@ -1815,6 +1815,26 @@
 </style>
 </head>
 <body>
+
+<!-- 加载提示：页面加载完成后自动隐藏 -->
+<div id="loadingSplash" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f0f4f8;z-index:99999;transition:opacity 0.3s;">
+  <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#2d9d78,#258565);display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 4px 20px rgba(45,157,120,0.2);">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3C7 3 3 7 3 12s4 9 9 9c0-5 4-9 9-9 0-5-4-9-9-9z" fill="#fff" opacity="0.3"/><path d="M12 21V8M12 8c0-2.5 2-4.5 4.5-4.5M12 8c0-2.5-2-4.5-4.5-4.5M12 8c0-2.5 2-4.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <p style="font-size:0.85rem;color:#6b7d8f;font-family:-apple-system,sans-serif;">正在加载教学反馈工具...</p>
+  <div style="margin-top:12px;width:120px;height:3px;background:rgba(45,157,120,0.15);border-radius:2px;overflow:hidden;"><div id="loadingBar" style="width:0%;height:100%;background:#2d9d78;border-radius:2px;transition:width 0.3s;"></div></div>
+</div>
+<script>
+(function(){
+  var splash=document.getElementById('loadingSplash');
+  var bar=document.getElementById('loadingBar');
+  var p=0;
+  var timer=setInterval(function(){p=Math.min(p+15,90);if(bar)bar.style.width=p+'%';},200);
+  function hide(){clearInterval(timer);if(bar)bar.style.width='100%';setTimeout(function(){if(splash){splash.style.opacity='0';setTimeout(function(){if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);},300);}},100);}
+  if(document.readyState==='complete'){hide();}else{window.addEventListener('load',hide);}
+  setTimeout(hide,5000);
+})();
+</script>
 
 <div class="container">
 
