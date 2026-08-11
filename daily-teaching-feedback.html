@@ -800,6 +800,89 @@
   .course-mgr-list {
     margin-top: 6px;
   }
+  .mgr-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    gap: 6px;
+  }
+  .mgr-item-text {
+    flex: 1;
+    font-size: 0.78rem;
+    color: var(--ink);
+    min-width: 0;
+  }
+  .mgr-item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .mgr-edit-btn {
+    padding: 2px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    background: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .mgr-edit-btn:hover { background: rgba(74,144,217,0.1); }
+  .mgr-edit-input {
+    flex: 1;
+    padding: 3px 6px;
+    border: 1.5px solid var(--accent2);
+    border-radius: 4px;
+    font-size: 0.78rem;
+    color: var(--ink);
+    font-family: inherit;
+    min-width: 0;
+  }
+  .mgr-edit-input:focus { outline: none; }
+  .mgr-save-btn {
+    padding: 2px 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    color: #fff;
+    background: var(--accent);
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .mgr-save-btn:hover { opacity: 0.9; }
+  .student-mgr-panel {
+    display: none;
+    margin-top: 8px;
+    padding: 10px;
+    background: rgba(255,255,255,0.5);
+    border: 1px dashed var(--rule);
+    border-radius: var(--radius-sm);
+  }
+  .student-mgr-panel.show { display: block; }
+  .student-mgr-add-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+    align-items: center;
+  }
+  .student-mgr-add-row input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1.5px solid var(--rule);
+    border-radius: 5px;
+    font-size: 0.78rem;
+    color: var(--ink);
+    background: rgba(255,255,255,0.6);
+    font-family: inherit;
+  }
+  .student-mgr-add-row input:focus { outline: none; border-color: var(--accent); }
+  .student-mgr-list {
+    margin-top: 6px;
+  }
 
   /* Today's feedback list */
   .today-list {
@@ -958,6 +1041,16 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="student-dropdown" id="studentDropdown"></div>
+      </div>
+    </div>
+    <div style="margin-top:6px;">
+      <span class="course-manager-toggle" id="studentMgrToggle">管理学生</span>
+      <div class="student-mgr-panel" id="studentMgrPanel">
+        <div class="student-mgr-add-row">
+          <input type="text" id="studentMgrInput" placeholder="输入学生姓名，如：张小明">
+          <button class="course-add-btn" id="studentMgrAddBtn" type="button">+ 添加</button>
+        </div>
+        <div class="student-mgr-list" id="studentMgrList"></div>
       </div>
     </div>
     <div class="subject-tags">
@@ -1693,12 +1786,62 @@
     }
     var html = '';
     courses.forEach(function(c) {
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.04);">';
-      html += '<span style="font-size:0.78rem;color:var(--ink);">' + c.period + ' ' + c.time + '</span>';
+      html += '<div class="mgr-item" data-id="' + c.id + '">';
+      html += '<span class="mgr-item-text">' + c.period + ' ' + c.time + '</span>';
+      html += '<div class="mgr-item-actions">';
+      html += '<button class="mgr-edit-btn" data-id="' + c.id + '">修改</button>';
       html += '<button class="tfi-btn tfi-del" data-id="' + c.id + '" style="padding:2px 6px;">删除</button>';
+      html += '</div>';
       html += '</div>';
     });
     courseMgrList.innerHTML = html;
+
+    // Bind edit buttons
+    courseMgrList.querySelectorAll('.mgr-edit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var id = btn.dataset.id;
+        var courses = getCourses();
+        var c = courses.find(function(x) { return x.id === id; });
+        if (!c) return;
+        var item = btn.closest('.mgr-item');
+        var textSpan = item.querySelector('.mgr-item-text');
+
+        // Replace text with two inputs
+        var inputHtml = '<input type="text" class="mgr-edit-input" data-field="period" value="' + c.period.replace(/"/g, '&quot;') + '" style="width:80px;" placeholder="第几节">';
+        inputHtml += '<input type="text" class="mgr-edit-input" data-field="time" value="' + c.time.replace(/"/g, '&quot;') + '" style="flex:1;" placeholder="时间">';
+        textSpan.outerHTML = inputHtml;
+        btn.textContent = '保存';
+        btn.classList.remove('mgr-edit-btn');
+        btn.classList.add('mgr-save-btn');
+
+        var periodInput = item.querySelector('[data-field="period"]');
+        var timeInput = item.querySelector('[data-field="time"]');
+        periodInput.focus();
+        periodInput.select();
+
+        function doSave() {
+          var newPeriod = periodInput.value.trim();
+          var newTime = timeInput.value.trim();
+          if (!newPeriod) { showToast('请输入第几节'); return; }
+          if (!newTime) { showToast('请输入时间'); return; }
+          c.period = newPeriod;
+          c.time = newTime;
+          saveCourses(courses);
+          renderCourseSelect();
+          renderCourseTags();
+          renderCourseMgrList();
+          showToast('课程已修改');
+        }
+
+        btn.onclick = doSave;
+
+        [periodInput, timeInput].forEach(function(inp) {
+          inp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') doSave();
+          });
+        });
+      });
+    });
 
     courseMgrList.querySelectorAll('.tfi-del').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -1881,6 +2024,11 @@
   // --- Student name management ---
   var studentDropdownBtn = document.getElementById('studentDropdownBtn');
   var studentDropdown = document.getElementById('studentDropdown');
+  var studentMgrToggle = document.getElementById('studentMgrToggle');
+  var studentMgrPanel = document.getElementById('studentMgrPanel');
+  var studentMgrInput = document.getElementById('studentMgrInput');
+  var studentMgrAddBtn = document.getElementById('studentMgrAddBtn');
+  var studentMgrList = document.getElementById('studentMgrList');
 
   function getStudents() {
     try {
@@ -1905,14 +2053,14 @@
   function renderStudentDropdown() {
     var students = getStudents();
     if (students.length === 0) {
-      studentDropdown.innerHTML = '<div class="student-dropdown-empty">还没有保存的学生，填写姓名后点击"生成反馈"会自动保存</div>';
+      studentDropdown.innerHTML = '<div class="student-dropdown-empty">还没有保存的学生，可在"管理学生"中添加</div>';
       return;
     }
     var html = '';
     students.forEach(function(name) {
-      html += '<div class="student-dropdown-item" data-name="' + name + '">';
+      html += '<div class="student-dropdown-item" data-name="' + name.replace(/"/g, '&quot;') + '">';
       html += '<span>' + name + '</span>';
-      html += '<button class="del-btn" data-name="' + name + '" title="删除">✕</button>';
+      html += '<button class="del-btn" data-name="' + name.replace(/"/g, '&quot;') + '" title="删除">✕</button>';
       html += '</div>';
     });
     studentDropdown.innerHTML = html;
@@ -1926,6 +2074,7 @@
           var students = getStudents().filter(function(s) { return s !== name; });
           saveStudents(students);
           renderStudentDropdown();
+          renderStudentMgrList();
           showToast('已删除：' + name);
           return;
         }
@@ -1935,6 +2084,111 @@
       });
     });
   }
+
+  function renderStudentMgrList() {
+    var students = getStudents();
+    if (students.length === 0) {
+      studentMgrList.innerHTML = '<div style="font-size:0.76rem;color:var(--muted);padding:4px 0;">还没有添加学生，在上方输入姓名即可添加</div>';
+      return;
+    }
+    var html = '';
+    students.forEach(function(name, idx) {
+      var safeName = name.replace(/"/g, '&quot;');
+      html += '<div class="mgr-item" data-idx="' + idx + '">';
+      html += '<span class="mgr-item-text" data-name="' + safeName + '">' + name + '</span>';
+      html += '<div class="mgr-item-actions">';
+      html += '<button class="mgr-edit-btn" data-idx="' + idx + '">修改</button>';
+      html += '<button class="tfi-btn tfi-del" data-idx="' + idx + '" style="padding:2px 6px;">删除</button>';
+      html += '</div>';
+      html += '</div>';
+    });
+    studentMgrList.innerHTML = html;
+
+    // Bind edit buttons
+    studentMgrList.querySelectorAll('.mgr-edit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.dataset.idx);
+        var students = getStudents();
+        var item = btn.closest('.mgr-item');
+        var textSpan = item.querySelector('.mgr-item-text');
+        var oldName = students[idx];
+
+        // Replace with input
+        var inputHtml = '<input type="text" class="mgr-edit-input" value="' + oldName.replace(/"/g, '&quot;') + '">';
+        textSpan.outerHTML = inputHtml;
+        btn.textContent = '保存';
+        btn.classList.remove('mgr-edit-btn');
+        btn.classList.add('mgr-save-btn');
+
+        var inputEl = item.querySelector('.mgr-edit-input');
+        inputEl.focus();
+        inputEl.select();
+
+        // Save on button click
+        btn.onclick = function() {
+          var newName = inputEl.value.trim();
+          if (!newName) { showToast('姓名不能为空'); return; }
+          if (newName !== oldName && students.indexOf(newName) !== -1) {
+            showToast('已存在同名学生');
+            return;
+          }
+          students[idx] = newName;
+          saveStudents(students);
+          // Update studentInput if it was showing old name
+          if (studentInput.value.trim() === oldName) {
+            studentInput.value = newName;
+            saveData();
+          }
+          renderStudentMgrList();
+          renderStudentDropdown();
+          showToast('已修改为：' + newName);
+        };
+
+        // Save on Enter key
+        inputEl.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') btn.click();
+        });
+      });
+    });
+
+    // Bind delete buttons
+    studentMgrList.querySelectorAll('.tfi-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.dataset.idx);
+        var students = getStudents();
+        var name = students[idx];
+        students.splice(idx, 1);
+        saveStudents(students);
+        renderStudentMgrList();
+        renderStudentDropdown();
+        showToast('已删除：' + name);
+      });
+    });
+  }
+
+  studentMgrToggle.addEventListener('click', function() {
+    studentMgrPanel.classList.toggle('show');
+    if (studentMgrPanel.classList.contains('show')) {
+      renderStudentMgrList();
+    }
+  });
+
+  studentMgrAddBtn.addEventListener('click', function() {
+    var name = studentMgrInput.value.trim();
+    if (!name) { showToast('请输入学生姓名'); return; }
+    var students = getStudents();
+    if (students.indexOf(name) !== -1) { showToast('该学生已存在'); return; }
+    students.push(name);
+    saveStudents(students);
+    studentMgrInput.value = '';
+    renderStudentMgrList();
+    renderStudentDropdown();
+    showToast('已添加学生：' + name);
+  });
+
+  studentMgrInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') studentMgrAddBtn.click();
+  });
 
   studentDropdownBtn.addEventListener('click', function(e) {
     e.stopPropagation();
