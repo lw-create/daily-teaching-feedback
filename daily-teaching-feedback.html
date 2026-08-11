@@ -883,6 +883,170 @@
   .student-mgr-list {
     margin-top: 6px;
   }
+  .student-mgr-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+  .student-export-btn {
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    background: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .student-export-btn:hover { background: rgba(74,144,217,0.1); }
+  .mgr-profile-btn {
+    padding: 2px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .mgr-profile-btn:hover { background: var(--accent-light); }
+  .mgr-edit-inputs {
+    flex: 1;
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+  }
+  .mgr-edit-inputs input {
+    padding: 3px 6px;
+    border: 1.5px solid var(--accent2);
+    border-radius: 4px;
+    font-size: 0.76rem;
+    color: var(--ink);
+    font-family: inherit;
+    min-width: 0;
+  }
+  .mgr-edit-inputs input:focus { outline: none; }
+  .mgr-edit-inputs input.mgr-name { flex: 2; }
+  .mgr-edit-inputs input.mgr-grade { flex: 1; }
+  .mgr-edit-inputs input.mgr-class { flex: 1; }
+
+  /* Student dropdown class headers */
+  .student-dropdown-group-header {
+    padding: 6px 12px 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-light);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid rgba(45,157,120,0.1);
+  }
+  .student-dropdown-item .sd-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .student-dropdown-item .sd-class {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  /* Student profile modal */
+  .sp-header {
+    margin-bottom: 16px;
+    padding-right: 24px;
+  }
+  .sp-header h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .sp-header .sp-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .sp-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid var(--rule);
+  }
+  .sp-add-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .sp-add-row input {
+    padding: 6px 8px;
+    border: 1.5px solid var(--rule);
+    border-radius: 5px;
+    font-size: 0.8rem;
+    color: var(--ink);
+    font-family: inherit;
+    background: rgba(255,255,255,0.6);
+  }
+  .sp-add-row input:focus { outline: none; border-color: var(--accent); }
+  .sp-add-row input.sp-exam-name { flex: 2; min-width: 100px; }
+  .sp-add-row input.sp-exam-score { flex: 1; min-width: 60px; }
+  .sp-add-row input.sp-exam-date { flex: 1.4; min-width: 110px; }
+  .sp-score-list { margin-top: 4px; }
+  .sp-score-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.6);
+    gap: 8px;
+  }
+  .sp-score-item .sp-score-main { flex: 1; min-width: 0; }
+  .sp-score-item .sp-score-exam {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .sp-score-item .sp-score-meta {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .sp-score-item .sp-score-val {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .sp-score-item .sp-score-del {
+    width: 24px; height: 24px;
+    border: none; background: transparent;
+    color: var(--muted); cursor: pointer;
+    font-size: 0.9rem; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .sp-score-item .sp-score-del:hover { background: rgba(217,83,79,0.1); color: var(--danger); }
+  .sp-empty {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 16px;
+  }
+  .sp-stat {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--accent-light);
+    border-radius: 10px;
+    font-size: 0.72rem;
+    color: var(--accent);
+    margin-left: 6px;
+  }
 
   /* Today's feedback list */
   .today-list {
@@ -1350,10 +1514,15 @@
       <span class="course-manager-toggle" id="studentMgrToggle">管理学生</span>
       <div class="student-mgr-panel" id="studentMgrPanel">
         <div class="student-mgr-add-row">
-          <input type="text" id="studentMgrInput" placeholder="输入学生姓名，如：张小明">
+          <input type="text" id="studentMgrInput" placeholder="姓名" style="flex:1;">
+          <input type="text" id="studentMgrGradeInput" placeholder="年级" style="width:70px;">
+          <input type="text" id="studentMgrClassInput" placeholder="班级" style="width:60px;">
           <button class="course-add-btn" id="studentMgrAddBtn" type="button">+ 添加</button>
         </div>
         <div class="student-mgr-list" id="studentMgrList"></div>
+        <div class="student-mgr-toolbar">
+          <button class="student-export-btn" id="studentExportBtn" type="button">导出名单</button>
+        </div>
       </div>
     </div>
     <div class="subject-tags">
@@ -1647,6 +1816,14 @@
       </div>
     </div>
   </div><!-- /panel-save -->
+
+  <!-- Student profile modal -->
+  <div class="sched-fullscreen-overlay" id="studentProfileModal" style="display:none;">
+    <div style="background:#fff;border-radius:14px;max-width:560px;width:92%;max-height:85vh;overflow-y:auto;margin:auto;padding:24px 20px;position:relative;">
+      <button id="closeProfileBtn" style="position:absolute;top:12px;right:16px;font-size:1.5rem;border:none;background:none;cursor:pointer;color:var(--muted);">✕</button>
+      <div id="studentProfileContent"></div>
+    </div>
+  </div>
 
   </div><!-- /app-feedback -->
 
@@ -2448,27 +2625,71 @@
   var studentMgrToggle = document.getElementById('studentMgrToggle');
   var studentMgrPanel = document.getElementById('studentMgrPanel');
   var studentMgrInput = document.getElementById('studentMgrInput');
+  var studentMgrGradeInput = document.getElementById('studentMgrGradeInput');
+  var studentMgrClassInput = document.getElementById('studentMgrClassInput');
   var studentMgrAddBtn = document.getElementById('studentMgrAddBtn');
   var studentMgrList = document.getElementById('studentMgrList');
+  var studentExportBtn = document.getElementById('studentExportBtn');
 
   function getStudents() {
+    var raw;
     try {
-      return JSON.parse(localStorage.getItem('teaching_students') || '[]');
+      raw = JSON.parse(localStorage.getItem('teaching_students') || '[]');
     } catch(e) { return []; }
+    if (!Array.isArray(raw)) return [];
+    var migrated = false;
+    var result = raw.map(function(item) {
+      if (typeof item === 'string') {
+        migrated = true;
+        return { id: 's' + Date.now() + Math.random().toString(36).slice(2, 6), name: item, grade: '', className: '', scores: [] };
+      }
+      // Ensure all fields exist
+      if (typeof item !== 'object' || item === null) {
+        migrated = true;
+        return { id: 's' + Date.now() + Math.random().toString(36).slice(2, 6), name: String(item), grade: '', className: '', scores: [] };
+      }
+      if (!item.id) { item.id = 's' + Date.now() + Math.random().toString(36).slice(2, 6); migrated = true; }
+      if (typeof item.name !== 'string') { item.name = ''; migrated = true; }
+      if (typeof item.grade !== 'string') { item.grade = ''; migrated = true; }
+      if (typeof item.className !== 'string') { item.className = ''; migrated = true; }
+      if (!Array.isArray(item.scores)) { item.scores = []; migrated = true; }
+      return item;
+    });
+    if (migrated) saveStudents(result);
+    return result;
   }
 
   function saveStudents(arr) {
     try { localStorage.setItem('teaching_students', JSON.stringify(arr)); } catch(e) {}
   }
 
-  function addStudent(name) {
-    name = name.trim();
-    if (!name) return;
-    var students = getStudents();
-    if (students.indexOf(name) === -1) {
-      students.push(name);
-      saveStudents(students);
+  function addStudent(info) {
+    if (typeof info === 'string') {
+      info = { name: info, grade: '', className: '' };
     }
+    var name = (info.name || '').trim();
+    if (!name) return;
+    var grade = (info.grade || '').trim();
+    var className = (info.className || '').trim();
+    var students = getStudents();
+    // Check for existing student with same name
+    for (var i = 0; i < students.length; i++) {
+      if (students[i].name === name) {
+        // Update grade/className if provided and currently empty
+        if (grade && !students[i].grade) students[i].grade = grade;
+        if (className && !students[i].className) students[i].className = className;
+        saveStudents(students);
+        return;
+      }
+    }
+    students.push({
+      id: 's' + Date.now() + Math.random().toString(36).slice(2, 6),
+      name: name,
+      grade: grade,
+      className: className,
+      scores: []
+    });
+    saveStudents(students);
   }
 
   function renderStudentDropdown() {
@@ -2477,12 +2698,31 @@
       studentDropdown.innerHTML = '<div class="student-dropdown-empty">还没有保存的学生，可在"管理学生"中添加</div>';
       return;
     }
+    // Group students by className
+    var groups = {};
+    var groupOrder = [];
+    students.forEach(function(s) {
+      var key = s.className || '未分班';
+      if (!groups[key]) {
+        groups[key] = [];
+        groupOrder.push(key);
+      }
+      groups[key].push(s);
+    });
+
     var html = '';
-    students.forEach(function(name) {
-      html += '<div class="student-dropdown-item" data-name="' + name.replace(/"/g, '&quot;') + '">';
-      html += '<span>' + name + '</span>';
-      html += '<button class="del-btn" data-name="' + name.replace(/"/g, '&quot;') + '" title="删除">✕</button>';
-      html += '</div>';
+    groupOrder.forEach(function(key) {
+      html += '<div class="student-dropdown-group-header">' + key + '</div>';
+      groups[key].forEach(function(s) {
+        var safeName = s.name.replace(/"/g, '&quot;');
+        var classLabel = s.className ? s.className : '';
+        if (s.grade) classLabel = (classLabel ? s.grade + ' ' + classLabel : s.grade);
+        html += '<div class="student-dropdown-item" data-name="' + safeName + '" data-id="' + (s.id || '') + '">';
+        html += '<span class="sd-name">' + s.name + '</span>';
+        if (classLabel) html += '<span class="sd-class">' + classLabel + '</span>';
+        html += '<button class="del-btn" data-name="' + safeName + '" data-id="' + (s.id || '') + '" title="删除">✕</button>';
+        html += '</div>';
+      });
     });
     studentDropdown.innerHTML = html;
 
@@ -2491,12 +2731,21 @@
       item.addEventListener('click', function(e) {
         if (e.target.classList.contains('del-btn')) {
           e.stopPropagation();
-          var name = e.target.dataset.name;
-          var students = getStudents().filter(function(s) { return s !== name; });
+          var sid = e.target.dataset.id;
+          var students = getStudents();
+          var removed = null;
+          if (sid) {
+            removed = students.filter(function(s) { return s.id === sid; })[0];
+            students = students.filter(function(s) { return s.id !== sid; });
+          } else {
+            var name = e.target.dataset.name;
+            removed = students.filter(function(s) { return s.name === name; })[0];
+            students = students.filter(function(s) { return s.name !== name; });
+          }
           saveStudents(students);
           renderStudentDropdown();
           renderStudentMgrList();
-          showToast('已删除：' + name);
+          showToast('已删除：' + (removed ? removed.name : ''));
           return;
         }
         studentInput.value = item.dataset.name;
@@ -2514,17 +2763,34 @@
       return;
     }
     var html = '';
-    students.forEach(function(name, idx) {
-      var safeName = name.replace(/"/g, '&quot;');
-      html += '<div class="mgr-item" data-idx="' + idx + '">';
-      html += '<span class="mgr-item-text" data-name="' + safeName + '">' + name + '</span>';
+    students.forEach(function(s, idx) {
+      var safeName = (s.name || '').replace(/"/g, '&quot;');
+      var safeGrade = (s.grade || '').replace(/"/g, '&quot;');
+      var safeClass = (s.className || '').replace(/"/g, '&quot;');
+      var display = s.name;
+      var metaParts = [];
+      if (s.grade) metaParts.push(s.grade);
+      if (s.className) metaParts.push(s.className);
+      if (metaParts.length) display += ' · ' + metaParts.join(' · ');
+      html += '<div class="mgr-item" data-idx="' + idx + '" data-id="' + (s.id || '') + '">';
+      html += '<span class="mgr-item-text" data-name="' + safeName + '" data-grade="' + safeGrade + '" data-class="' + safeClass + '">' + display + '</span>';
       html += '<div class="mgr-item-actions">';
+      html += '<button class="mgr-profile-btn" data-idx="' + idx + '">档案</button>';
       html += '<button class="mgr-edit-btn" data-idx="' + idx + '">修改</button>';
       html += '<button class="tfi-btn tfi-del" data-idx="' + idx + '" style="padding:2px 6px;">删除</button>';
       html += '</div>';
       html += '</div>';
     });
     studentMgrList.innerHTML = html;
+
+    // Bind profile buttons
+    studentMgrList.querySelectorAll('.mgr-profile-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.dataset.idx);
+        var students = getStudents();
+        if (students[idx]) openStudentProfile(students[idx].id);
+      });
+    });
 
     // Bind edit buttons
     studentMgrList.querySelectorAll('.mgr-edit-btn').forEach(function(btn) {
@@ -2533,42 +2799,61 @@
         var students = getStudents();
         var item = btn.closest('.mgr-item');
         var textSpan = item.querySelector('.mgr-item-text');
-        var oldName = students[idx];
+        var s = students[idx];
+        if (!s) return;
+        var oldName = s.name || '';
+        var oldGrade = s.grade || '';
+        var oldClass = s.className || '';
 
-        // Replace with input
-        var inputHtml = '<input type="text" class="mgr-edit-input" value="' + oldName.replace(/"/g, '&quot;') + '">';
+        // Replace text span with 3 inputs
+        var inputHtml = '<div class="mgr-edit-inputs">'
+          + '<input type="text" class="mgr-edit-input mgr-name" value="' + oldName.replace(/"/g, '&quot;') + '" placeholder="姓名">'
+          + '<input type="text" class="mgr-edit-input mgr-grade" value="' + oldGrade.replace(/"/g, '&quot;') + '" placeholder="年级">'
+          + '<input type="text" class="mgr-edit-input mgr-class" value="' + oldClass.replace(/"/g, '&quot;') + '" placeholder="班级">'
+          + '</div>';
         textSpan.outerHTML = inputHtml;
         btn.textContent = '保存';
         btn.classList.remove('mgr-edit-btn');
         btn.classList.add('mgr-save-btn');
 
-        var inputEl = item.querySelector('.mgr-edit-input');
-        inputEl.focus();
-        inputEl.select();
+        var nameInput = item.querySelector('.mgr-name');
+        nameInput.focus();
+        nameInput.select();
 
-        // Save on button click
-        btn.onclick = function() {
-          var newName = inputEl.value.trim();
+        function doSave() {
+          var newName = nameInput.value.trim();
+          var newGrade = item.querySelector('.mgr-grade').value.trim();
+          var newClass = item.querySelector('.mgr-class').value.trim();
           if (!newName) { showToast('姓名不能为空'); return; }
-          if (newName !== oldName && students.indexOf(newName) !== -1) {
-            showToast('已存在同名学生');
-            return;
+          // Check duplicate name (excluding self)
+          for (var i = 0; i < students.length; i++) {
+            if (i !== idx && students[i].name === newName) {
+              showToast('已存在同名学生');
+              return;
+            }
           }
-          students[idx] = newName;
+          var oldNameVal = students[idx].name;
+          students[idx].name = newName;
+          students[idx].grade = newGrade;
+          students[idx].className = newClass;
           saveStudents(students);
           // Update studentInput if it was showing old name
-          if (studentInput.value.trim() === oldName) {
+          if (studentInput.value.trim() === oldNameVal) {
             studentInput.value = newName;
             saveData();
           }
           renderStudentMgrList();
           renderStudentDropdown();
           showToast('已修改为：' + newName);
-        };
+        }
+
+        btn.onclick = doSave;
 
         // Save on Enter key
-        inputEl.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') btn.click();
+        item.querySelectorAll('.mgr-edit-input').forEach(function(inp) {
+          inp.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') doSave();
+          });
         });
       });
     });
@@ -2578,12 +2863,13 @@
       btn.addEventListener('click', function() {
         var idx = parseInt(btn.dataset.idx);
         var students = getStudents();
-        var name = students[idx];
+        var s = students[idx];
+        if (!s) return;
         students.splice(idx, 1);
         saveStudents(students);
         renderStudentMgrList();
         renderStudentDropdown();
-        showToast('已删除：' + name);
+        showToast('已删除：' + (s.name || ''));
       });
     });
   }
@@ -2598,19 +2884,34 @@
   studentMgrAddBtn.addEventListener('click', function() {
     var name = studentMgrInput.value.trim();
     if (!name) { showToast('请输入学生姓名'); return; }
+    var grade = studentMgrGradeInput.value.trim();
+    var className = studentMgrClassInput.value.trim();
     var students = getStudents();
-    if (students.indexOf(name) !== -1) { showToast('该学生已存在'); return; }
-    students.push(name);
+    for (var i = 0; i < students.length; i++) {
+      if (students[i].name === name) { showToast('该学生已存在'); return; }
+    }
+    students.push({
+      id: 's' + Date.now() + Math.random().toString(36).slice(2, 6),
+      name: name,
+      grade: grade,
+      className: className,
+      scores: []
+    });
     saveStudents(students);
     studentMgrInput.value = '';
+    studentMgrGradeInput.value = '';
+    studentMgrClassInput.value = '';
     renderStudentMgrList();
     renderStudentDropdown();
     showToast('已添加学生：' + name);
   });
 
-  studentMgrInput.addEventListener('keydown', function(e) {
+  function studentMgrAddOnEnter(e) {
     if (e.key === 'Enter') studentMgrAddBtn.click();
-  });
+  }
+  studentMgrInput.addEventListener('keydown', studentMgrAddOnEnter);
+  studentMgrGradeInput.addEventListener('keydown', studentMgrAddOnEnter);
+  studentMgrClassInput.addEventListener('keydown', studentMgrAddOnEnter);
 
   var infoCardEl = document.getElementById('infoCard');
 
@@ -2626,6 +2927,187 @@
       studentDropdown.classList.remove('show');
       infoCardEl.style.zIndex = '10';
     }
+  });
+
+  // --- Student profile modal ---
+  var studentProfileModal = document.getElementById('studentProfileModal');
+  var studentProfileContent = document.getElementById('studentProfileContent');
+  var closeProfileBtn = document.getElementById('closeProfileBtn');
+  var currentProfileStudentId = null;
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function openStudentProfile(studentId) {
+    currentProfileStudentId = studentId;
+    renderStudentProfile();
+    studentProfileModal.style.display = 'flex';
+  }
+
+  function closeStudentProfile() {
+    studentProfileModal.style.display = 'none';
+    currentProfileStudentId = null;
+  }
+
+  function getStudentById(id) {
+    var students = getStudents();
+    for (var i = 0; i < students.length; i++) {
+      if (students[i].id === id) return students[i];
+    }
+    return null;
+  }
+
+  function renderStudentProfile() {
+    var s = getStudentById(currentProfileStudentId);
+    if (!s) { closeStudentProfile(); return; }
+
+    var infoParts = [];
+    if (s.grade) infoParts.push(s.grade);
+    if (s.className) infoParts.push(s.className);
+    var infoText = infoParts.length ? infoParts.join(' · ') : '未设置年级/班级';
+    var scoreCount = (s.scores && s.scores.length) || 0;
+
+    // Sort scores by date (newest first)
+    var scores = (s.scores || []).slice().sort(function(a, b) {
+      var da = a.date || '';
+      var db = b.date || '';
+      if (da < db) return 1;
+      if (da > db) return -1;
+      return 0;
+    });
+
+    var today = new Date();
+    var todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+    var html = '';
+    // Header
+    html += '<div class="sp-header">';
+    html += '<h3>' + escapeHtml(s.name) + '</h3>';
+    html += '<div class="sp-sub">' + escapeHtml(infoText) + '<span class="sp-stat">' + scoreCount + '次考试</span></div>';
+    html += '</div>';
+
+    // Exam scores section
+    html += '<div class="sp-section-title">考试成绩记录</div>';
+
+    // Add form
+    html += '<div class="sp-add-row">';
+    html += '<input type="text" class="sp-exam-name" id="spExamName" placeholder="考试名称，如：期中考试">';
+    html += '<input type="text" class="sp-exam-score" id="spExamScore" placeholder="分数">';
+    html += '<input type="date" class="sp-exam-date" id="spExamDate" value="' + todayStr + '">';
+    html += '<button class="course-add-btn" id="spAddScoreBtn" type="button">+ 添加</button>';
+    html += '</div>';
+
+    // Score list
+    html += '<div class="sp-score-list" id="spScoreList">';
+    if (scores.length === 0) {
+      html += '<div class="sp-empty">暂无考试记录，在上方添加第一条成绩</div>';
+    } else {
+      scores.forEach(function(sc) {
+        html += '<div class="sp-score-item" data-score-id="' + escapeHtml(sc.id || '') + '">';
+        html += '<div class="sp-score-main">';
+        html += '<div class="sp-score-exam">' + escapeHtml(sc.examName || '未命名考试') + '</div>';
+        html += '<div class="sp-score-meta">' + escapeHtml(sc.date || '无日期') + '</div>';
+        html += '</div>';
+        html += '<span class="sp-score-val">' + escapeHtml(sc.score || '-') + '</span>';
+        html += '<button class="sp-score-del" data-score-id="' + escapeHtml(sc.id || '') + '" title="删除">✕</button>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
+    studentProfileContent.innerHTML = html;
+
+    // Bind add score button
+    var spAddScoreBtn = document.getElementById('spAddScoreBtn');
+    spAddScoreBtn.addEventListener('click', function() {
+      var examName = document.getElementById('spExamName').value.trim();
+      var score = document.getElementById('spExamScore').value.trim();
+      var date = document.getElementById('spExamDate').value.trim();
+      if (!examName) { showToast('请输入考试名称'); return; }
+      if (!score) { showToast('请输入分数'); return; }
+
+      var students = getStudents();
+      for (var i = 0; i < students.length; i++) {
+        if (students[i].id === currentProfileStudentId) {
+          if (!students[i].scores) students[i].scores = [];
+          students[i].scores.push({
+            id: 'e' + Date.now() + Math.random().toString(36).slice(2, 6),
+            examName: examName,
+            score: score,
+            date: date
+          });
+          saveStudents(students);
+          break;
+        }
+      }
+      renderStudentProfile();
+      renderStudentMgrList();
+      showToast('已添加成绩：' + examName);
+    });
+
+    // Enter key on add form inputs
+    ['spExamName', 'spExamScore', 'spExamDate'].forEach(function(id) {
+      var el = document.getElementById(id);
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') spAddScoreBtn.click();
+      });
+    });
+
+    // Bind delete score buttons
+    document.querySelectorAll('#spScoreList .sp-score-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var scoreId = btn.dataset.scoreId;
+        var students = getStudents();
+        for (var i = 0; i < students.length; i++) {
+          if (students[i].id === currentProfileStudentId) {
+            students[i].scores = (students[i].scores || []).filter(function(sc) {
+              return sc.id !== scoreId;
+            });
+            saveStudents(students);
+            break;
+          }
+        }
+        renderStudentProfile();
+        renderStudentMgrList();
+        showToast('已删除该成绩');
+      });
+    });
+  }
+
+  closeProfileBtn.addEventListener('click', closeStudentProfile);
+  studentProfileModal.addEventListener('click', function(e) {
+    if (e.target === studentProfileModal) closeStudentProfile();
+  });
+
+  // --- Export student list (CSV) ---
+  studentExportBtn.addEventListener('click', function() {
+    var students = getStudents();
+    if (students.length === 0) { showToast('暂无学生可导出'); return; }
+    var rows = ['\ufeff姓名,年级,班级,考试次数'];
+    students.forEach(function(s) {
+      var name = (s.name || '').replace(/,/g, '，');
+      var grade = (s.grade || '').replace(/,/g, '，');
+      var className = (s.className || '').replace(/,/g, '，');
+      var count = (s.scores && s.scores.length) || 0;
+      rows.push(name + ',' + grade + ',' + className + ',' + count);
+    });
+    var csv = rows.join('\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var now = new Date();
+    var y = now.getFullYear();
+    var m = String(now.getMonth() + 1).padStart(2, '0');
+    var d = String(now.getDate()).padStart(2, '0');
+    var filename = '学生名单_' + y + m + d + '.csv';
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已导出：' + filename);
   });
 
   // --- Data backup: export & import ---
@@ -2679,6 +3161,9 @@
       var val = localStorage.getItem(key);
       if (val !== null) data[key] = val;
     });
+    // Include persistent info if it exists
+    var persistentInfo = localStorage.getItem('persistent_info');
+    if (persistentInfo !== null) data.persistent_info = persistentInfo;
 
     data.__meta = {
       app: '每日教学反馈生成器',
@@ -2741,7 +3226,15 @@
             localStorage.setItem(key, data[key]);
             importCount++;
           }
+          // Also restore persistent_info
+          if (key === 'persistent_info') {
+            localStorage.setItem('persistent_info', data[key]);
+            importCount++;
+          }
         });
+
+        // Trigger migration of student data (old string array -> new object array)
+        getStudents();
 
         // Refresh all UI
         renderStudentDropdown();
@@ -2940,7 +3433,7 @@
   generateBtn.addEventListener('click', function() {
     // Save student name to dropdown
     if (studentInput.value.trim()) {
-      addStudent(studentInput.value.trim());
+      addStudent({ name: studentInput.value.trim(), grade: '', className: '' });
     }
     // Save each section content to history
     sections.forEach(function(s) {
@@ -3032,7 +3525,7 @@
 
     // Save student name and history
     if (studentInput.value.trim()) {
-      addStudent(studentInput.value.trim());
+      addStudent({ name: studentInput.value.trim(), grade: '', className: '' });
     }
     sections.forEach(function(s) {
       var content = document.getElementById(s.id).value.trim();
