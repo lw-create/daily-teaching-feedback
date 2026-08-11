@@ -3400,10 +3400,12 @@
         schedNoteSection.style.display = 'none';
         schedDeleteBtn.style.display = 'none';
         schedUploadSection.style.display = 'block';
+        schedUploadBtn.textContent = '上传并查看';
         return;
       }
 
-      schedUploadSection.style.display = 'none';
+      schedUploadSection.style.display = 'block';
+      schedUploadBtn.textContent = '重新上传（替换当前课表）';
       schedDateDisplay.textContent = schedFormatDate(schedule.scheduleDate);
       schedWeekdayDisplay.textContent = schedGetWeekday(schedule.scheduleDate);
       schedDeleteBtn.style.display = 'block';
