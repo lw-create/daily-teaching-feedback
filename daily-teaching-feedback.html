@@ -1108,6 +1108,94 @@
     margin-left: 4px;
   }
 
+  /* Score chart */
+  .sp-chart-wrap {
+    margin: 8px 0 4px;
+    padding: 10px;
+    background: rgba(45,157,120,0.04);
+    border-radius: 8px;
+  }
+  .sp-chart-title {
+    font-size: 0.76rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .sp-chart-canvas {
+    width: 100%;
+    height: 140px;
+    display: block;
+  }
+  .sp-chart-empty {
+    font-size: 0.76rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 16px 0;
+  }
+
+  /* Violation records */
+  .sp-violation-add {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .sp-violation-add select,
+  .sp-violation-add input {
+    padding: 5px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    font-size: 0.78rem;
+    font-family: inherit;
+  }
+  .sp-violation-list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .sp-violation-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .sp-violation-item:last-child { border-bottom: none; }
+  .sp-violation-main {
+    flex: 1;
+  }
+  .sp-violation-type {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e74c3c;
+  }
+  .sp-violation-date {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .sp-violation-note {
+    font-size: 0.76rem;
+    color: var(--ink);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+  .sp-violation-del {
+    padding: 2px 6px;
+    border: none;
+    background: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .violation-tag {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(231,76,60,0.08);
+    color: #e74c3c;
+  }
+
   .mgr-profile-btn {
     padding: 2px 8px;
     border: 1px solid var(--rule);
@@ -3329,13 +3417,23 @@
     if (s.className) infoParts.push(s.className);
     var infoText = infoParts.length ? infoParts.join(' · ') : '未设置年级/班级';
     var scoreCount = (s.scores && s.scores.length) || 0;
+    var violationCount = (s.violations && s.violations.length) || 0;
 
-    // Sort scores by date (newest first)
+    // Sort scores by date (newest first for list)
     var scores = (s.scores || []).slice().sort(function(a, b) {
       var da = a.date || '';
       var db = b.date || '';
       if (da < db) return 1;
       if (da > db) return -1;
+      return 0;
+    });
+
+    // Sort scores by date ascending for chart
+    var chartScores = (s.scores || []).slice().sort(function(a, b) {
+      var da = a.date || '';
+      var db = b.date || '';
+      if (da < db) return -1;
+      if (da > db) return 1;
       return 0;
     });
 
@@ -3346,8 +3444,19 @@
     // Header
     html += '<div class="sp-header">';
     html += '<h3>' + escapeHtml(s.name) + '</h3>';
-    html += '<div class="sp-sub">' + escapeHtml(infoText) + '<span class="sp-stat">' + scoreCount + '次考试</span></div>';
+    html += '<div class="sp-sub">' + escapeHtml(infoText);
+    html += '<span class="sp-stat">' + scoreCount + '次考试</span>';
+    if (violationCount > 0) html += '<span class="sp-stat" style="color:#e74c3c;">' + violationCount + '次违规</span>';
     html += '</div>';
+    html += '</div>';
+
+    // Score trend chart
+    if (chartScores.length >= 2) {
+      html += '<div class="sp-chart-wrap">';
+      html += '<div class="sp-chart-title">成绩趋势</div>';
+      html += '<canvas class="sp-chart-canvas" id="spScoreChart"></canvas>';
+      html += '</div>';
+    }
 
     // Exam scores section
     html += '<div class="sp-section-title">考试成绩记录</div>';
@@ -3388,7 +3497,56 @@
     }
     html += '</div>';
 
+    // Violation records section
+    html += '<div class="sp-section-title" style="color:#e74c3c;">违规记录</div>';
+
+    // Violation add form
+    var violationTypes = getViolationTypes();
+    html += '<div class="sp-violation-add">';
+    html += '<select id="spViolationType" style="flex:1;min-width:120px;">';
+    violationTypes.forEach(function(t) {
+      html += '<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>';
+    });
+    html += '<option value="__custom__">+ 自定义...</option>';
+    html += '</select>';
+    html += '<input type="date" id="spViolationDate" value="' + todayStr + '" style="width:130px;">';
+    html += '<button class="course-add-btn" id="spAddViolationBtn" type="button">+ 添加</button>';
+    html += '</div>';
+    html += '<input type="text" id="spViolationCustom" placeholder="输入自定义违规类型" style="display:none;width:100%;padding:5px 8px;border:1px solid var(--rule);border-radius:5px;font-size:0.78rem;margin-bottom:6px;">';
+    html += '<input type="text" id="spViolationNote" placeholder="备注（选填，如具体情况的说明）" style="width:100%;padding:5px 8px;border:1px solid var(--rule);border-radius:5px;font-size:0.78rem;margin-bottom:8px;">';
+
+    // Violation list
+    var violations = (s.violations || []).slice().sort(function(a, b) {
+      var da = a.date || '';
+      var db = b.date || '';
+      if (da < db) return 1;
+      if (da > db) return -1;
+      return 0;
+    });
+
+    html += '<div class="sp-violation-list" id="spViolationList">';
+    if (violations.length === 0) {
+      html += '<div class="sp-empty">暂无违规记录</div>';
+    } else {
+      violations.forEach(function(v) {
+        html += '<div class="sp-violation-item" data-violation-id="' + escapeHtml(v.id || '') + '">';
+        html += '<div class="sp-violation-main">';
+        html += '<div class="sp-violation-type">' + escapeHtml(v.type || '') + '</div>';
+        html += '<div class="sp-violation-date">' + escapeHtml(v.date || '') + '</div>';
+        if (v.note) html += '<div class="sp-violation-note">' + escapeHtml(v.note) + '</div>';
+        html += '</div>';
+        html += '<button class="sp-violation-del" data-violation-id="' + escapeHtml(v.id || '') + '" title="删除">✕</button>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
     studentProfileContent.innerHTML = html;
+
+    // Draw score chart if exists
+    if (chartScores.length >= 2) {
+      drawScoreChart('spScoreChart', chartScores);
+    }
 
     // Bind add score button
     var spAddScoreBtn = document.getElementById('spAddScoreBtn');
@@ -3464,6 +3622,188 @@
         showToast('已删除该成绩');
       });
     });
+
+    // --- Violation type selector toggle ---
+    var spViolationType = document.getElementById('spViolationType');
+    var spViolationCustom = document.getElementById('spViolationCustom');
+    if (spViolationType) {
+      spViolationType.addEventListener('change', function() {
+        spViolationCustom.style.display = this.value === '__custom__' ? 'block' : 'none';
+      });
+    }
+
+    // --- Add violation button ---
+    var spAddViolationBtn = document.getElementById('spAddViolationBtn');
+    if (spAddViolationBtn) {
+      spAddViolationBtn.addEventListener('click', function() {
+        var typeSelect = document.getElementById('spViolationType');
+        var type = typeSelect.value;
+        var customInput = document.getElementById('spViolationCustom');
+        var note = document.getElementById('spViolationNote').value.trim();
+        var date = document.getElementById('spViolationDate').value;
+
+        if (type === '__custom__') {
+          type = customInput.value.trim();
+          if (!type) { showToast('请输入违规类型'); return; }
+          addViolationType(type);
+        }
+        if (!type || type === '__custom__') { showToast('请选择或输入违规类型'); return; }
+        if (!date) { showToast('请选择日期'); return; }
+
+        var students = getStudents();
+        for (var i = 0; i < students.length; i++) {
+          if (students[i].id === currentProfileStudentId) {
+            if (!students[i].violations) students[i].violations = [];
+            students[i].violations.push({
+              id: 'v' + Date.now() + Math.random().toString(36).slice(2, 6),
+              type: type,
+              date: date,
+              note: note
+            });
+            saveStudents(students);
+            break;
+          }
+        }
+        renderStudentProfile();
+        renderStudentMgrList();
+        showToast('已添加违规记录：' + type);
+      });
+    }
+
+    // --- Delete violation buttons ---
+    document.querySelectorAll('#spViolationList .sp-violation-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var violationId = btn.dataset.violationId;
+        var students = getStudents();
+        for (var i = 0; i < students.length; i++) {
+          if (students[i].id === currentProfileStudentId) {
+            students[i].violations = (students[i].violations || []).filter(function(v) {
+              return v.id !== violationId;
+            });
+            saveStudents(students);
+            break;
+          }
+        }
+        renderStudentProfile();
+        renderStudentMgrList();
+        showToast('已删除该违规记录');
+      });
+    });
+  }
+
+  // --- Draw score chart on canvas ---
+  function drawScoreChart(canvasId, scores) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.offsetWidth;
+    var h = 140;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    var padL = 32, padR = 12, padT = 12, padB = 28;
+    var chartW = w - padL - padR;
+    var chartH = h - padT - padB;
+
+    // Parse scores as numbers
+    var points = [];
+    var minVal = Infinity, maxVal = -Infinity;
+    scores.forEach(function(sc) {
+      var val = parseFloat(sc.score);
+      if (isNaN(val)) val = 0;
+      points.push({ val: val, label: sc.examName || sc.date || '', date: sc.date || '' });
+      if (val < minVal) minVal = val;
+      if (val > maxVal) maxVal = val;
+    });
+
+    if (points.length === 0) return;
+
+    // Adjust range
+    var range = maxVal - minVal;
+    if (range < 10) {
+      var mid = (maxVal + minVal) / 2;
+      minVal = mid - 5;
+      maxVal = mid + 5;
+    } else {
+      minVal = minVal - range * 0.1;
+      maxVal = maxVal + range * 0.1;
+    }
+    if (minVal < 0) minVal = 0;
+
+    // Background
+    ctx.fillStyle = 'rgba(45,157,120,0.02)';
+    ctx.fillRect(padL, padT, chartW, chartH);
+
+    // Y-axis grid lines (4 lines)
+    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+    ctx.lineWidth = 1;
+    ctx.font = '10px sans-serif';
+    ctx.fillStyle = '#999';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (var i = 0; i <= 4; i++) {
+      var y = padT + chartH - (chartH / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(padL + chartW, y);
+      ctx.stroke();
+      var val = minVal + (maxVal - minVal) * (i / 4);
+      ctx.fillText(Math.round(val), padL - 4, y);
+    }
+
+    // X positions
+    var xStep = points.length > 1 ? chartW / (points.length - 1) : 0;
+
+    // Draw line
+    ctx.strokeStyle = '#2d9d78';
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    points.forEach(function(p, idx) {
+      var x = padL + xStep * idx;
+      var y = padT + chartH - ((p.val - minVal) / (maxVal - minVal)) * chartH;
+      if (idx === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    // Fill area under line
+    ctx.lineTo(padL + xStep * (points.length - 1), padT + chartH);
+    ctx.lineTo(padL, padT + chartH);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(45,157,120,0.1)';
+    ctx.fill();
+
+    // Draw points and labels
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    points.forEach(function(p, idx) {
+      var x = padL + xStep * idx;
+      var y = padT + chartH - ((p.val - minVal) / (maxVal - minVal)) * chartH;
+
+      // Point circle
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#2d9d78';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Score value above point
+      ctx.fillStyle = '#2d9d78';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText(p.val, x, y - 14);
+
+      // X label (date, shortened)
+      ctx.fillStyle = '#999';
+      ctx.font = '9px sans-serif';
+      var dateLabel = (p.date || '').substring(5); // MM-DD
+      ctx.fillText(dateLabel, x, padT + chartH + 4);
+    });
   }
 
   closeProfileBtn.addEventListener('click', closeStudentProfile);
@@ -3482,12 +3822,13 @@
     if (students.length === 0) { showToast('暂无学生可导出'); return; }
     var exams = getExams();
 
-    // Build header row: 姓名, 年级, 班级, [each exam name], 考试次数
+    // Build header row: 姓名, 年级, 班级, [each exam name], 考试次数, 违规次数
     var header = ['姓名', '年级', '班级'];
     exams.forEach(function(e) {
       header.push(e.name + '(' + e.date + ')');
     });
     header.push('考试次数');
+    header.push('违规次数');
 
     var rows = ['\ufeff' + header.map(csvEscape).join(',')];
 
@@ -3510,6 +3851,7 @@
         row.push(csvEscape(score));
       });
       row.push(csvEscape(String((s.scores && s.scores.length) || 0)));
+      row.push(csvEscape(String((s.violations && s.violations.length) || 0)));
       rows.push(row.join(','));
     });
 
@@ -3543,7 +3885,8 @@
     'teaching_courses',
     'teaching_feedback',
     'teaching_history',
-    'teaching_exams'
+    'teaching_exams',
+    'teaching_violation_types'
   ];
 
   function getTodayBackupKeys() {
@@ -4084,6 +4427,33 @@
     saveStudents(students);
   }
 
+  // ====== Violation type management ======
+  var DEFAULT_VIOLATIONS = [
+    '迟到', '早退', '无故旷课', '作业完成不认真',
+    '不接受批评教育并顶撞老师', '态度恶劣', '抽烟',
+    '无假条外出', '上课说话', '玩手机', '考试作弊'
+  ];
+
+  function getViolationTypes() {
+    try {
+      var data = localStorage.getItem('teaching_violation_types');
+      if (data) return JSON.parse(data);
+    } catch(e) {}
+    return DEFAULT_VIOLATIONS.slice();
+  }
+
+  function saveViolationTypes(types) {
+    try { localStorage.setItem('teaching_violation_types', JSON.stringify(types)); } catch(e) {}
+  }
+
+  function addViolationType(type) {
+    var types = getViolationTypes();
+    if (types.indexOf(type) === -1) {
+      types.push(type);
+      saveViolationTypes(types);
+    }
+  }
+
   // ====== Overview panel rendering ======
   var overviewStudentList = document.getElementById('overviewStudentList');
   var overviewExportBtn = document.getElementById('overviewExportBtn');
@@ -4128,6 +4498,10 @@
       if (s.scores && s.scores.length > 0) {
         var latestScore = s.scores[s.scores.length - 1];
         tags += '<span class="ov-student-tag score-tag">' + escapeHtml(latestScore.score || '-') + '分</span>';
+      }
+      // Show violation count if any
+      if (s.violations && s.violations.length > 0) {
+        tags += '<span class="violation-tag">' + s.violations.length + '次违规</span>';
       }
       html += '<div class="ov-student-item">';
       html += '<div class="ov-student-info">';
