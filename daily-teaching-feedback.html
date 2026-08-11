@@ -986,11 +986,303 @@
     .card { padding: 18px 16px; }
     .history-chip .chip-text { max-width: 120px; }
   }
+
+  /* ====== Top-level app navigation ====== */
+  .app-nav {
+    display: flex;
+    gap: 0;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 5px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px rgba(45, 157, 120, 0.08);
+    border: 1px solid var(--rule);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+  .app-nav-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .app-nav-btn:hover { color: var(--accent); }
+  .app-nav-btn.active {
+    background: linear-gradient(135deg, var(--accent), #258565);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(45, 157, 120, 0.25);
+  }
+  .app-panel { display: none; }
+  .app-panel.active { display: block; }
+
+  /* ====== Schedule viewer styles ====== */
+  .sched-section {
+    background: var(--bg2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(45,157,120,0.06);
+  }
+  .sched-section h3 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .sched-upload-area {
+    border: 2px dashed var(--rule);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.4);
+  }
+  .sched-upload-area:hover {
+    border-color: var(--accent);
+    background: rgba(45,157,120,0.04);
+  }
+  .sched-upload-area p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .sched-upload-icon {
+    font-size: 2rem;
+    margin-bottom: 4px;
+  }
+  .sched-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .sched-preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f3f4f6;
+  }
+  .sched-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .sched-preview-item .sched-rm-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    border: none;
+    cursor: pointer;
+  }
+  .sched-textarea {
+    width: 100%;
+    border: 1.5px solid var(--rule);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 0.82rem;
+    color: var(--ink);
+    font-family: inherit;
+    background: rgba(255,255,255,0.6);
+    resize: vertical;
+    min-height: 80px;
+  }
+  .sched-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .sched-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .sched-btn-primary {
+    background: linear-gradient(135deg, var(--accent), #258565);
+    color: #fff;
+  }
+  .sched-btn-primary:active { opacity: 0.85; }
+  .sched-btn-primary:disabled { opacity: 0.5; }
+  .sched-btn-secondary {
+    background: rgba(74,144,217,0.1);
+    color: var(--accent2);
+  }
+  .sched-btn-danger {
+    background: rgba(217,83,79,0.08);
+    color: var(--danger);
+  }
+  .sched-btn-danger:active { background: rgba(217,83,79,0.15); }
+  .sched-img-card {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .sched-img-card img {
+    width: 100%;
+    display: block;
+  }
+  .sched-date-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sched-date-big {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .sched-date-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .sched-edit-link {
+    font-size: 0.78rem;
+    color: var(--accent2);
+    cursor: pointer;
+    font-weight: 600;
+    background: none;
+    border: none;
+    font-family: inherit;
+  }
+  .sched-edit-link:hover { text-decoration: underline; }
+  .sched-editor-box {
+    margin-top: 10px;
+    padding: 14px;
+    background: rgba(255,255,255,0.5);
+    border: 1px dashed var(--rule);
+    border-radius: var(--radius-sm);
+  }
+  .sched-editor-box input[type="date"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    margin-bottom: 10px;
+  }
+  .sched-editor-box input[type="date"]:focus { outline: none; border-color: var(--accent); }
+  .sched-btn-row {
+    display: flex;
+    gap: 8px;
+  }
+  .sched-btn-row .sched-btn { width: auto; flex: 1; }
+  .sched-btn-row .sched-btn-secondary {
+    background: rgba(0,0,0,0.05);
+    color: var(--ink);
+  }
+  .sched-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .sched-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+  .sched-persistent-text {
+    font-size: 0.82rem;
+    color: var(--ink);
+    white-space: pre-wrap;
+    line-height: 1.7;
+    min-height: 1.5rem;
+  }
+  .sched-persistent-text.placeholder {
+    color: var(--muted);
+  }
+  .sched-note-display {
+    font-size: 0.82rem;
+    color: var(--ink);
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+  .sched-fullscreen-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+  }
+  .sched-fullscreen-overlay.show { display: flex; }
+  .sched-fullscreen-overlay img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    touch-action: pinch-zoom;
+  }
+  .sched-fullscreen-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: #fff;
+    font-size: 2rem;
+    z-index: 10000;
+    line-height: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
 </style>
 </head>
 <body>
 
 <div class="container">
+
+  <!-- Top-level app navigation -->
+  <div class="app-nav">
+    <button class="app-nav-btn active" id="appNavFeedback">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11 4H5C4.44772 4 4 4.44772 4 5V19C4 19.5523 4.44772 20 5 20H19C19.5523 20 20 19.5523 20 19V13M11 4L20 13M11 4L13 2L20 9L18 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      教学反馈
+    </button>
+    <button class="app-nav-btn" id="appNavSchedule">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 9H21M8 3V7M16 3V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      课表查看
+    </button>
+  </div>
+
+  <!-- App Panel: Feedback -->
+  <div class="app-panel active" id="app-feedback">
+
   <!-- Header -->
   <div class="header">
     <h1>
@@ -1344,6 +1636,90 @@
       </div>
     </div>
   </div><!-- /panel-save -->
+
+  </div><!-- /app-feedback -->
+
+  <!-- App Panel: Schedule -->
+  <div class="app-panel" id="app-schedule">
+
+    <!-- Schedule: Upload section -->
+    <div class="sched-section" id="schedUploadSection">
+      <h3>上传课表</h3>
+      <div class="sched-upload-area" id="schedUploadArea">
+        <div class="sched-upload-icon">📷</div>
+        <p>点击选择图片（最多5张，可拍照或相册）</p>
+      </div>
+      <input type="file" id="schedFileInput" accept="image/*" multiple style="display:none;">
+      <div class="sched-preview-grid" id="schedPreviewGrid"></div>
+
+      <div style="margin-top:14px;">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">每日备注（本次课表说明）</label>
+        <textarea class="sched-textarea" id="schedDailyNote" rows="3" placeholder="比如：今天调课、考试安排等..."></textarea>
+      </div>
+
+      <button class="sched-btn sched-btn-primary" id="schedUploadBtn" style="margin-top:12px;">上传并查看</button>
+    </div>
+
+    <!-- Schedule: View section -->
+    <div class="sched-section" id="schedViewSection">
+      <div class="sched-date-card">
+        <div>
+          <div class="sched-date-big" id="schedDateDisplay">--月--日</div>
+          <div class="sched-date-sub" id="schedWeekdayDisplay">星期-</div>
+        </div>
+        <button class="sched-edit-link" id="schedEditDateBtn">改日期</button>
+      </div>
+
+      <div class="sched-editor-box" id="schedDateEditor" style="display:none;">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">选择课表对应日期</label>
+        <input type="date" id="schedDatePicker">
+        <div class="sched-btn-row">
+          <button class="sched-btn sched-btn-primary" id="schedSaveDateBtn">保存</button>
+          <button class="sched-btn sched-btn-secondary" id="schedCancelDateBtn">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule: Images -->
+    <div class="sched-section" id="schedImagesSection" style="display:none;">
+      <h3>课表图片</h3>
+      <div id="schedImageList"></div>
+    </div>
+
+    <!-- Schedule: Daily note display -->
+    <div class="sched-section" id="schedNoteSection" style="display:none;">
+      <h3>每日备注</h3>
+      <div class="sched-note-display" id="schedNoteText"></div>
+    </div>
+
+    <!-- Schedule: Persistent info -->
+    <div class="sched-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <h3 style="margin-bottom:0;">常驻信息</h3>
+        <button class="sched-edit-link" id="schedEditPersistentBtn">编辑</button>
+      </div>
+      <div class="sched-persistent-text placeholder" id="schedPersistentDisplay">点击「编辑」添加课时安排、教室、学生姓名等信息</div>
+
+      <div class="sched-editor-box" id="schedPersistentEditor" style="display:none;margin-top:10px;">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">编辑常驻信息</label>
+        <textarea class="sched-textarea" id="schedPersistentInput" rows="8" placeholder="例如：&#10;第一节课 08:00-08:45&#10;第二节课 08:55-09:40&#10;教室：3号楼201&#10;学生：张三、李四"></textarea>
+        <div class="sched-btn-row" style="margin-top:10px;">
+          <button class="sched-btn sched-btn-primary" id="schedSavePersistentBtn">保存</button>
+          <button class="sched-btn sched-btn-secondary" id="schedCancelPersistentBtn">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule: Delete button -->
+    <button class="sched-btn sched-btn-danger" id="schedDeleteBtn" style="display:none;">删除当前课表</button>
+
+  </div><!-- /app-schedule -->
+
+  <!-- Schedule: Fullscreen overlay -->
+  <div class="sched-fullscreen-overlay" id="schedFullscreen">
+    <button class="sched-fullscreen-close" id="schedCloseFullscreen">✕</button>
+    <img id="schedFullscreenImg" alt="课表大图">
+  </div>
 
 </div>
 
@@ -2746,6 +3122,385 @@
       fallbackCopy(text);
     }
   });
+})();
+</script>
+
+<!-- Schedule viewer script -->
+<script>
+(function() {
+  // ====== Top-level app navigation ======
+  var appNavFeedback = document.getElementById('appNavFeedback');
+  var appNavSchedule = document.getElementById('appNavSchedule');
+  var appFeedback = document.getElementById('app-feedback');
+  var appSchedule = document.getElementById('app-schedule');
+
+  appNavFeedback.addEventListener('click', function() {
+    appNavFeedback.classList.add('active');
+    appNavSchedule.classList.remove('active');
+    appFeedback.classList.add('active');
+    appSchedule.classList.remove('active');
+  });
+
+  appNavSchedule.addEventListener('click', function() {
+    appNavSchedule.classList.add('active');
+    appNavFeedback.classList.remove('active');
+    appSchedule.classList.add('active');
+    appFeedback.classList.remove('active');
+    schedLoadView();
+  });
+
+  // ====== IndexedDB wrapper ======
+  var DB_NAME = 'ScheduleDB';
+  var DB_VERSION = 1;
+  var STORE_NAME = 'schedule';
+
+  function openDB() {
+    return new Promise(function(resolve, reject) {
+      var req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function(e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function() { resolve(req.result); };
+      req.onerror = function() { reject(req.error); };
+    });
+  }
+
+  function saveSchedule(data) {
+    return openDB().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        try {
+          var tx = db.transaction(STORE_NAME, 'readwrite');
+          var store = tx.objectStore(STORE_NAME);
+          store.put(Object.assign({ id: 1 }, data));
+          tx.oncomplete = function() { resolve(); };
+          tx.onerror = function() { reject(new Error(tx.error ? tx.error.name + ': ' + tx.error.message : '写入失败')); };
+          tx.onabort = function() { reject(new Error('事务已中止')); };
+        } catch(e) { reject(e); }
+      });
+    });
+  }
+
+  function getSchedule() {
+    return openDB().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction(STORE_NAME, 'readonly');
+        var store = tx.objectStore(STORE_NAME);
+        var req = store.get(1);
+        req.onsuccess = function() { resolve(req.result || null); };
+        req.onerror = function() { reject(req.error); };
+      });
+    });
+  }
+
+  function deleteSchedule() {
+    return openDB().then(function(db) {
+      return new Promise(function(resolve, reject) {
+        var tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).clear();
+        tx.oncomplete = function() { resolve(); };
+        tx.onerror = function() { reject(tx.error); };
+      });
+    });
+  }
+
+  // ====== Image compression ======
+  function compressImage(file, maxSize, quality) {
+    maxSize = maxSize || 1280;
+    quality = quality || 0.8;
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var width = img.width, height = img.height;
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = Math.round((height * maxSize) / width);
+              width = maxSize;
+            } else {
+              width = Math.round((width * maxSize) / height);
+              height = maxSize;
+            }
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ====== Date utils ======
+  var WEEKDAYS = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+  function schedFormatDate(dateStr) {
+    var d = new Date(dateStr + 'T00:00:00');
+    return (d.getMonth() + 1) + '月' + d.getDate() + '日';
+  }
+
+  function schedGetWeekday(dateStr) {
+    var d = new Date(dateStr + 'T00:00:00');
+    return WEEKDAYS[d.getDay()];
+  }
+
+  function schedTomorrowStr() {
+    var d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  }
+
+  // ====== State ======
+  var schedSelectedFiles = [];
+
+  // ====== Elements ======
+  var schedUploadArea = document.getElementById('schedUploadArea');
+  var schedFileInput = document.getElementById('schedFileInput');
+  var schedPreviewGrid = document.getElementById('schedPreviewGrid');
+  var schedUploadBtn = document.getElementById('schedUploadBtn');
+  var schedDailyNote = document.getElementById('schedDailyNote');
+  var schedDateDisplay = document.getElementById('schedDateDisplay');
+  var schedWeekdayDisplay = document.getElementById('schedWeekdayDisplay');
+  var schedEditDateBtn = document.getElementById('schedEditDateBtn');
+  var schedDateEditor = document.getElementById('schedDateEditor');
+  var schedDatePicker = document.getElementById('schedDatePicker');
+  var schedSaveDateBtn = document.getElementById('schedSaveDateBtn');
+  var schedCancelDateBtn = document.getElementById('schedCancelDateBtn');
+  var schedImagesSection = document.getElementById('schedImagesSection');
+  var schedImageList = document.getElementById('schedImageList');
+  var schedNoteSection = document.getElementById('schedNoteSection');
+  var schedNoteText = document.getElementById('schedNoteText');
+  var schedPersistentDisplay = document.getElementById('schedPersistentDisplay');
+  var schedEditPersistentBtn = document.getElementById('schedEditPersistentBtn');
+  var schedPersistentEditor = document.getElementById('schedPersistentEditor');
+  var schedPersistentInput = document.getElementById('schedPersistentInput');
+  var schedSavePersistentBtn = document.getElementById('schedSavePersistentBtn');
+  var schedCancelPersistentBtn = document.getElementById('schedCancelPersistentBtn');
+  var schedDeleteBtn = document.getElementById('schedDeleteBtn');
+  var schedUploadSection = document.getElementById('schedUploadSection');
+  var schedFullscreen = document.getElementById('schedFullscreen');
+  var schedFullscreenImg = document.getElementById('schedFullscreenImg');
+  var schedCloseFullscreen = document.getElementById('schedCloseFullscreen');
+
+  // ====== Upload area click ======
+  schedUploadArea.addEventListener('click', function() { schedFileInput.click(); });
+
+  schedFileInput.addEventListener('change', function(e) {
+    var files = Array.from(e.target.files);
+    files.forEach(function(f) {
+      if (schedSelectedFiles.length < 5) schedSelectedFiles.push(f);
+    });
+    schedFileInput.value = '';
+    schedRenderPreviews();
+  });
+
+  function schedRenderPreviews() {
+    schedPreviewGrid.innerHTML = '';
+    schedSelectedFiles.forEach(function(file, idx) {
+      var item = document.createElement('div');
+      item.className = 'sched-preview-item';
+      var url = URL.createObjectURL(file);
+      item.innerHTML = '<img src="' + url + '" alt="预览"><button class="sched-rm-btn" data-idx="' + idx + '">✕</button>';
+      schedPreviewGrid.appendChild(item);
+    });
+    schedPreviewGrid.querySelectorAll('.sched-rm-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var idx = parseInt(btn.dataset.idx);
+        schedSelectedFiles.splice(idx, 1);
+        schedRenderPreviews();
+      });
+    });
+  }
+
+  // ====== Upload button ======
+  schedUploadBtn.addEventListener('click', function() {
+    if (schedSelectedFiles.length === 0) {
+      showToast('请先选择至少一张图片');
+      return;
+    }
+    schedUploadBtn.disabled = true;
+    schedUploadBtn.textContent = '压缩上传中...';
+
+    var images = [];
+    var chain = Promise.resolve();
+    schedSelectedFiles.forEach(function(file) {
+      chain = chain.then(function() {
+        return compressImage(file).then(function(dataURL) {
+          images.push(dataURL);
+        });
+      });
+    });
+
+    chain.then(function() {
+      var dailyNote = schedDailyNote.value.trim();
+      var scheduleDate = schedTomorrowStr();
+
+      var totalKB = images.reduce(function(sum, img) {
+        return sum + Math.round((img.length * 3) / 4 / 1024);
+      }, 0);
+      if (totalKB > 5000) {
+        if (!confirm('图片总大小约 ' + totalKB + 'KB，可能导致存储失败。是否继续？')) {
+          schedUploadBtn.disabled = false;
+          schedUploadBtn.textContent = '上传并查看';
+          return;
+        }
+      }
+
+      return saveSchedule({ images: images, dailyNote: dailyNote, uploadedAt: Date.now(), scheduleDate: scheduleDate });
+    }).then(function() {
+      schedSelectedFiles = [];
+      schedRenderPreviews();
+      schedDailyNote.value = '';
+      schedUploadBtn.disabled = false;
+      schedUploadBtn.textContent = '上传并查看';
+      schedLoadView();
+      showToast('课表上传成功');
+    }).catch(function(err) {
+      schedUploadBtn.disabled = false;
+      schedUploadBtn.textContent = '上传并查看';
+      var msg = err.message || '未知错误';
+      if (msg.indexOf('Quota') !== -1 || msg.indexOf('quota') !== -1) {
+        msg = '存储空间不足，请清理浏览器数据后重试';
+      }
+      showToast('上传失败：' + msg);
+    });
+  });
+
+  // ====== Load view page ======
+  function schedLoadView() {
+    getSchedule().then(function(schedule) {
+      if (!schedule) {
+        schedDateDisplay.textContent = '暂无课表';
+        schedWeekdayDisplay.textContent = '';
+        schedImagesSection.style.display = 'none';
+        schedNoteSection.style.display = 'none';
+        schedDeleteBtn.style.display = 'none';
+        schedUploadSection.style.display = 'block';
+        return;
+      }
+
+      schedUploadSection.style.display = 'none';
+      schedDateDisplay.textContent = schedFormatDate(schedule.scheduleDate);
+      schedWeekdayDisplay.textContent = schedGetWeekday(schedule.scheduleDate);
+      schedDeleteBtn.style.display = 'block';
+
+      // Images
+      schedImagesSection.style.display = 'block';
+      schedImageList.innerHTML = '';
+      schedule.images.forEach(function(dataURL, idx) {
+        var card = document.createElement('div');
+        card.className = 'sched-img-card';
+        card.innerHTML = '<img src="' + dataURL + '" alt="课表' + (idx + 1) + '">';
+        card.addEventListener('click', function() { schedOpenFullscreen(dataURL); });
+        schedImageList.appendChild(card);
+      });
+
+      // Daily note
+      if (schedule.dailyNote) {
+        schedNoteText.textContent = schedule.dailyNote;
+        schedNoteSection.style.display = 'block';
+      } else {
+        schedNoteSection.style.display = 'none';
+      }
+
+      // Persistent info
+      schedLoadPersistentInfo();
+    });
+  }
+
+  // ====== Date editing ======
+  schedEditDateBtn.addEventListener('click', function() {
+    getSchedule().then(function(schedule) {
+      if (schedule) schedDatePicker.value = schedule.scheduleDate;
+      schedDateEditor.style.display = schedDateEditor.style.display === 'none' ? 'block' : 'none';
+    });
+  });
+
+  schedSaveDateBtn.addEventListener('click', function() {
+    getSchedule().then(function(schedule) {
+      if (schedule && schedDatePicker.value) {
+        schedule.scheduleDate = schedDatePicker.value;
+        return saveSchedule(schedule);
+      }
+    }).then(function() {
+      schedDateEditor.style.display = 'none';
+      schedLoadView();
+      showToast('日期已更新');
+    });
+  });
+
+  schedCancelDateBtn.addEventListener('click', function() {
+    schedDateEditor.style.display = 'none';
+  });
+
+  // ====== Persistent info ======
+  function schedLoadPersistentInfo() {
+    var info = localStorage.getItem('persistent_info') || '';
+    if (info) {
+      schedPersistentDisplay.textContent = info;
+      schedPersistentDisplay.classList.remove('placeholder');
+    } else {
+      schedPersistentDisplay.textContent = '点击「编辑」添加课时安排、教室、学生姓名等信息';
+      schedPersistentDisplay.classList.add('placeholder');
+    }
+  }
+
+  schedEditPersistentBtn.addEventListener('click', function() {
+    schedPersistentInput.value = localStorage.getItem('persistent_info') || '';
+    schedPersistentEditor.style.display = 'block';
+  });
+
+  schedSavePersistentBtn.addEventListener('click', function() {
+    localStorage.setItem('persistent_info', schedPersistentInput.value.trim());
+    schedPersistentEditor.style.display = 'none';
+    schedLoadPersistentInfo();
+    showToast('常驻信息已保存');
+  });
+
+  schedCancelPersistentBtn.addEventListener('click', function() {
+    schedPersistentEditor.style.display = 'none';
+  });
+
+  // ====== Delete schedule ======
+  schedDeleteBtn.addEventListener('click', function() {
+    if (confirm('确定删除当前课表？图片和每日备注都会清除，常驻信息不受影响。')) {
+      deleteSchedule().then(function() {
+        schedLoadView();
+        showToast('课表已删除');
+      });
+    }
+  });
+
+  // ====== Fullscreen ======
+  function schedOpenFullscreen(dataURL) {
+    schedFullscreenImg.src = dataURL;
+    schedFullscreen.classList.add('show');
+  }
+
+  schedCloseFullscreen.addEventListener('click', function() {
+    schedFullscreen.classList.remove('show');
+    schedFullscreenImg.src = '';
+  });
+
+  schedFullscreen.addEventListener('click', function(e) {
+    if (e.target === schedFullscreen) {
+      schedFullscreen.classList.remove('show');
+      schedFullscreenImg.src = '';
+    }
+  });
+
+  // ====== Init ======
+  schedLoadView();
 })();
 </script>
 
