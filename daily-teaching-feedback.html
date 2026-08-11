@@ -1387,6 +1387,21 @@
             { text: '稍显被动', phrase: '学习稍显被动', level: 'warn' },
             { text: '需督促', phrase: '需要督促才能完成学习', level: 'danger' }
           ]
+        },
+        {
+          label: '可提升方面',
+          icon: '📈',
+          type: 'multi',
+          opts: [
+            { text: '注意力持续', phrase: '注意力持续性有待加强' },
+            { text: '课堂纪律', phrase: '课堂纪律需要改进' },
+            { text: '作业完成', phrase: '作业完成度需要提升' },
+            { text: '互动积极', phrase: '课堂互动可以更积极' },
+            { text: '自主学习', phrase: '自主学习能力有待培养' },
+            { text: '时间管理', phrase: '时间管理能力需要加强' },
+            { text: '情绪管理', phrase: '情绪管理能力有待提升' },
+            { text: '合作意识', phrase: '合作意识可以进一步增强' }
+          ]
         }
       ],
       extraLabel: '补充说明（选填）',
@@ -1429,7 +1444,13 @@
             { text: '表达规范', phrase: '书面表达需规范' },
             { text: '基础知识', phrase: '基础知识需巩固' },
             { text: '应用能力', phrase: '知识应用能力待加强' },
-            { text: '检查习惯', phrase: '需养成检查的习惯' }
+            { text: '检查习惯', phrase: '需养成检查的习惯' },
+            { text: '书写工整', phrase: '书写需要更加工整' },
+            { text: '听课专注', phrase: '听课专注度需要提升' },
+            { text: '提问勇气', phrase: '鼓励大胆提问' },
+            { text: '错题反思', phrase: '需要加强错题反思' },
+            { text: '笔记习惯', phrase: '课堂笔记习惯待养成' },
+            { text: '独立思考', phrase: '独立思考能力需培养' }
           ]
         },
         {
@@ -2035,9 +2056,11 @@
     var lines = [];
     lines.push('【每日教学反馈】');
     var metaLine = dateDisplay + ' | ' + subject + ' | 学生：' + student;
-    var courseText = getCourseText();
-    if (courseText) metaLine += ' | ' + courseText;
     lines.push(metaLine);
+    var courseText = getCourseText();
+    if (courseText) {
+      lines.push('【课程】' + courseText);
+    }
     lines.push('');
 
     sections.forEach(function(s) {
@@ -2069,9 +2092,11 @@
     var html = '';
     html += '<div class="preview-title">每日教学反馈</div>';
     var metaHtml = dateDisplay + '　|　科目：' + subject + '　|　学生：' + student;
-    var courseText2 = getCourseText();
-    if (courseText2) metaHtml += '　|　' + courseText2;
     html += '<div class="preview-meta">' + metaHtml + '</div>';
+    var courseText2 = getCourseText();
+    if (courseText2) {
+      html += '<div class="preview-section" style="margin-top:4px;"><span class="preview-section-label">【课程】</span>' + courseText2 + '</div>';
+    }
 
     sections.forEach(function(s) {
       var content = document.getElementById(s.id).value.trim();
