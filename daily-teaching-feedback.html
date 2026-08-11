@@ -3424,8 +3424,10 @@
 
   function openStudentProfile(studentId) {
     currentProfileStudentId = studentId;
-    renderStudentProfile();
     studentProfileModal.style.display = 'flex';
+    requestAnimationFrame(function() {
+      renderStudentProfile();
+    });
   }
 
   function closeStudentProfile() {
@@ -3578,7 +3580,9 @@
 
     // Draw score chart if exists
     if (chartScores.length >= 2) {
-      drawScoreChart('spScoreChart', chartScores);
+      requestAnimationFrame(function() {
+        drawScoreChart('spScoreChart', chartScores);
+      });
     }
 
     // Bind add score button
@@ -3732,6 +3736,13 @@
     var dpr = window.devicePixelRatio || 1;
     var w = canvas.offsetWidth;
     var h = 140;
+
+    // If canvas width is 0 (not yet laid out), retry after a short delay
+    if (w === 0) {
+      setTimeout(function() { drawScoreChart(canvasId, scores); }, 50);
+      return;
+    }
+
     canvas.width = w * dpr;
     canvas.height = h * dpr;
     var ctx = canvas.getContext('2d');
@@ -3765,6 +3776,7 @@
       maxVal = maxVal + range * 0.1;
     }
     if (minVal < 0) minVal = 0;
+    if (maxVal <= minVal) maxVal = minVal + 10;
 
     // Background
     ctx.fillStyle = 'rgba(45,157,120,0.02)';
