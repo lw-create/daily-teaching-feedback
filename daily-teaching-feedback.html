@@ -98,6 +98,34 @@
     color: var(--muted);
     margin-top: 6px;
   }
+  .header-update-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.6);
+    color: var(--accent2);
+    font-size: 0.72rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .header-update-btn:hover {
+    background: rgba(74,144,217,0.1);
+    border-color: var(--accent2);
+  }
+  .header-update-btn.checking {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 
   /* Card base */
   .card {
@@ -1816,6 +1844,11 @@
       每日教学反馈生成器
     </h1>
     <p>填写下方内容，一键生成格式统一的教学反馈，方便发送给家长</p>
+    <button class="header-update-btn" id="checkUpdateBtn" type="button">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      检查更新
+    </button>
+    <meta name="app-version" content="20260811.2">
   </div>
 
   <!-- Tabs -->
@@ -4347,6 +4380,55 @@
     setTimeout(function() {
       toast.classList.remove('show');
     }, 2500);
+  }
+
+  // --- Check for updates ---
+  var checkUpdateBtn = document.getElementById('checkUpdateBtn');
+  var APP_VERSION = document.querySelector('meta[name="app-version"]');
+  var currentVersion = APP_VERSION ? APP_VERSION.content : 'unknown';
+
+  checkUpdateBtn.addEventListener('click', function() {
+    checkUpdateBtn.classList.add('checking');
+    checkUpdateBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 11-3-6.7L21 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> 检查中...';
+
+    // Try to fetch the latest version from the server
+    var pageUrl = window.location.href.split('?')[0].split('#')[0];
+    fetch(pageUrl + '?v=' + Date.now(), { cache: 'no-cache' })
+      .then(function(r) { return r.text(); })
+      .then(function(html) {
+        // Extract version from the fetched HTML
+        var match = html.match(/app-version[^>]*content=["']([^"']+)["']/);
+        var remoteVersion = match ? match[1] : null;
+
+        if (remoteVersion && remoteVersion !== currentVersion) {
+          showToast('发现新版本，正在更新...');
+          setTimeout(function() {
+            // Force reload with cache busting - localStorage data is preserved
+            window.location.href = pageUrl + '?v=' + Date.now();
+          }, 1200);
+        } else if (remoteVersion === currentVersion) {
+          showToast('当前已是最新版本');
+          resetUpdateBtn();
+        } else {
+          // Can't determine version, force reload anyway
+          showToast('正在刷新到最新版本...');
+          setTimeout(function() {
+            window.location.href = pageUrl + '?v=' + Date.now();
+          }, 1200);
+        }
+      })
+      .catch(function() {
+        // Network error (e.g., opening from local file) - force reload
+        showToast('正在刷新页面...');
+        setTimeout(function() {
+          window.location.reload();
+        }, 1200);
+      });
+  });
+
+  function resetUpdateBtn() {
+    checkUpdateBtn.classList.remove('checking');
+    checkUpdateBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> 检查更新';
   }
 
   // --- Reset ---
