@@ -1642,24 +1642,6 @@
   <!-- App Panel: Schedule -->
   <div class="app-panel" id="app-schedule">
 
-    <!-- Schedule: Upload section -->
-    <div class="sched-section" id="schedUploadSection">
-      <h3>上传课表</h3>
-      <div class="sched-upload-area" id="schedUploadArea">
-        <div class="sched-upload-icon">📷</div>
-        <p>点击选择图片（最多5张，可拍照或相册）</p>
-      </div>
-      <input type="file" id="schedFileInput" accept="image/*" multiple style="display:none;">
-      <div class="sched-preview-grid" id="schedPreviewGrid"></div>
-
-      <div style="margin-top:14px;">
-        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">每日备注（本次课表说明）</label>
-        <textarea class="sched-textarea" id="schedDailyNote" rows="3" placeholder="比如：今天调课、考试安排等..."></textarea>
-      </div>
-
-      <button class="sched-btn sched-btn-primary" id="schedUploadBtn" style="margin-top:12px;">上传并查看</button>
-    </div>
-
     <!-- Schedule: View section -->
     <div class="sched-section" id="schedViewSection">
       <div class="sched-date-card">
@@ -1712,6 +1694,24 @@
 
     <!-- Schedule: Delete button -->
     <button class="sched-btn sched-btn-danger" id="schedDeleteBtn" style="display:none;">删除当前课表</button>
+
+    <!-- Schedule: Upload section -->
+    <div class="sched-section" id="schedUploadSection" style="margin-top:16px;">
+      <h3>上传课表</h3>
+      <div class="sched-upload-area" id="schedUploadArea">
+        <div class="sched-upload-icon">📷</div>
+        <p>点击选择图片（最多5张，可拍照或相册）</p>
+      </div>
+      <input type="file" id="schedFileInput" accept="image/*" multiple style="display:none;">
+      <div class="sched-preview-grid" id="schedPreviewGrid"></div>
+
+      <div style="margin-top:14px;">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">每日备注（本次课表说明）</label>
+        <textarea class="sched-textarea" id="schedDailyNote" rows="3" placeholder="比如：今天调课、考试安排等..."></textarea>
+      </div>
+
+      <button class="sched-btn sched-btn-primary" id="schedUploadBtn" style="margin-top:12px;">上传并查看</button>
+    </div>
 
     <!-- Schedule: Data backup -->
     <div class="sched-section" style="margin-top:16px;">
