@@ -2068,7 +2068,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.1">
+    <meta name="app-version" content="20260812.2">
   </div>
 
   <!-- Tabs -->
@@ -5163,6 +5163,10 @@
       fallbackCopy(text);
     }
   });
+
+  // Export shared functions for the schedule viewer IIFE
+  window.showToast = showToast;
+  window.escapeHtml = escapeHtml;
 })();
 </script>
 
@@ -5248,6 +5252,29 @@
   }
 
   // ====== Schedule Template System ======
+  // Local data access (reads same localStorage keys as main IIFE)
+  function getTplTemplates() {
+    try {
+      return JSON.parse(localStorage.getItem('teaching_sched_templates') || '[]');
+    } catch(e) { return []; }
+  }
+  function saveTplTemplates(arr) {
+    try { localStorage.setItem('teaching_sched_templates', JSON.stringify(arr)); } catch(e) {}
+  }
+  function getTplActive() {
+    try {
+      return JSON.parse(localStorage.getItem('teaching_sched_active') || 'null');
+    } catch(e) { return null; }
+  }
+  function saveTplActive(obj) {
+    try { localStorage.setItem('teaching_sched_active', JSON.stringify(obj)); } catch(e) {}
+  }
+  function getCoursesLocal() {
+    try {
+      return JSON.parse(localStorage.getItem('teaching_courses') || '[]');
+    } catch(e) { return []; }
+  }
+
   var tplList = document.getElementById('tplList');
   var tplActiveSection = document.getElementById('tplActiveSection');
   var tplVisibleToggle = document.getElementById('tplVisibleToggle');
@@ -5395,7 +5422,7 @@
   }
 
   function createTemplateFromCourses() {
-    var courses = getCourses();
+    var courses = getCoursesLocal();
     if (courses.length === 0) {
       showToast('请先在"教学反馈"中添加课程');
       return;
@@ -5929,13 +5956,15 @@
 
   function schedUpdateBackupInfo(schedule) {
     var info = localStorage.getItem('persistent_info') || '';
+    var tplCount = getTplTemplates().length;
+    var tplStr = tplCount > 0 ? ' · ' + tplCount + '个模板' : '';
     if (schedule) {
       var sizeKB = schedule.images.reduce(function(sum, img) {
         return sum + Math.round((img.length * 3) / 4 / 1024);
       }, 0);
-      schedBackupInfo.textContent = '当前数据：' + schedule.images.length + '张课表图片 · 约' + sizeKB + 'KB' + (info ? ' · 有常驻信息' : '');
+      schedBackupInfo.textContent = '当前数据：' + schedule.images.length + '张课表图片 · 约' + sizeKB + 'KB' + (info ? ' · 有常驻信息' : '') + tplStr;
     } else {
-      schedBackupInfo.textContent = '当前数据：暂无课表' + (info ? ' · 有常驻信息' : '');
+      schedBackupInfo.textContent = '当前数据：暂无课表' + (info ? ' · 有常驻信息' : '') + tplStr;
     }
   }
 
@@ -5958,7 +5987,13 @@
       var info = localStorage.getItem('persistent_info');
       if (info !== null) data.persistent_info = info;
 
-      if (!schedule && !info) {
+      // Include template data
+      var templates = getTplTemplates();
+      if (templates.length > 0) data.sched_templates = templates;
+      var active = getTplActive();
+      if (active) data.sched_active = active;
+
+      if (!schedule && !info && templates.length === 0) {
         showToast('暂无数据可导出');
         return;
       }
@@ -6021,8 +6056,18 @@
           localStorage.setItem('persistent_info', data.persistent_info);
         }
 
+        // Import template data
+        if (data.sched_templates) {
+          saveTplTemplates(data.sched_templates);
+        }
+        if (data.sched_active) {
+          saveTplActive(data.sched_active);
+        }
+
         Promise.all(tasks).then(function() {
           schedLoadViewWithBackup();
+          renderTplList();
+          renderTplActive();
           showToast('课表数据导入成功');
           schedImportFileInput.value = '';
         }).catch(function(err) {
