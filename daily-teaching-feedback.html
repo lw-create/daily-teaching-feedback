@@ -1812,6 +1812,206 @@
     cursor: pointer;
     padding: 4px;
   }
+
+  /* ===== Schedule Template ===== */
+  .tpl-section {
+    margin-bottom: 14px;
+    padding: 14px;
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+  }
+  .tpl-section-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .tpl-section-title .tpl-sub {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .tpl-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--bg2);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-family: inherit;
+  }
+  .tpl-btn:active { opacity: 0.7; }
+  .tpl-btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tpl-btn-blue { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+  .tpl-btn-danger { background: rgba(217,83,79,0.1); color: var(--danger); border-color: rgba(217,83,79,0.2); }
+  .tpl-btn-sm { padding: 3px 8px; font-size: 0.72rem; }
+
+  .tpl-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tpl-card {
+    padding: 12px;
+    background: rgba(45,157,120,0.03);
+    border: 1px solid rgba(45,157,120,0.12);
+    border-radius: 8px;
+  }
+  .tpl-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .tpl-card-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .tpl-card-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .tpl-course-row {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr auto;
+    gap: 4px;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    font-size: 0.78rem;
+  }
+  .tpl-course-row:last-child { border-bottom: none; }
+  .tpl-course-row input {
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 0.78rem;
+    font-family: inherit;
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: var(--ink);
+    width: 100%;
+  }
+  .tpl-course-row input:focus {
+    border-color: var(--accent);
+    background: var(--bg2);
+    outline: none;
+  }
+  .tpl-course-row input.tpl-input-period { width: 70px; grid-column: 1; }
+  .tpl-course-row input.tpl-input-time { grid-column: 2; }
+  .tpl-course-row input.tpl-input-subject { grid-column: 3; }
+  .tpl-course-row .tpl-row-del {
+    grid-column: 4;
+    border: none;
+    background: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0 4px;
+  }
+  .tpl-course-row .tpl-row-num {
+    grid-column: 1;
+    font-size: 0.7rem;
+    color: var(--muted);
+    width: 24px;
+    text-align: center;
+  }
+  .tpl-add-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .tpl-add-row input {
+    flex: 1;
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 3px 6px;
+    font-size: 0.76rem;
+    font-family: inherit;
+  }
+  .tpl-add-row input:focus { border-color: var(--accent); outline: none; }
+  .tpl-empty {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 12px 0;
+  }
+  .tpl-toggle-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .tpl-toggle-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .tpl-toggle {
+    position: relative;
+    width: 42px;
+    height: 22px;
+    background: #ccc;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .tpl-toggle.on { background: var(--accent); }
+  .tpl-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .tpl-toggle.on::after { transform: translateX(20px); }
+  .tpl-schedule-table {
+    margin-top: 8px;
+  }
+  .tpl-schedule-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 1fr;
+    gap: 6px;
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    font-size: 0.78rem;
+    align-items: center;
+  }
+  .tpl-schedule-row:nth-child(odd) { background: rgba(0,0,0,0.015); }
+  .tpl-schedule-period { font-weight: 600; color: var(--accent); }
+  .tpl-schedule-time { color: var(--muted); }
+  .tpl-schedule-subject { color: var(--ink); }
+  .tpl-modal-input {
+    width: 100%;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+  .tpl-modal-input:focus { border-color: var(--accent); outline: none; }
+  .tpl-name-input {
+    border: 1px solid var(--rule);
+    border-radius: 5px;
+    padding: 3px 6px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    width: 100%;
+  }
+  .tpl-name-input:focus { border-color: var(--accent); outline: none; }
 </style>
 </head>
 <body>
@@ -1868,7 +2068,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260811.2">
+    <meta name="app-version" content="20260812.1">
   </div>
 
   <!-- Tabs -->
@@ -2231,6 +2431,59 @@
         <div class="sched-btn-row">
           <button class="sched-btn sched-btn-primary" id="schedSaveDateBtn">保存</button>
           <button class="sched-btn sched-btn-secondary" id="schedCancelDateBtn">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule Template Section -->
+    <div class="tpl-section">
+      <div class="tpl-section-title">
+        <span>课表模板 <span class="tpl-sub">从已有课程生成模板，编辑后可展示/隐藏</span></span>
+      </div>
+
+      <!-- Template management -->
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          <button class="tpl-btn tpl-btn-primary tpl-btn-sm" id="tplCreateFromCoursesBtn">从课程生成模板</button>
+          <button class="tpl-btn tpl-btn-blue tpl-btn-sm" id="tplCreateBlankBtn">新建空白模板</button>
+        </div>
+        <div class="tpl-list" id="tplList"></div>
+      </div>
+
+      <!-- Active schedule -->
+      <div id="tplActiveSection" style="display:none;margin-top:12px;border-top:1px solid var(--rule);padding-top:12px;">
+        <div class="tpl-toggle-wrap">
+          <span class="tpl-toggle-label">课表展示</span>
+          <div class="tpl-toggle" id="tplVisibleToggle"></div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:0.82rem;font-weight:600;color:var(--ink);" id="tplActiveTitle">编辑课表</span>
+          <div style="display:flex;gap:4px;">
+            <button class="tpl-btn tpl-btn-sm" id="tplEditBtn">编辑</button>
+            <button class="tpl-btn tpl-btn-sm" id="tplSaveActiveBtn">保存</button>
+            <button class="tpl-btn tpl-btn-sm" id="tplResetActiveBtn">重置</button>
+            <button class="tpl-btn tpl-btn-danger tpl-btn-sm" id="tplClearActiveBtn">清除</button>
+          </div>
+        </div>
+
+        <!-- View mode -->
+        <div class="tpl-schedule-table" id="tplScheduleView"></div>
+
+        <!-- Edit mode -->
+        <div id="tplScheduleEdit" style="display:none;">
+          <div style="display:grid;grid-template-columns:auto 1fr 1fr auto;gap:4px;font-size:0.72rem;color:var(--muted);padding:0 0 4px;border-bottom:1px solid var(--rule);margin-bottom:4px;">
+            <span style="width:24px;text-align:center;">#</span>
+            <span>节次</span>
+            <span>科目/备注</span>
+            <span style="width:20px;"></span>
+          </div>
+          <div id="tplEditRows"></div>
+          <div class="tpl-add-row">
+            <input type="text" id="tplAddPeriod" placeholder="节次" style="width:80px;">
+            <input type="text" id="tplAddSubject" placeholder="科目/备注（选填）">
+            <button class="tpl-btn tpl-btn-sm" id="tplAddRowBtn">+ 添加</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2724,6 +2977,24 @@
 
   function saveCourses(arr) {
     try { localStorage.setItem('teaching_courses', JSON.stringify(arr)); } catch(e) {}
+  }
+
+  // Schedule template data access (defined early for backup info)
+  function getTplTemplates() {
+    try {
+      return JSON.parse(localStorage.getItem('teaching_sched_templates') || '[]');
+    } catch(e) { return []; }
+  }
+  function saveTplTemplates(arr) {
+    try { localStorage.setItem('teaching_sched_templates', JSON.stringify(arr)); } catch(e) {}
+  }
+  function getTplActive() {
+    try {
+      return JSON.parse(localStorage.getItem('teaching_sched_active') || 'null');
+    } catch(e) { return null; }
+  }
+  function saveTplActive(obj) {
+    try { localStorage.setItem('teaching_sched_active', JSON.stringify(obj)); } catch(e) {}
   }
 
   function renderCourseSelect() {
@@ -3951,7 +4222,9 @@
     'teaching_feedback',
     'teaching_history',
     'teaching_exams',
-    'teaching_violation_types'
+    'teaching_violation_types',
+    'teaching_sched_templates',
+    'teaching_sched_active'
   ];
 
   function getTodayBackupKeys() {
@@ -3976,7 +4249,7 @@
         feedbackCount += arr.length;
       } catch(e) {}
     });
-    dataBackupInfo.textContent = '当前数据：' + studentCount + '名学生 · ' + courseCount + '节课程 · ' + getExams().length + '次考试 · ' + feedbackCount + '条反馈记录';
+    dataBackupInfo.textContent = '当前数据：' + studentCount + '名学生 · ' + courseCount + '节课程 · ' + getExams().length + '次考试 · ' + feedbackCount + '条反馈 · ' + getTplTemplates().length + '个课表模板';
   }
 
   exportBtn.addEventListener('click', function() {
@@ -4973,6 +5246,385 @@
       });
     });
   }
+
+  // ====== Schedule Template System ======
+  var tplList = document.getElementById('tplList');
+  var tplActiveSection = document.getElementById('tplActiveSection');
+  var tplVisibleToggle = document.getElementById('tplVisibleToggle');
+  var tplActiveTitle = document.getElementById('tplActiveTitle');
+  var tplScheduleView = document.getElementById('tplScheduleView');
+  var tplScheduleEdit = document.getElementById('tplScheduleEdit');
+  var tplEditRows = document.getElementById('tplEditRows');
+  var tplEditBtn = document.getElementById('tplEditBtn');
+  var tplSaveActiveBtn = document.getElementById('tplSaveActiveBtn');
+  var tplResetActiveBtn = document.getElementById('tplResetActiveBtn');
+  var tplClearActiveBtn = document.getElementById('tplClearActiveBtn');
+  var tplCreateFromCoursesBtn = document.getElementById('tplCreateFromCoursesBtn');
+  var tplCreateBlankBtn = document.getElementById('tplCreateBlankBtn');
+  var tplAddPeriod = document.getElementById('tplAddPeriod');
+  var tplAddSubject = document.getElementById('tplAddSubject');
+  var tplAddRowBtn = document.getElementById('tplAddRowBtn');
+  var tplIsEditing = false;
+
+  function renderTplList() {
+    var templates = getTplTemplates();
+    if (templates.length === 0) {
+      tplList.innerHTML = '<div class="tpl-empty">暂无模板，点击上方按钮创建</div>';
+      return;
+    }
+    var html = '';
+    templates.forEach(function(tpl) {
+      html += '<div class="tpl-card">';
+      html += '<div class="tpl-card-header">';
+      html += '<span class="tpl-card-name">' + escapeHtml(tpl.name) + ' <span style="color:var(--muted);font-weight:400;font-size:0.72rem;">(' + tpl.courses.length + '节)</span></span>';
+      html += '<div class="tpl-card-actions">';
+      html += '<button class="tpl-btn tpl-btn-primary tpl-btn-sm tpl-use-btn" data-id="' + tpl.id + '">使用</button>';
+      html += '<button class="tpl-btn tpl-btn-sm tpl-edit-tpl-btn" data-id="' + tpl.id + '">编辑</button>';
+      html += '<button class="tpl-btn tpl-btn-danger tpl-btn-sm tpl-del-tpl-btn" data-id="' + tpl.id + '">删除</button>';
+      html += '</div>';
+      html += '</div>';
+      html += '<div class="tpl-schedule-table">';
+      tpl.courses.forEach(function(c) {
+        html += '<div class="tpl-schedule-row">';
+        html += '<span class="tpl-schedule-period">' + escapeHtml(c.period || '') + '</span>';
+        html += '<span class="tpl-schedule-time">' + escapeHtml(c.time || '') + '</span>';
+        html += '<span class="tpl-schedule-subject">' + escapeHtml(c.subject || '') + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '</div>';
+    });
+    tplList.innerHTML = html;
+
+    // Bind buttons
+    tplList.querySelectorAll('.tpl-use-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        useTemplate(btn.dataset.id);
+      });
+    });
+    tplList.querySelectorAll('.tpl-edit-tpl-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        editTemplate(btn.dataset.id);
+      });
+    });
+    tplList.querySelectorAll('.tpl-del-tpl-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (!confirm('确定删除此模板？')) return;
+        var templates = getTplTemplates().filter(function(t) { return t.id !== btn.dataset.id; });
+        saveTplTemplates(templates);
+        renderTplList();
+        showToast('模板已删除');
+      });
+    });
+  }
+
+  function renderTplActive() {
+    var active = getTplActive();
+    if (!active || !active.courses || active.courses.length === 0) {
+      tplActiveSection.style.display = 'none';
+      return;
+    }
+    tplActiveSection.style.display = 'block';
+
+    // Toggle state
+    if (active.visible) {
+      tplVisibleToggle.classList.add('on');
+    } else {
+      tplVisibleToggle.classList.remove('on');
+    }
+
+    tplActiveTitle.textContent = active.name || '编辑课表';
+
+    if (tplIsEditing) {
+      tplScheduleView.style.display = 'none';
+      tplScheduleEdit.style.display = 'block';
+      renderTplEditRows(active.courses);
+    } else {
+      tplScheduleView.style.display = 'block';
+      tplScheduleEdit.style.display = 'none';
+      var html = '';
+      active.courses.forEach(function(c) {
+        html += '<div class="tpl-schedule-row">';
+        html += '<span class="tpl-schedule-period">' + escapeHtml(c.period || '') + '</span>';
+        html += '<span class="tpl-schedule-time">' + escapeHtml(c.time || '') + '</span>';
+        html += '<span class="tpl-schedule-subject">' + escapeHtml(c.subject || '') + '</span>';
+        html += '</div>';
+      });
+      tplScheduleView.innerHTML = html;
+    }
+  }
+
+  function renderTplEditRows(courses) {
+    var html = '';
+    courses.forEach(function(c, idx) {
+      html += '<div class="tpl-course-row" data-idx="' + idx + '">';
+      html += '<span class="tpl-row-num">' + (idx + 1) + '</span>';
+      html += '<input type="text" class="tpl-input-period" value="' + escapeHtml(c.period || '') + '" placeholder="节次">';
+      html += '<input type="text" class="tpl-input-subject" value="' + escapeHtml(c.subject || '') + '" placeholder="科目/备注">';
+      html += '<button class="tpl-row-del" data-idx="' + idx + '">✕</button>';
+      html += '</div>';
+    });
+    tplEditRows.innerHTML = html;
+
+    tplEditRows.querySelectorAll('.tpl-row-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.dataset.idx);
+        var active = getTplActive();
+        if (!active) return;
+        active.courses.splice(idx, 1);
+        saveTplActive(active);
+        renderTplEditRows(active.courses);
+      });
+    });
+
+    // Auto-save on input blur
+    tplEditRows.querySelectorAll('.tpl-course-row').forEach(function(row) {
+      var idx = parseInt(row.dataset.idx);
+      var periodInput = row.querySelector('.tpl-input-period');
+      var subjectInput = row.querySelector('.tpl-input-subject');
+      function saveField() {
+        var active = getTplActive();
+        if (!active || !active.courses[idx]) return;
+        active.courses[idx].period = periodInput.value.trim();
+        active.courses[idx].subject = subjectInput.value.trim();
+        saveTplActive(active);
+      }
+      periodInput.addEventListener('blur', saveField);
+      subjectInput.addEventListener('blur', saveField);
+    });
+  }
+
+  function createTemplateFromCourses() {
+    var courses = getCourses();
+    if (courses.length === 0) {
+      showToast('请先在"教学反馈"中添加课程');
+      return;
+    }
+    var templates = getTplTemplates();
+    if (templates.length >= 5) {
+      showToast('最多保存5个模板');
+      return;
+    }
+    var name = '模板' + (templates.length + 1);
+    var tplCourses = courses.map(function(c) {
+      return {
+        period: c.period || '',
+        time: c.time || '',
+        subject: ''
+      };
+    });
+    var tpl = {
+      id: 'tpl_' + Date.now(),
+      name: name,
+      courses: tplCourses
+    };
+    templates.push(tpl);
+    saveTplTemplates(templates);
+    renderTplList();
+    showToast('已从课程生成模板：' + name);
+  }
+
+  function createBlankTemplate() {
+    var templates = getTplTemplates();
+    if (templates.length >= 5) {
+      showToast('最多保存5个模板');
+      return;
+    }
+    var name = '模板' + (templates.length + 1);
+    var tpl = {
+      id: 'tpl_' + Date.now(),
+      name: name,
+      courses: []
+    };
+    templates.push(tpl);
+    saveTplTemplates(templates);
+    renderTplList();
+    // Immediately edit
+    editTemplate(tpl.id);
+  }
+
+  function useTemplate(tplId) {
+    var templates = getTplTemplates();
+    var tpl = templates.find(function(t) { return t.id === tplId; });
+    if (!tpl) { showToast('模板不存在'); return; }
+    var active = {
+      templateId: tpl.id,
+      name: tpl.name,
+      visible: true,
+      courses: tpl.courses.map(function(c) {
+        return {
+          period: c.period || '',
+          time: c.time || '',
+          subject: c.subject || ''
+        };
+      })
+    };
+    saveTplActive(active);
+    tplIsEditing = false;
+    renderTplActive();
+    showToast('已使用模板：' + tpl.name);
+  }
+
+  function editTemplate(tplId) {
+    var templates = getTplTemplates();
+    var tpl = templates.find(function(t) { return t.id === tplId; });
+    if (!tpl) return;
+
+    // Replace the card with an edit form
+    renderTplList();
+    var card = tplList.querySelector('.tpl-card .tpl-edit-tpl-btn[data-id="' + tplId + '"]');
+    if (!card) return;
+    var cardEl = card.closest('.tpl-card');
+    var html = '';
+    html += '<div class="tpl-card-header">';
+    html += '<input type="text" class="tpl-name-input" id="tplNameInput_' + tplId + '" value="' + escapeHtml(tpl.name) + '" style="flex:1;">';
+    html += '<div class="tpl-card-actions">';
+    html += '<button class="tpl-btn tpl-btn-primary tpl-btn-sm tpl-save-tpl-btn" data-id="' + tplId + '">保存</button>';
+    html += '<button class="tpl-btn tpl-btn-sm tpl-cancel-tpl-btn" data-id="' + tplId + '">取消</button>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div id="tplEditCourses_' + tplId + '">';
+    tpl.courses.forEach(function(c, idx) {
+      html += '<div class="tpl-course-row" data-idx="' + idx + '">';
+      html += '<span class="tpl-row-num">' + (idx + 1) + '</span>';
+      html += '<input type="text" class="tpl-input-period" value="' + escapeHtml(c.period || '') + '" placeholder="节次" style="width:70px;">';
+      html += '<input type="text" class="tpl-input-time" value="' + escapeHtml(c.time || '') + '" placeholder="时间">';
+      html += '<button class="tpl-row-del" data-idx="' + idx + '">✕</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="tpl-add-row">';
+    html += '<input type="text" id="tplAddPeriod_' + tplId + '" placeholder="节次" style="width:70px;">';
+    html += '<input type="text" id="tplAddTime_' + tplId + '" placeholder="时间">';
+    html += '<button class="tpl-btn tpl-btn-sm tpl-add-course-btn" data-id="' + tplId + '">+ 添加</button>';
+    html += '</div>';
+    cardEl.innerHTML = html;
+
+    // Bind save
+    cardEl.querySelector('.tpl-save-tpl-btn').addEventListener('click', function() {
+      var name = document.getElementById('tplNameInput_' + tplId).value.trim() || '未命名模板';
+      var courseRows = cardEl.querySelectorAll('.tpl-course-row');
+      var newCourses = [];
+      courseRows.forEach(function(row) {
+        var p = row.querySelector('.tpl-input-period').value.trim();
+        var t = row.querySelector('.tpl-input-time').value.trim();
+        if (p || t) newCourses.push({ period: p, time: t, subject: '' });
+      });
+      tpl.name = name;
+      tpl.courses = newCourses;
+      saveTplTemplates(templates);
+      renderTplList();
+      showToast('模板已保存');
+    });
+
+    // Bind cancel
+    cardEl.querySelector('.tpl-cancel-tpl-btn').addEventListener('click', function() {
+      renderTplList();
+    });
+
+    // Bind delete row
+    cardEl.querySelectorAll('.tpl-row-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(btn.dataset.idx);
+        tpl.courses.splice(idx, 1);
+        saveTplTemplates(templates);
+        editTemplate(tplId);
+      });
+    });
+
+    // Bind add course
+    cardEl.querySelector('.tpl-add-course-btn').addEventListener('click', function() {
+      var p = document.getElementById('tplAddPeriod_' + tplId).value.trim();
+      var t = document.getElementById('tplAddTime_' + tplId).value.trim();
+      if (!p && !t) { showToast('请输入节次或时间'); return; }
+      tpl.courses.push({ period: p, time: t, subject: '' });
+      saveTplTemplates(templates);
+      editTemplate(tplId);
+    });
+  }
+
+  // Toggle visibility
+  tplVisibleToggle.addEventListener('click', function() {
+    var active = getTplActive();
+    if (!active) return;
+    active.visible = !active.visible;
+    saveTplActive(active);
+    renderTplActive();
+  });
+
+  // Edit active schedule
+  tplEditBtn.addEventListener('click', function() {
+    tplIsEditing = true;
+    renderTplActive();
+  });
+
+  // Save active schedule
+  tplSaveActiveBtn.addEventListener('click', function() {
+    var active = getTplActive();
+    if (!active) return;
+    // Collect from edit rows
+    var rows = tplEditRows.querySelectorAll('.tpl-course-row');
+    var newCourses = [];
+    rows.forEach(function(row) {
+      var p = row.querySelector('.tpl-input-period').value.trim();
+      var s = row.querySelector('.tpl-input-subject').value.trim();
+      var idx = parseInt(row.dataset.idx);
+      var t = (active.courses[idx] && active.courses[idx].time) || '';
+      if (p || s) newCourses.push({ period: p, time: t, subject: s });
+    });
+    active.courses = newCourses;
+    saveTplActive(active);
+    tplIsEditing = false;
+    renderTplActive();
+    showToast('课表已保存');
+  });
+
+  // Reset active schedule to template
+  tplResetActiveBtn.addEventListener('click', function() {
+    var active = getTplActive();
+    if (!active) return;
+    if (!active.templateId) { showToast('无法重置'); return; }
+    var templates = getTplTemplates();
+    var tpl = templates.find(function(t) { return t.id === active.templateId; });
+    if (!tpl) { showToast('原模板已删除'); return; }
+    active.courses = tpl.courses.map(function(c) {
+      return { period: c.period || '', time: c.time || '', subject: c.subject || '' };
+    });
+    saveTplActive(active);
+    renderTplActive();
+    showToast('已重置为模板原始内容');
+  });
+
+  // Clear active schedule
+  tplClearActiveBtn.addEventListener('click', function() {
+    if (!confirm('确定清除当前编辑的课表？')) return;
+    localStorage.removeItem('teaching_sched_active');
+    tplIsEditing = false;
+    renderTplActive();
+    showToast('已清除课表');
+  });
+
+  // Add row in active schedule edit
+  tplAddRowBtn.addEventListener('click', function() {
+    var active = getTplActive();
+    if (!active) return;
+    var p = tplAddPeriod.value.trim();
+    var s = tplAddSubject.value.trim();
+    if (!p && !s) { showToast('请输入内容'); return; }
+    active.courses.push({ period: p, time: '', subject: s });
+    saveTplActive(active);
+    tplAddPeriod.value = '';
+    tplAddSubject.value = '';
+    renderTplEditRows(active.courses);
+  });
+
+  // Create template buttons
+  tplCreateFromCoursesBtn.addEventListener('click', createTemplateFromCourses);
+  tplCreateBlankBtn.addEventListener('click', createBlankTemplate);
+
+  // Initial render
+  renderTplList();
+  renderTplActive();
 
   // ====== Image compression ======
   function compressImage(file, maxSize, quality) {
