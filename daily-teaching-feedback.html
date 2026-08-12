@@ -2022,6 +2022,33 @@
     border-radius: 6px;
     margin-bottom: 6px;
   }
+  .tpl-entry-summary {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+    cursor: pointer;
+    font-size: 0.76rem;
+    color: var(--ink);
+  }
+  .tpl-entry-card.collapsed .tpl-entry-summary { display: flex; }
+  .tpl-entry-card.collapsed .tpl-field-grid { display: none; }
+  .tpl-entry-card.collapsed { padding: 6px 28px 6px 10px; }
+  .tpl-entry-toggle {
+    font-size: 0.7rem;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .tpl-entry-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: rgba(45,157,120,0.1);
+    color: var(--accent);
+    white-space: nowrap;
+  }
   .tpl-field-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2260,6 +2287,68 @@
     width: 100%;
     box-sizing: border-box;
   }
+
+  /* Fullscreen schedule modal */
+  .tpl-fullscreen-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+  }
+  .tpl-fullscreen-overlay.open { display: flex; }
+  .tpl-fullscreen-box {
+    background: #fff;
+    width: 95vw;
+    max-width: 1200px;
+    max-height: 90vh;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .tpl-fullscreen-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--rule);
+    flex-shrink: 0;
+  }
+  .tpl-fullscreen-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .tpl-fullscreen-close {
+    border: none;
+    background: rgba(217,83,79,0.1);
+    color: var(--danger);
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .tpl-fullscreen-body {
+    overflow: auto;
+    padding: 12px 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tpl-fullscreen-body table {
+    min-width: 600px;
+  }
+  .tpl-schedule-scroll-hint {
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--muted);
+    padding: 4px 0;
+    background: rgba(45,157,120,0.04);
+    border-radius: 4px;
+    margin-top: 4px;
+  }
 </style>
 </head>
 <body>
@@ -2316,7 +2405,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.6">
+    <meta name="app-version" content="20260812.7">
   </div>
 
   <!-- Tabs -->
@@ -2769,12 +2858,14 @@
           <div class="tpl-toggle" id="tplVisibleToggle"></div>
         </div>
 
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
           <span style="font-size:0.82rem;font-weight:600;color:var(--ink);" id="tplActiveTitle">编辑课表</span>
-          <div style="display:flex;gap:4px;">
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
             <button class="tpl-btn tpl-btn-sm" id="tplEditBtn">编辑</button>
             <button class="tpl-btn tpl-btn-sm" id="tplSaveActiveBtn">保存</button>
             <button class="tpl-btn tpl-btn-sm" id="tplResetActiveBtn">重置</button>
+            <button class="tpl-btn tpl-btn-sm" id="tplFullscreenBtn">全屏</button>
+            <button class="tpl-btn tpl-btn-sm" id="tplExportCsvBtn">导出</button>
             <button class="tpl-btn tpl-btn-danger tpl-btn-sm" id="tplClearActiveBtn">清除</button>
           </div>
         </div>
@@ -6111,8 +6202,20 @@
   function renderTplEditRows(courses) {
     var html = '';
     courses.forEach(function(c, idx) {
-      html += '<div class="tpl-entry-card" data-idx="' + idx + '">';
+      var summaryParts = [];
+      if (c.weekday) summaryParts.push(c.weekday);
+      if (c.period) summaryParts.push(c.period);
+      if (c.grade || c.className) summaryParts.push((c.grade || '') + (c.className || ''));
+      if (c.subject) summaryParts.push(c.subject);
+      var summaryText = summaryParts.length > 0 ? summaryParts.join(' · ') : '条目 ' + (idx + 1);
+
+      html += '<div class="tpl-entry-card collapsed" data-idx="' + idx + '">';
       html += '<button class="tpl-entry-del" data-idx="' + idx + '">✕</button>';
+      html += '<div class="tpl-entry-summary">';
+      html += '<span class="tpl-entry-badge">' + (idx + 1) + '</span>';
+      html += '<span style="flex:1;">' + escapeHtml(summaryText) + '</span>';
+      html += '<span class="tpl-entry-toggle">展开 ▼</span>';
+      html += '</div>';
       html += '<div class="tpl-field-grid">';
       // Row 1: weekday + period
       html += '<div class="tpl-field"><label>星期</label>' + buildWeekdaySelect(c.weekday || '周一', 'tpl-fld-weekday') + '</div>';
@@ -6131,9 +6234,26 @@
     });
     tplEditRows.innerHTML = html;
 
+    // Bind toggle (collapse/expand)
+    tplEditRows.querySelectorAll('.tpl-entry-summary').forEach(function(summary) {
+      summary.addEventListener('click', function() {
+        var card = summary.closest('.tpl-entry-card');
+        if (card.classList.contains('collapsed')) {
+          card.classList.remove('collapsed');
+          summary.querySelector('.tpl-entry-toggle').textContent = '收起 ▲';
+        } else {
+          card.classList.add('collapsed');
+          summary.querySelector('.tpl-entry-toggle').textContent = '展开 ▼';
+          // Update summary text after editing
+          updateEntrySummary(card);
+        }
+      });
+    });
+
     // Bind delete buttons
     tplEditRows.querySelectorAll('.tpl-entry-del').forEach(function(btn) {
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
         var idx = parseInt(btn.dataset.idx);
         var active = getTplActive();
         if (!active) return;
@@ -6174,6 +6294,22 @@
       bindOptSelect(row, 'tpl-fld-teacher', function(val) { addTplOpt('teachers', val); refreshAllDatalists(); });
       bindOptSelect(row, 'tpl-fld-classroom', function(val) { addTplOpt('classrooms', val); refreshAllDatalists(); });
     });
+  }
+
+  // Update summary text after editing
+  function updateEntrySummary(card) {
+    var idx = parseInt(card.dataset.idx);
+    var active = getTplActive();
+    if (!active || !active.courses[idx]) return;
+    var c = active.courses[idx];
+    var parts = [];
+    if (c.weekday) parts.push(c.weekday);
+    if (c.period) parts.push(c.period);
+    if (c.grade || c.className) parts.push((c.grade || '') + (c.className || ''));
+    if (c.subject) parts.push(c.subject);
+    var text = parts.length > 0 ? parts.join(' · ') : '条目 ' + (idx + 1);
+    var summarySpan = card.querySelector('.tpl-entry-summary span:nth-child(2)');
+    if (summarySpan) summarySpan.textContent = text;
   }
 
   function createTemplateFromCourses() {
@@ -6504,6 +6640,146 @@
   // Create template buttons
   tplCreateFromCoursesBtn.addEventListener('click', createTemplateFromCourses);
   tplCreateBlankBtn.addEventListener('click', createBlankTemplate);
+
+  // Fullscreen schedule view
+  var tplFullscreenBtn = document.getElementById('tplFullscreenBtn');
+  var tplFullscreenOverlay = document.getElementById('tplFullscreenOverlay');
+  var tplFullscreenClose = document.getElementById('tplFullscreenClose');
+  var tplFullscreenBody = document.getElementById('tplFullscreenBody');
+  var tplFullscreenTitle = document.getElementById('tplFullscreenTitle');
+
+  function buildScheduleHtml(courses, selectedGrade) {
+    var displayCourses = selectedGrade
+      ? courses.filter(function(c) { return (c.grade || '').trim() === selectedGrade; })
+      : courses;
+    var groups = groupByWeekday(displayCourses);
+    var html = '';
+    var hasAny = false;
+    TPL_WEEKDAYS.forEach(function(d) {
+      if (!groups[d] || groups[d].length === 0) return;
+      hasAny = true;
+      html += '<div class="tpl-weekday-group" style="margin-bottom:12px;">';
+      html += '<div class="tpl-weekday-header">📅 ' + d + ' <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">(' + groups[d].length + '条)</span></div>';
+      // Sub-group by grade
+      var gradeGroups = {};
+      var noGrade = [];
+      groups[d].forEach(function(c) {
+        var g = (c.grade || '').trim();
+        if (g) { if (!gradeGroups[g]) gradeGroups[g] = []; gradeGroups[g].push(c); }
+        else { noGrade.push(c); }
+      });
+      var sortedGrades = Object.keys(gradeGroups).sort();
+      sortedGrades.forEach(function(g) {
+        html += '<div class="tpl-grade-subheader">📚 ' + escapeHtml(g) + ' <span style="font-size:0.66rem;color:var(--muted);font-weight:400;">(' + gradeGroups[g].length + '条)</span></div>';
+        html += '<table class="tpl-view-table"><thead><tr><th>班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+        gradeGroups[g].forEach(function(c) {
+          html += '<tr>';
+          html += '<td>' + escapeHtml(c.className || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.time || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+      });
+      if (noGrade.length > 0) {
+        if (sortedGrades.length > 0) html += '<div class="tpl-grade-subheader" style="border-left-color:var(--muted);">未分年级</div>';
+        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+        noGrade.forEach(function(c) {
+          var gc = escapeHtml((c.grade || '') + (c.className || ''));
+          html += '<tr>';
+          html += '<td>' + (gc || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.time || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+      }
+      html += '</div>';
+    });
+    if (!hasAny) html = '<div class="tpl-view-empty">' + (selectedGrade ? '该年级暂无课表' : '暂无课表内容') + '</div>';
+    return html;
+  }
+
+  tplFullscreenBtn.addEventListener('click', function() {
+    var active = getTplActive();
+    if (!active || !active.courses || active.courses.length === 0) {
+      showToast('暂无课表可查看');
+      return;
+    }
+    tplFullscreenTitle.textContent = (active.name || '课表') + ' - 全屏查看';
+    tplFullscreenBody.innerHTML = buildScheduleHtml(active.courses, tplSelectedGrade) +
+      '<div class="tpl-schedule-scroll-hint">💡 左右滑动查看更多内容</div>';
+    tplFullscreenOverlay.classList.add('open');
+  });
+
+  tplFullscreenClose.addEventListener('click', function() {
+    tplFullscreenOverlay.classList.remove('open');
+  });
+  tplFullscreenOverlay.addEventListener('click', function(e) {
+    if (e.target === tplFullscreenOverlay) tplFullscreenOverlay.classList.remove('open');
+  });
+
+  // Export schedule as CSV (Excel compatible)
+  var tplExportCsvBtn = document.getElementById('tplExportCsvBtn');
+  tplExportCsvBtn.addEventListener('click', function() {
+    var active = getTplActive();
+    if (!active || !active.courses || active.courses.length === 0) {
+      showToast('暂无课表可导出');
+      return;
+    }
+    var courses = active.courses;
+    // Build CSV grouped by weekday then grade
+    var csv = '\uFEFF'; // BOM for Excel UTF-8
+    csv += '星期,年级,班级,节次,时间,科目,老师,教室\n';
+    // Sort by weekday order, then grade, then period
+    var sorted = courses.slice().sort(function(a, b) {
+      var wa = TPL_WEEKDAYS.indexOf(a.weekday || '周一');
+      var wb = TPL_WEEKDAYS.indexOf(b.weekday || '周一');
+      if (wa !== wb) return wa - wb;
+      var ga = (a.grade || '').trim();
+      var gb = (b.grade || '').trim();
+      if (ga !== gb) return ga < gb ? -1 : 1;
+      return 0;
+    });
+    sorted.forEach(function(c) {
+      var row = [
+        c.weekday || '',
+        c.grade || '',
+        c.className || '',
+        c.period || '',
+        c.time || '',
+        c.subject || '',
+        c.teacher || '',
+        c.classroom || ''
+      ];
+      // Escape CSV fields
+      csv += row.map(function(val) {
+        var s = String(val);
+        if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+          return '"' + s.replace(/"/g, '""') + '"';
+        }
+        return s;
+      }).join(',') + '\n';
+    });
+    // Download
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    var dateStr = new Date().toISOString().slice(0, 10);
+    a.download = '课表_' + (active.name || '') + '_' + dateStr + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('课表已导出为CSV（可用Excel打开）');
+  });
 
   // Initial render
   refreshAllDatalists();
@@ -6961,6 +7237,17 @@
   schedLoadViewWithBackup();
 })();
 </script>
+
+<!-- Fullscreen schedule modal -->
+<div class="tpl-fullscreen-overlay" id="tplFullscreenOverlay">
+  <div class="tpl-fullscreen-box">
+    <div class="tpl-fullscreen-header">
+      <span class="tpl-fullscreen-title" id="tplFullscreenTitle">课表全屏查看</span>
+      <button class="tpl-fullscreen-close" id="tplFullscreenClose">关闭 ✕</button>
+    </div>
+    <div class="tpl-fullscreen-body" id="tplFullscreenBody"></div>
+  </div>
+</div>
 
 </body>
 </html>
