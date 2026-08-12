@@ -2405,7 +2405,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.8">
+    <meta name="app-version" content="20260812.9">
   </div>
 
   <!-- Tabs -->
@@ -5620,6 +5620,17 @@
 })();
 </script>
 
+<!-- Fullscreen schedule modal -->
+<div class="tpl-fullscreen-overlay" id="tplFullscreenOverlay">
+  <div class="tpl-fullscreen-box">
+    <div class="tpl-fullscreen-header">
+      <span class="tpl-fullscreen-title" id="tplFullscreenTitle">课表全屏查看</span>
+      <button class="tpl-fullscreen-close" id="tplFullscreenClose">关闭 ✕</button>
+    </div>
+    <div class="tpl-fullscreen-body" id="tplFullscreenBody"></div>
+  </div>
+</div>
+
 <!-- Schedule viewer script -->
 <script>
 (function() {
@@ -6745,22 +6756,22 @@
     return html;
   }
 
-  tplFullscreenBtn.addEventListener('click', function() {
+  if (tplFullscreenBtn) tplFullscreenBtn.addEventListener('click', function() {
     var active = getTplActive();
     if (!active || !active.courses || active.courses.length === 0) {
       showToast('暂无课表可查看');
       return;
     }
-    tplFullscreenTitle.textContent = (active.name || '课表') + ' - 全屏查看';
-    tplFullscreenBody.innerHTML = buildScheduleHtml(active.courses, tplSelectedGrade) +
+    if (tplFullscreenTitle) tplFullscreenTitle.textContent = (active.name || '课表') + ' - 全屏查看';
+    if (tplFullscreenBody) tplFullscreenBody.innerHTML = buildScheduleHtml(active.courses, tplSelectedGrade) +
       '<div class="tpl-schedule-scroll-hint">💡 左右滑动查看更多内容</div>';
-    tplFullscreenOverlay.classList.add('open');
+    if (tplFullscreenOverlay) tplFullscreenOverlay.classList.add('open');
   });
 
-  tplFullscreenClose.addEventListener('click', function() {
-    tplFullscreenOverlay.classList.remove('open');
+  if (tplFullscreenClose) tplFullscreenClose.addEventListener('click', function() {
+    if (tplFullscreenOverlay) tplFullscreenOverlay.classList.remove('open');
   });
-  tplFullscreenOverlay.addEventListener('click', function(e) {
+  if (tplFullscreenOverlay) tplFullscreenOverlay.addEventListener('click', function(e) {
     if (e.target === tplFullscreenOverlay) tplFullscreenOverlay.classList.remove('open');
   });
 
@@ -7276,17 +7287,6 @@
   schedLoadViewWithBackup();
 })();
 </script>
-
-<!-- Fullscreen schedule modal -->
-<div class="tpl-fullscreen-overlay" id="tplFullscreenOverlay">
-  <div class="tpl-fullscreen-box">
-    <div class="tpl-fullscreen-header">
-      <span class="tpl-fullscreen-title" id="tplFullscreenTitle">课表全屏查看</span>
-      <button class="tpl-fullscreen-close" id="tplFullscreenClose">关闭 ✕</button>
-    </div>
-    <div class="tpl-fullscreen-body" id="tplFullscreenBody"></div>
-  </div>
-</div>
 
 </body>
 </html>
