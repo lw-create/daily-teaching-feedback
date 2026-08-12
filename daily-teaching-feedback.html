@@ -2405,7 +2405,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.9">
+    <meta name="app-version" content="20260812.10">
   </div>
 
   <!-- Tabs -->
@@ -3010,6 +3010,62 @@
 <!-- Toast -->
 <div class="toast" id="toast">已复制到剪贴板</div>
 
+<!-- Global error handler & safe storage utility -->
+<script>
+(function() {
+  // Global toast function (works before main IIFE defines its own)
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  window.__showToast = function(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() {
+      toastEl.classList.remove('show');
+    }, 3000);
+  };
+
+  // Safe storage setter - catches QuotaExceededError and notifies user
+  window.safeStorageSet = function(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch(e) {
+      var msg = e && e.name === 'QuotaExceededError' ? '存储空间已满，请导出备份后清理旧数据' : '数据保存失败：' + (e.message || '未知错误');
+      window.__showToast(msg);
+      console.error('[存储失败] ' + key + ':', e);
+      return false;
+    }
+  };
+
+  // Global error handler - prevents silent script crashes
+  window.addEventListener('error', function(e) {
+    var msg = e.message || '未知错误';
+    var file = e.filename ? e.filename.split('/').pop() : '';
+    var line = e.lineno || '';
+    console.error('[全局错误] ' + msg + ' (' + file + ':' + line + ')');
+    // Show user-friendly message for errors that would otherwise silently break functionality
+    if (msg.indexOf('null') !== -1 || msg.indexOf('undefined') !== -1 || msg.indexOf('Cannot read') !== -1) {
+      window.__showToast('页面功能异常，请刷新重试');
+    } else {
+      window.__showToast('发生错误：' + msg);
+    }
+    // Prevent default to avoid white screen on critical errors
+    e.preventDefault();
+  });
+
+  // Catch unhandled promise rejections
+  window.addEventListener('unhandledrejection', function(e) {
+    var reason = e.reason;
+    var msg = (reason && reason.message) ? reason.message : String(reason || '未知错误');
+    console.error('[Promise错误] ' + msg);
+    window.__showToast('操作失败：' + msg);
+    e.preventDefault();
+  });
+})();
+</script>
+
 <script>
 (function() {
   // --- Elements ---
@@ -3092,9 +3148,7 @@
     sections.forEach(function(s) {
       data[s.id] = document.getElementById(s.id).value;
     });
-    try {
-      localStorage.setItem('teaching_feedback', JSON.stringify(data));
-    } catch(e) {}
+    safeStorageSet('teaching_feedback', JSON.stringify(data));
   }
 
   subjectInput.addEventListener('input', saveData);
@@ -3420,7 +3474,7 @@
   }
 
   function saveCourses(arr) {
-    try { localStorage.setItem('teaching_courses', JSON.stringify(arr)); } catch(e) {}
+    safeStorageSet('teaching_courses', JSON.stringify(arr));
   }
 
   // Schedule template data access (defined early for backup info)
@@ -3430,7 +3484,7 @@
     } catch(e) { return []; }
   }
   function saveTplTemplates(arr) {
-    try { localStorage.setItem('teaching_sched_templates', JSON.stringify(arr)); } catch(e) {}
+    safeStorageSet('teaching_sched_templates', JSON.stringify(arr));
   }
   function getTplActive() {
     try {
@@ -3438,7 +3492,7 @@
     } catch(e) { return null; }
   }
   function saveTplActive(obj) {
-    try { localStorage.setItem('teaching_sched_active', JSON.stringify(obj)); } catch(e) {}
+    safeStorageSet('teaching_sched_active', JSON.stringify(obj));
   }
 
   function renderCourseSelect() {
@@ -3605,7 +3659,7 @@
   }
 
   function saveTodayFeedbacks(arr) {
-    try { localStorage.setItem(getTodayKey(), JSON.stringify(arr)); } catch(e) {}
+    safeStorageSet(getTodayKey(), JSON.stringify(arr));
   }
 
   function getCourseText() {
@@ -3878,7 +3932,7 @@
   }
 
   function saveStudents(arr) {
-    try { localStorage.setItem('teaching_students', JSON.stringify(arr)); } catch(e) {}
+    safeStorageSet('teaching_students', JSON.stringify(arr));
   }
 
   function addStudent(info) {
@@ -4776,12 +4830,12 @@
           if (key === '__meta') return;
           // Only restore teaching_ prefixed keys for safety
           if (key.indexOf('teaching_') === 0) {
-            localStorage.setItem(key, data[key]);
+            safeStorageSet(key, data[key]);
             importCount++;
           }
           // Also restore persistent_info
           if (key === 'persistent_info') {
-            localStorage.setItem('persistent_info', data[key]);
+            safeStorageSet('persistent_info', data[key]);
             importCount++;
           }
         });
@@ -4830,7 +4884,7 @@
   }
 
   function saveHistory(data) {
-    try { localStorage.setItem('teaching_history', JSON.stringify(data)); } catch(e) {}
+    safeStorageSet('teaching_history', JSON.stringify(data));
   }
 
   function addToHistory(sectionId, content) {
@@ -5234,7 +5288,7 @@
   }
 
   function saveExams(exams) {
-    try { localStorage.setItem('teaching_exams', JSON.stringify(exams)); } catch(e) {}
+    safeStorageSet('teaching_exams', JSON.stringify(exams));
   }
 
   function addExam(name, date) {
@@ -5280,7 +5334,7 @@
   }
 
   function saveViolationTypes(types) {
-    try { localStorage.setItem('teaching_violation_types', JSON.stringify(types)); } catch(e) {}
+    safeStorageSet('teaching_violation_types', JSON.stringify(types));
   }
 
   function addViolationType(type) {
@@ -5739,7 +5793,7 @@
     } catch(e) { return []; }
   }
   function saveTplTemplates(arr) {
-    try { localStorage.setItem('teaching_sched_templates', JSON.stringify(arr)); } catch(e) {}
+    safeStorageSet('teaching_sched_templates', JSON.stringify(arr));
   }
   function getTplActive() {
     try {
@@ -5751,7 +5805,7 @@
     } catch(e) { return null; }
   }
   function saveTplActive(obj) {
-    try { localStorage.setItem('teaching_sched_active', JSON.stringify(obj)); } catch(e) {}
+    safeStorageSet('teaching_sched_active', JSON.stringify(obj));
   }
   function getCoursesLocal() {
     try {
@@ -5768,7 +5822,7 @@
     } catch(e) { return []; }
   }
   function saveTplOpt(key, arr) {
-    try { localStorage.setItem(TPL_OPT_PREFIX + key, JSON.stringify(arr)); } catch(e) {}
+    safeStorageSet(TPL_OPT_PREFIX + key, JSON.stringify(arr));
   }
   function addTplOpt(key, val) {
     if (!val) return;
@@ -7094,7 +7148,7 @@
   });
 
   schedSavePersistentBtn.addEventListener('click', function() {
-    localStorage.setItem('persistent_info', schedPersistentInput.value.trim());
+    safeStorageSet('persistent_info', schedPersistentInput.value.trim());
     schedPersistentEditor.style.display = 'none';
     schedLoadPersistentInfo();
     showToast('常驻信息已保存');
@@ -7245,7 +7299,7 @@
 
         // Import persistent info (localStorage)
         if (data.persistent_info !== undefined) {
-          localStorage.setItem('persistent_info', data.persistent_info);
+          safeStorageSet('persistent_info', data.persistent_info);
         }
 
         // Import template data
