@@ -2405,7 +2405,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.7">
+    <meta name="app-version" content="20260812.8">
   </div>
 
   <!-- Tabs -->
@@ -5703,9 +5703,28 @@
 
   // ====== Schedule Template System (Enhanced) ======
   // Local data access (reads same localStorage keys as main IIFE)
+  function normalizeCourse(c) {
+    return {
+      weekday: c.weekday || '周一',
+      period: c.period || '',
+      time: c.time || '',
+      grade: c.grade || '',
+      className: c.className || c.class || '',
+      subject: c.subject || '',
+      teacher: c.teacher || '',
+      classroom: c.classroom || ''
+    };
+  }
   function getTplTemplates() {
     try {
-      return JSON.parse(localStorage.getItem('teaching_sched_templates') || '[]');
+      var arr = JSON.parse(localStorage.getItem('teaching_sched_templates') || '[]');
+      // Normalize old data to ensure all fields exist
+      arr.forEach(function(tpl) {
+        if (tpl.courses && Array.isArray(tpl.courses)) {
+          tpl.courses = tpl.courses.map(normalizeCourse);
+        }
+      });
+      return arr;
     } catch(e) { return []; }
   }
   function saveTplTemplates(arr) {
@@ -5713,7 +5732,11 @@
   }
   function getTplActive() {
     try {
-      return JSON.parse(localStorage.getItem('teaching_sched_active') || 'null');
+      var obj = JSON.parse(localStorage.getItem('teaching_sched_active') || 'null');
+      if (obj && obj.courses && Array.isArray(obj.courses)) {
+        obj.courses = obj.courses.map(normalizeCourse);
+      }
+      return obj;
     } catch(e) { return null; }
   }
   function saveTplActive(obj) {
@@ -5953,6 +5976,7 @@
   var tplAddClassroomWrap = document.getElementById('tplAddClassroomWrap');
   var tplAddRowBtn = document.getElementById('tplAddRowBtn');
   var tplIsEditing = false;
+  var tplIsRendering = false; // flag to prevent auto-save during rendering
 
   // Populate the add-form selects from preset options
   function renderAddFormSelects() {
@@ -6200,6 +6224,7 @@
   }
 
   function renderTplEditRows(courses) {
+    tplIsRendering = true;
     var html = '';
     courses.forEach(function(c, idx) {
       var summaryParts = [];
@@ -6233,6 +6258,7 @@
       html += '</div>';
     });
     tplEditRows.innerHTML = html;
+    tplIsRendering = false;
 
     // Bind toggle (collapse/expand)
     tplEditRows.querySelectorAll('.tpl-entry-summary').forEach(function(summary) {
@@ -6267,16 +6293,29 @@
     tplEditRows.querySelectorAll('.tpl-entry-card').forEach(function(row) {
       var idx = parseInt(row.dataset.idx);
       function saveField() {
+        if (tplIsRendering) return; // skip during rendering
         var active = getTplActive();
         if (!active || !active.courses[idx]) return;
-        active.courses[idx].weekday = row.querySelector('.tpl-fld-weekday').value;
-        active.courses[idx].period = readOptVal(row, 'tpl-fld-period');
-        active.courses[idx].time = row.querySelector('.tpl-fld-time').value.trim();
-        active.courses[idx].grade = readOptVal(row, 'tpl-fld-grade');
-        active.courses[idx].className = readOptVal(row, 'tpl-fld-class');
-        active.courses[idx].subject = readOptVal(row, 'tpl-fld-subject');
-        active.courses[idx].teacher = readOptVal(row, 'tpl-fld-teacher');
-        active.courses[idx].classroom = readOptVal(row, 'tpl-fld-classroom');
+        var newWeekday = row.querySelector('.tpl-fld-weekday').value;
+        var newPeriod = readOptVal(row, 'tpl-fld-period');
+        var newTime = row.querySelector('.tpl-fld-time').value.trim();
+        var newGrade = readOptVal(row, 'tpl-fld-grade');
+        var newClassName = readOptVal(row, 'tpl-fld-class');
+        var newSubject = readOptVal(row, 'tpl-fld-subject');
+        var newTeacher = readOptVal(row, 'tpl-fld-teacher');
+        var newClassroom = readOptVal(row, 'tpl-fld-classroom');
+        // Safeguard: don't overwrite with all-empty values (prevents data loss)
+        if (!newWeekday && !newPeriod && !newTime && !newGrade && !newClassName && !newSubject && !newTeacher && !newClassroom) {
+          return;
+        }
+        active.courses[idx].weekday = newWeekday;
+        active.courses[idx].period = newPeriod;
+        active.courses[idx].time = newTime;
+        active.courses[idx].grade = newGrade;
+        active.courses[idx].className = newClassName;
+        active.courses[idx].subject = newSubject;
+        active.courses[idx].teacher = newTeacher;
+        active.courses[idx].classroom = newClassroom;
         saveTplActive(active);
         // Save new options
         saveEntryOpts(active.courses[idx]);
