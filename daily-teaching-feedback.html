@@ -2109,6 +2109,35 @@
     text-align: center;
     padding: 8px;
   }
+  .tpl-grade-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 1px solid var(--rule);
+    background: #fff;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .tpl-grade-chip.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .tpl-grade-subheader {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--ink);
+    padding: 3px 6px;
+    margin: 4px 0 2px;
+    border-left: 3px solid var(--accent);
+    background: rgba(45,157,120,0.04);
+    border-radius: 0 4px 4px 0;
+  }
 
   /* Add form */
   .tpl-add-form {
@@ -2190,7 +2219,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.4">
+    <meta name="app-version" content="20260812.5">
   </div>
 
   <!-- Tabs -->
@@ -2594,6 +2623,12 @@
             <button class="tpl-btn tpl-btn-sm" id="tplResetActiveBtn">重置</button>
             <button class="tpl-btn tpl-btn-danger tpl-btn-sm" id="tplClearActiveBtn">清除</button>
           </div>
+        </div>
+
+        <!-- Grade filter bar -->
+        <div id="tplGradeFilterBar" style="display:none;margin-bottom:8px;flex-wrap:wrap;gap:6px;align-items:center;">
+          <span style="font-size:0.72rem;color:var(--muted);">筛选年级：</span>
+          <div id="tplGradeFilterChips" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
         </div>
 
         <!-- View mode -->
@@ -5520,6 +5555,9 @@
   var tplScheduleView = document.getElementById('tplScheduleView');
   var tplScheduleEdit = document.getElementById('tplScheduleEdit');
   var tplEditRows = document.getElementById('tplEditRows');
+  var tplGradeFilterBar = document.getElementById('tplGradeFilterBar');
+  var tplGradeFilterChips = document.getElementById('tplGradeFilterChips');
+  var tplSelectedGrade = ''; // empty = show all grades
   var tplEditBtn = document.getElementById('tplEditBtn');
   var tplSaveActiveBtn = document.getElementById('tplSaveActiveBtn');
   var tplResetActiveBtn = document.getElementById('tplResetActiveBtn');
@@ -5554,25 +5592,56 @@
       html += '<button class="tpl-btn tpl-btn-danger tpl-btn-sm tpl-del-tpl-btn" data-id="' + tpl.id + '">删除</button>';
       html += '</div>';
       html += '</div>';
-      // Preview grouped by weekday
+      // Preview grouped by weekday then by grade
       var groups = groupByWeekday(tpl.courses);
       html += '<div class="tpl-schedule-table">';
       TPL_WEEKDAYS.forEach(function(d) {
         if (!groups[d] || groups[d].length === 0) return;
         html += '<div class="tpl-weekday-header">📅 ' + d + '</div>';
-        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+        // Sub-group by grade
+        var gradeGroups = {};
+        var noGrade = [];
         groups[d].forEach(function(c) {
-          var gc = escapeHtml((c.grade || '') + (c.className || ''));
-          html += '<tr>';
-          html += '<td>' + (gc || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.period || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.time || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
-          html += '</tr>';
+          var g = (c.grade || '').trim();
+          if (g) {
+            if (!gradeGroups[g]) gradeGroups[g] = [];
+            gradeGroups[g].push(c);
+          } else {
+            noGrade.push(c);
+          }
         });
-        html += '</tbody></table>';
+        var sortedGrades = Object.keys(gradeGroups).sort();
+        sortedGrades.forEach(function(g) {
+          html += '<div class="tpl-grade-subheader">📚 ' + escapeHtml(g) + '</div>';
+          html += '<table class="tpl-view-table"><thead><tr><th>班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+          gradeGroups[g].forEach(function(c) {
+            html += '<tr>';
+            html += '<td>' + escapeHtml(c.className || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.time || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+        });
+        if (noGrade.length > 0) {
+          if (sortedGrades.length > 0) html += '<div class="tpl-grade-subheader" style="border-left-color:var(--muted);">未分年级</div>';
+          html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+          noGrade.forEach(function(c) {
+            var gc = escapeHtml((c.grade || '') + (c.className || ''));
+            html += '<tr>';
+            html += '<td>' + (gc || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.time || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+        }
       });
       html += '</div>';
       html += '</div>';
@@ -5621,11 +5690,50 @@
     if (tplIsEditing) {
       tplScheduleView.style.display = 'none';
       tplScheduleEdit.style.display = 'block';
+      tplGradeFilterBar.style.display = 'none';
       renderTplEditRows(active.courses);
     } else {
       tplScheduleView.style.display = 'block';
       tplScheduleEdit.style.display = 'none';
-      var groups = groupByWeekday(active.courses);
+
+      // Extract unique grades
+      var allGrades = [];
+      active.courses.forEach(function(c) {
+        var g = (c.grade || '').trim();
+        if (g && allGrades.indexOf(g) === -1) allGrades.push(g);
+      });
+      allGrades.sort();
+
+      // Reset filter if selected grade no longer exists
+      if (tplSelectedGrade && allGrades.indexOf(tplSelectedGrade) === -1) {
+        tplSelectedGrade = '';
+      }
+
+      // Show grade filter if there are 2+ distinct grades
+      if (allGrades.length >= 2) {
+        tplGradeFilterBar.style.display = 'flex';
+        var chipsHtml = '<span class="tpl-grade-chip' + (tplSelectedGrade === '' ? ' active' : '') + '" data-grade="">全部</span>';
+        allGrades.forEach(function(g) {
+          chipsHtml += '<span class="tpl-grade-chip' + (tplSelectedGrade === g ? ' active' : '') + '" data-grade="' + escapeHtml(g) + '">' + escapeHtml(g) + '</span>';
+        });
+        tplGradeFilterChips.innerHTML = chipsHtml;
+        // Bind chip clicks
+        tplGradeFilterChips.querySelectorAll('.tpl-grade-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            tplSelectedGrade = chip.dataset.grade;
+            renderTplActive();
+          });
+        });
+      } else {
+        tplGradeFilterBar.style.display = 'none';
+      }
+
+      // Filter courses by selected grade
+      var displayCourses = tplSelectedGrade
+        ? active.courses.filter(function(c) { return (c.grade || '').trim() === tplSelectedGrade; })
+        : active.courses;
+
+      var groups = groupByWeekday(displayCourses);
       var html = '';
       var hasAny = false;
       TPL_WEEKDAYS.forEach(function(d) {
@@ -5633,22 +5741,63 @@
         hasAny = true;
         html += '<div class="tpl-weekday-group">';
         html += '<div class="tpl-weekday-header">📅 ' + d + ' <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">(' + groups[d].length + '条)</span></div>';
-        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+
+        // Sub-group by grade within this weekday
+        var gradeGroups = {};
+        var noGrade = [];
         groups[d].forEach(function(c) {
-          var gc = escapeHtml((c.grade || '') + (c.className || ''));
-          html += '<tr>';
-          html += '<td>' + (gc || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.period || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.time || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
-          html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
-          html += '</tr>';
+          var g = (c.grade || '').trim();
+          if (g) {
+            if (!gradeGroups[g]) gradeGroups[g] = [];
+            gradeGroups[g].push(c);
+          } else {
+            noGrade.push(c);
+          }
         });
-        html += '</tbody></table>';
+
+        // Get sorted grade keys
+        var sortedGrades = Object.keys(gradeGroups).sort();
+
+        // Render each grade sub-group
+        sortedGrades.forEach(function(g) {
+          html += '<div class="tpl-grade-subheader">📚 ' + escapeHtml(g) + ' <span style="font-size:0.66rem;color:var(--muted);font-weight:400;">(' + gradeGroups[g].length + '条)</span></div>';
+          html += '<table class="tpl-view-table"><thead><tr><th>班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+          gradeGroups[g].forEach(function(c) {
+            html += '<tr>';
+            html += '<td>' + escapeHtml(c.className || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.time || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+        });
+
+        // Render entries with no grade
+        if (noGrade.length > 0) {
+          if (sortedGrades.length > 0) {
+            html += '<div class="tpl-grade-subheader" style="border-left-color:var(--muted);">未分年级</div>';
+          }
+          html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+          noGrade.forEach(function(c) {
+            var gc = escapeHtml((c.grade || '') + (c.className || ''));
+            html += '<tr>';
+            html += '<td>' + (gc || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.time || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+            html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table>';
+        }
+
         html += '</div>';
       });
-      if (!hasAny) html = '<div class="tpl-view-empty">暂无课表内容，点击"编辑"添加</div>';
+      if (!hasAny) html = '<div class="tpl-view-empty">' + (tplSelectedGrade ? '该年级暂无课表' : '暂无课表内容，点击"编辑"添加') + '</div>';
       tplScheduleView.innerHTML = html;
     }
   }
@@ -5785,6 +5934,7 @@
     var templates = getTplTemplates();
     var tpl = templates.find(function(t) { return t.id === tplId; });
     if (!tpl) { showToast('模板不存在'); return; }
+    tplSelectedGrade = ''; // reset grade filter
     var active = {
       templateId: tpl.id,
       name: tpl.name,
@@ -5852,17 +6002,17 @@
     // Bind save
     cardEl.querySelector('.tpl-save-tpl-btn').addEventListener('click', function() {
       var name = document.getElementById('tplNameInput_' + tplId).value.trim() || '未命名模板';
-      var entryCards = cardEl.querySelectorAll('[data-tpl-idx]');
+      var entryCards = cardEl.querySelectorAll('.tpl-entry-card');
       var newCourses = [];
-      entryCards.forEach(function(card) {
-        var weekday = card.querySelector('.tpl-tf-weekday').value;
-        var period = card.querySelector('.tpl-tf-period').value.trim();
-        var time = card.querySelector('.tpl-tf-time').value.trim();
-        var grade = card.querySelector('.tpl-tf-grade').value.trim();
-        var className = card.querySelector('.tpl-tf-class').value.trim();
-        var subject = card.querySelector('.tpl-tf-subject').value.trim();
-        var teacher = card.querySelector('.tpl-tf-teacher').value.trim();
-        var classroom = card.querySelector('.tpl-tf-classroom').value.trim();
+      entryCards.forEach(function(entryCard) {
+        var weekday = entryCard.querySelector('.tpl-tf-weekday').value;
+        var period = entryCard.querySelector('.tpl-tf-period').value.trim();
+        var time = entryCard.querySelector('.tpl-tf-time').value.trim();
+        var grade = entryCard.querySelector('.tpl-tf-grade').value.trim();
+        var className = entryCard.querySelector('.tpl-tf-class').value.trim();
+        var subject = entryCard.querySelector('.tpl-tf-subject').value.trim();
+        var teacher = entryCard.querySelector('.tpl-tf-teacher').value.trim();
+        var classroom = entryCard.querySelector('.tpl-tf-classroom').value.trim();
         if (weekday || period || time || grade || className || subject || teacher || classroom) {
           var entry = { weekday: weekday, period: period, time: time, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
           newCourses.push(entry);
@@ -5902,7 +6052,7 @@
       var subject = document.getElementById('tplTfAddSubject_' + tplId).value.trim();
       var teacher = document.getElementById('tplTfAddTeacher_' + tplId).value.trim();
       var classroom = document.getElementById('tplTfAddClassroom_' + tplId).value.trim();
-      if (!period && !time && !grade && !className && !subject && !teacher && !classroom) {
+      if (!weekday && !period && !time && !grade && !className && !subject && !teacher && !classroom) {
         showToast('请至少输入一项内容');
         return;
       }
@@ -5979,6 +6129,7 @@
     if (!confirm('确定清除当前编辑的课表？')) return;
     localStorage.removeItem('teaching_sched_active');
     tplIsEditing = false;
+    tplSelectedGrade = '';
     renderTplActive();
     showToast('已清除课表');
   });
@@ -5998,7 +6149,7 @@
     var subject = tplAddSubject.value.trim();
     var teacher = tplAddTeacher.value.trim();
     var classroom = tplAddClassroom.value.trim();
-    if (!period && !time && !grade && !className && !subject && !teacher && !classroom) {
+    if (!weekday && !period && !time && !grade && !className && !subject && !teacher && !classroom) {
       showToast('请至少输入一项内容');
       return;
     }
