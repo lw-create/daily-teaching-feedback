@@ -2405,7 +2405,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.10">
+    <meta name="app-version" content="20260812.11">
   </div>
 
   <!-- Tabs -->
@@ -2648,6 +2648,8 @@
       <input type="file" id="importFileInput" accept=".json" style="display:none;">
     </div>
     <div id="dataBackupInfo" style="font-size:0.72rem;color:var(--muted);margin-top:6px;"></div>
+    <div id="autoBackupInfo" style="font-size:0.72rem;color:var(--muted);margin-top:4px;"></div>
+    <button class="btn btn-secondary" id="restoreAutoBackupBtn" type="button" style="font-size:0.78rem;padding:6px 12px;margin-top:6px;display:none;">恢复自动备份</button>
   </div>
 
   </div><!-- /panel-manual -->
@@ -3027,9 +3029,57 @@
   };
 
   // Safe storage setter - catches QuotaExceededError and notifies user
+  // Also triggers auto-backup (throttled) after each successful write
+  var autoBackupTimer = null;
+  var AUTO_BACKUP_KEY = 'auto_backup_snapshot';
+  var AUTO_BACKUP_KEYS = [
+    'teaching_students', 'teaching_courses', 'teaching_feedback',
+    'teaching_history', 'teaching_exams', 'teaching_violation_types',
+    'teaching_sched_templates', 'teaching_sched_active',
+    'tpl_opt_grades', 'tpl_opt_classes', 'tpl_opt_subjects',
+    'tpl_opt_teachers', 'tpl_opt_classrooms', 'tpl_opt_periods',
+    'persistent_info'
+  ];
+
+  window.autoBackup = function() {
+    try {
+      var snapshot = { __time: Date.now(), __date: new Date().toISOString() };
+      AUTO_BACKUP_KEYS.forEach(function(k) {
+        var v = localStorage.getItem(k);
+        if (v !== null) snapshot[k] = v;
+      });
+      // Also collect teaching_today_ keys
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && key.indexOf('teaching_today_') === 0) {
+          snapshot[key] = localStorage.getItem(key);
+        }
+      }
+      localStorage.setItem(AUTO_BACKUP_KEY, JSON.stringify(snapshot));
+      // Update UI if elements exist
+      var infoEl = document.getElementById('autoBackupInfo');
+      if (infoEl) {
+        var d = new Date(snapshot.__time);
+        var tStr = (d.getMonth()+1) + '月' + d.getDate() + '日 ' +
+          String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+        infoEl.textContent = '自动备份：' + tStr;
+      }
+      var restoreBtn = document.getElementById('restoreAutoBackupBtn');
+      if (restoreBtn) restoreBtn.style.display = 'inline-flex';
+    } catch(e) {
+      console.error('[自动备份失败]', e);
+    }
+  };
+
   window.safeStorageSet = function(key, value) {
     try {
       localStorage.setItem(key, value);
+      // Throttle auto-backup: at most once per 30 seconds
+      if (autoBackupTimer) clearTimeout(autoBackupTimer);
+      autoBackupTimer = setTimeout(function() {
+        window.autoBackup();
+        autoBackupTimer = null;
+      }, 30000);
       return true;
     } catch(e) {
       var msg = e && e.name === 'QuotaExceededError' ? '存储空间已满，请导出备份后清理旧数据' : '数据保存失败：' + (e.message || '未知错误');
@@ -3062,6 +3112,18 @@
     console.error('[Promise错误] ' + msg);
     window.__showToast('操作失败：' + msg);
     e.preventDefault();
+  });
+
+  // Emergency backup before page unloads
+  window.addEventListener('beforeunload', function() {
+    if (typeof window.autoBackup === 'function') window.autoBackup();
+  });
+
+  // Initial auto-backup on page load (after a short delay to let data settle)
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      if (typeof window.autoBackup === 'function') window.autoBackup();
+    }, 2000);
   });
 })();
 </script>
@@ -3478,9 +3540,29 @@
   }
 
   // Schedule template data access (defined early for backup info)
+  // normalizeCourse ensures old data has all required fields
+  function normalizeCourse(c) {
+    if (!c || typeof c !== 'object') return { weekday: '周一', period: '', time: '', grade: '', className: '', subject: '', teacher: '', classroom: '' };
+    return {
+      weekday: c.weekday || '周一',
+      period: c.period || '',
+      time: c.time || '',
+      grade: c.grade || '',
+      className: c.className || c.class || '',
+      subject: c.subject || '',
+      teacher: c.teacher || '',
+      classroom: c.classroom || ''
+    };
+  }
   function getTplTemplates() {
     try {
-      return JSON.parse(localStorage.getItem('teaching_sched_templates') || '[]');
+      var arr = JSON.parse(localStorage.getItem('teaching_sched_templates') || '[]');
+      arr.forEach(function(tpl) {
+        if (tpl.courses && Array.isArray(tpl.courses)) {
+          tpl.courses = tpl.courses.map(normalizeCourse);
+        }
+      });
+      return arr;
     } catch(e) { return []; }
   }
   function saveTplTemplates(arr) {
@@ -3488,7 +3570,11 @@
   }
   function getTplActive() {
     try {
-      return JSON.parse(localStorage.getItem('teaching_sched_active') || 'null');
+      var obj = JSON.parse(localStorage.getItem('teaching_sched_active') || 'null');
+      if (obj && obj.courses && Array.isArray(obj.courses)) {
+        obj.courses = obj.courses.map(normalizeCourse);
+      }
+      return obj;
     } catch(e) { return null; }
   }
   function saveTplActive(obj) {
@@ -4756,6 +4842,53 @@
     dataBackupInfo.textContent = '当前数据：' + studentCount + '名学生 · ' + courseCount + '节课程 · ' + getExams().length + '次考试 · ' + feedbackCount + '条反馈 · ' + getTplTemplates().length + '个课表模板';
   }
 
+  // --- Auto backup: restore & page-load check ---
+  var restoreAutoBackupBtn = document.getElementById('restoreAutoBackupBtn');
+  var autoBackupInfoEl = document.getElementById('autoBackupInfo');
+
+  function checkAutoBackupOnLoad() {
+    try {
+      var raw = localStorage.getItem('auto_backup_snapshot');
+      if (!raw) return;
+      var snap = JSON.parse(raw);
+      if (!snap || !snap.__time) return;
+      var d = new Date(snap.__time);
+      var tStr = (d.getMonth()+1) + '月' + d.getDate() + '日 ' +
+        String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      if (autoBackupInfoEl) autoBackupInfoEl.textContent = '自动备份：' + tStr;
+      if (restoreAutoBackupBtn) restoreAutoBackupBtn.style.display = 'inline-flex';
+    } catch(e) {}
+  }
+
+  if (restoreAutoBackupBtn) {
+    restoreAutoBackupBtn.addEventListener('click', function() {
+      try {
+        var raw = localStorage.getItem('auto_backup_snapshot');
+        if (!raw) { showToast('暂无自动备份'); return; }
+        var snap = JSON.parse(raw);
+        if (!snap || !snap.__time) { showToast('备份数据无效'); return; }
+        var d = new Date(snap.__time);
+        var tStr = (d.getMonth()+1) + '月' + d.getDate() + '日 ' +
+          String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+        if (!confirm('将恢复至 ' + tStr + ' 的自动备份，当前数据会被覆盖。确定恢复吗？')) return;
+        // Restore each key
+        var restoredCount = 0;
+        Object.keys(snap).forEach(function(k) {
+          if (k === '__time' || k === '__date') return;
+          safeStorageSet(k, snap[k]);
+          restoredCount++;
+        });
+        showToast('已恢复 ' + restoredCount + ' 项数据，刷新页面生效');
+        setTimeout(function() { location.reload(); }, 1500);
+      } catch(e) {
+        showToast('恢复失败：' + (e.message || '未知错误'));
+      }
+    });
+  }
+
+  // Check auto backup on page load
+  checkAutoBackupOnLoad();
+
   exportBtn.addEventListener('click', function() {
     var data = {};
     // Collect known keys
@@ -5671,6 +5804,11 @@
   // Export shared functions for the schedule viewer IIFE
   window.showToast = showToast;
   window.escapeHtml = escapeHtml;
+  window.normalizeCourse = normalizeCourse;
+  window.getTplTemplates = getTplTemplates;
+  window.saveTplTemplates = saveTplTemplates;
+  window.getTplActive = getTplActive;
+  window.saveTplActive = saveTplActive;
 })();
 </script>
 
@@ -5767,46 +5905,9 @@
   }
 
   // ====== Schedule Template System (Enhanced) ======
-  // Local data access (reads same localStorage keys as main IIFE)
-  function normalizeCourse(c) {
-    return {
-      weekday: c.weekday || '周一',
-      period: c.period || '',
-      time: c.time || '',
-      grade: c.grade || '',
-      className: c.className || c.class || '',
-      subject: c.subject || '',
-      teacher: c.teacher || '',
-      classroom: c.classroom || ''
-    };
-  }
-  function getTplTemplates() {
-    try {
-      var arr = JSON.parse(localStorage.getItem('teaching_sched_templates') || '[]');
-      // Normalize old data to ensure all fields exist
-      arr.forEach(function(tpl) {
-        if (tpl.courses && Array.isArray(tpl.courses)) {
-          tpl.courses = tpl.courses.map(normalizeCourse);
-        }
-      });
-      return arr;
-    } catch(e) { return []; }
-  }
-  function saveTplTemplates(arr) {
-    safeStorageSet('teaching_sched_templates', JSON.stringify(arr));
-  }
-  function getTplActive() {
-    try {
-      var obj = JSON.parse(localStorage.getItem('teaching_sched_active') || 'null');
-      if (obj && obj.courses && Array.isArray(obj.courses)) {
-        obj.courses = obj.courses.map(normalizeCourse);
-      }
-      return obj;
-    } catch(e) { return null; }
-  }
-  function saveTplActive(obj) {
-    safeStorageSet('teaching_sched_active', JSON.stringify(obj));
-  }
+  // normalizeCourse is defined in the first IIFE and exported via window.normalizeCourse
+  // getTplTemplates/getTplActive also defined in first IIFE with normalization — reuse them
+  // Local save/getCourses for convenience
   function getCoursesLocal() {
     try {
       return JSON.parse(localStorage.getItem('teaching_courses') || '[]');
