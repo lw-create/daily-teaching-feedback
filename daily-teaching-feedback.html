@@ -2190,7 +2190,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.3">
+    <meta name="app-version" content="20260812.4">
   </div>
 
   <!-- Tabs -->
@@ -2621,6 +2621,10 @@
                 <label>节次</label>
                 <input type="text" id="tplAddPeriod" placeholder="如：第一节" list="dlPeriods">
                 <datalist id="dlPeriods"></datalist>
+              </div>
+              <div class="tpl-field">
+                <label>时间</label>
+                <input type="text" id="tplAddTime" placeholder="如：08:00-08:45">
               </div>
               <div class="tpl-field">
                 <label>年级</label>
@@ -5524,6 +5528,7 @@
   var tplCreateBlankBtn = document.getElementById('tplCreateBlankBtn');
   var tplAddWeekday = document.getElementById('tplAddWeekday');
   var tplAddPeriod = document.getElementById('tplAddPeriod');
+  var tplAddTime = document.getElementById('tplAddTime');
   var tplAddGrade = document.getElementById('tplAddGrade');
   var tplAddClass = document.getElementById('tplAddClass');
   var tplAddSubject = document.getElementById('tplAddSubject');
@@ -5555,12 +5560,13 @@
       TPL_WEEKDAYS.forEach(function(d) {
         if (!groups[d] || groups[d].length === 0) return;
         html += '<div class="tpl-weekday-header">📅 ' + d + '</div>';
-        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
         groups[d].forEach(function(c) {
           var gc = escapeHtml((c.grade || '') + (c.className || ''));
           html += '<tr>';
           html += '<td>' + (gc || '-') + '</td>';
           html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.time || '-') + '</td>';
           html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
           html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
           html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
@@ -5627,12 +5633,13 @@
         hasAny = true;
         html += '<div class="tpl-weekday-group">';
         html += '<div class="tpl-weekday-header">📅 ' + d + ' <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">(' + groups[d].length + '条)</span></div>';
-        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>时间</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
         groups[d].forEach(function(c) {
           var gc = escapeHtml((c.grade || '') + (c.className || ''));
           html += '<tr>';
           html += '<td>' + (gc || '-') + '</td>';
           html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.time || '-') + '</td>';
           html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
           html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
           html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
@@ -5655,14 +5662,15 @@
       // Row 1: weekday + period
       html += '<div class="tpl-field"><label>星期</label>' + buildWeekdaySelect(c.weekday || '周一', 'tpl-fld-weekday') + '</div>';
       html += '<div class="tpl-field"><label>节次</label><input type="text" class="tpl-fld-period" value="' + escapeHtml(c.period || '') + '" placeholder="如：第一节" list="dlPeriods"></div>';
-      // Row 2: grade + class
+      // Row 2: time + grade
+      html += '<div class="tpl-field"><label>时间</label><input type="text" class="tpl-fld-time" value="' + escapeHtml(c.time || '') + '" placeholder="如：08:00-08:45"></div>';
       html += '<div class="tpl-field"><label>年级</label><input type="text" class="tpl-fld-grade" value="' + escapeHtml(c.grade || '') + '" placeholder="如：高一" list="dlGrades"></div>';
+      // Row 3: class + subject
       html += '<div class="tpl-field"><label>班级</label><input type="text" class="tpl-fld-class" value="' + escapeHtml(c.className || '') + '" placeholder="如：1班" list="dlClasses"></div>';
-      // Row 3: subject + teacher
       html += '<div class="tpl-field"><label>科目</label><input type="text" class="tpl-fld-subject" value="' + escapeHtml(c.subject || '') + '" placeholder="如：数学" list="dlSubjects"></div>';
+      // Row 4: teacher + classroom
       html += '<div class="tpl-field"><label>老师</label><input type="text" class="tpl-fld-teacher" value="' + escapeHtml(c.teacher || '') + '" placeholder="如：张老师" list="dlTeachers"></div>';
-      // Row 4: classroom (full width)
-      html += '<div class="tpl-field" style="grid-column:1 / -1;"><label>教室</label><input type="text" class="tpl-fld-classroom" value="' + escapeHtml(c.classroom || '') + '" placeholder="如：101" list="dlClassrooms"></div>';
+      html += '<div class="tpl-field"><label>教室</label><input type="text" class="tpl-fld-classroom" value="' + escapeHtml(c.classroom || '') + '" placeholder="如：101" list="dlClassrooms"></div>';
       html += '</div>';
       html += '</div>';
     });
@@ -5688,6 +5696,7 @@
         if (!active || !active.courses[idx]) return;
         active.courses[idx].weekday = row.querySelector('.tpl-fld-weekday').value;
         active.courses[idx].period = row.querySelector('.tpl-fld-period').value.trim();
+        active.courses[idx].time = row.querySelector('.tpl-fld-time').value.trim();
         active.courses[idx].grade = row.querySelector('.tpl-fld-grade').value.trim();
         active.courses[idx].className = row.querySelector('.tpl-fld-class').value.trim();
         active.courses[idx].subject = row.querySelector('.tpl-fld-subject').value.trim();
@@ -5721,11 +5730,12 @@
       return {
         weekday: '周一',
         period: c.period || '',
+        time: c.time || '',
         grade: '',
         className: '',
         subject: '',
         teacher: '',
-        classroom: c.time || ''
+        classroom: ''
       };
     });
     var tpl = {
@@ -5762,6 +5772,7 @@
     return {
       weekday: c.weekday || '周一',
       period: c.period || '',
+      time: c.time || '',
       grade: c.grade || '',
       className: c.className || '',
       subject: c.subject || '',
@@ -5812,11 +5823,12 @@
       html += '<div class="tpl-field-grid">';
       html += '<div class="tpl-field"><label>星期</label>' + buildWeekdaySelect(c.weekday || '周一', 'tpl-tf-weekday') + '</div>';
       html += '<div class="tpl-field"><label>节次</label><input type="text" class="tpl-tf-period" value="' + escapeHtml(c.period || '') + '" placeholder="如：第一节" list="dlPeriods"></div>';
+      html += '<div class="tpl-field"><label>时间</label><input type="text" class="tpl-tf-time" value="' + escapeHtml(c.time || '') + '" placeholder="如：08:00-08:45"></div>';
       html += '<div class="tpl-field"><label>年级</label><input type="text" class="tpl-tf-grade" value="' + escapeHtml(c.grade || '') + '" placeholder="如：高一" list="dlGrades"></div>';
       html += '<div class="tpl-field"><label>班级</label><input type="text" class="tpl-tf-class" value="' + escapeHtml(c.className || '') + '" placeholder="如：1班" list="dlClasses"></div>';
       html += '<div class="tpl-field"><label>科目</label><input type="text" class="tpl-tf-subject" value="' + escapeHtml(c.subject || '') + '" placeholder="如：数学" list="dlSubjects"></div>';
       html += '<div class="tpl-field"><label>老师</label><input type="text" class="tpl-tf-teacher" value="' + escapeHtml(c.teacher || '') + '" placeholder="如：张老师" list="dlTeachers"></div>';
-      html += '<div class="tpl-field" style="grid-column:1 / -1;"><label>教室</label><input type="text" class="tpl-tf-classroom" value="' + escapeHtml(c.classroom || '') + '" placeholder="如：101" list="dlClassrooms"></div>';
+      html += '<div class="tpl-field"><label>教室</label><input type="text" class="tpl-tf-classroom" value="' + escapeHtml(c.classroom || '') + '" placeholder="如：101" list="dlClassrooms"></div>';
       html += '</div>';
       html += '</div>';
     });
@@ -5826,11 +5838,12 @@
     html += '<div class="tpl-field-grid">';
     html += '<div class="tpl-field"><label>星期</label>' + buildWeekdaySelect('周一', 'tpl-tf-add-weekday') + '</div>';
     html += '<div class="tpl-field"><label>节次</label><input type="text" id="tplTfAddPeriod_' + tplId + '" placeholder="如：第一节" list="dlPeriods"></div>';
+    html += '<div class="tpl-field"><label>时间</label><input type="text" id="tplTfAddTime_' + tplId + '" placeholder="如：08:00-08:45"></div>';
     html += '<div class="tpl-field"><label>年级</label><input type="text" id="tplTfAddGrade_' + tplId + '" placeholder="如：高一" list="dlGrades"></div>';
     html += '<div class="tpl-field"><label>班级</label><input type="text" id="tplTfAddClass_' + tplId + '" placeholder="如：1班" list="dlClasses"></div>';
     html += '<div class="tpl-field"><label>科目</label><input type="text" id="tplTfAddSubject_' + tplId + '" placeholder="如：数学" list="dlSubjects"></div>';
     html += '<div class="tpl-field"><label>老师</label><input type="text" id="tplTfAddTeacher_' + tplId + '" placeholder="如：张老师" list="dlTeachers"></div>';
-    html += '<div class="tpl-field" style="grid-column:1 / -1;"><label>教室</label><input type="text" id="tplTfAddClassroom_' + tplId + '" placeholder="如：101" list="dlClassrooms"></div>';
+    html += '<div class="tpl-field"><label>教室</label><input type="text" id="tplTfAddClassroom_' + tplId + '" placeholder="如：101" list="dlClassrooms"></div>';
     html += '</div>';
     html += '<button class="tpl-add-form-btn tpl-tf-add-btn" data-id="' + tplId + '">+ 添加到模板</button>';
     html += '</div>';
@@ -5844,13 +5857,14 @@
       entryCards.forEach(function(card) {
         var weekday = card.querySelector('.tpl-tf-weekday').value;
         var period = card.querySelector('.tpl-tf-period').value.trim();
+        var time = card.querySelector('.tpl-tf-time').value.trim();
         var grade = card.querySelector('.tpl-tf-grade').value.trim();
         var className = card.querySelector('.tpl-tf-class').value.trim();
         var subject = card.querySelector('.tpl-tf-subject').value.trim();
         var teacher = card.querySelector('.tpl-tf-teacher').value.trim();
         var classroom = card.querySelector('.tpl-tf-classroom').value.trim();
-        if (weekday || period || grade || className || subject || teacher || classroom) {
-          var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+        if (weekday || period || time || grade || className || subject || teacher || classroom) {
+          var entry = { weekday: weekday, period: period, time: time, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
           newCourses.push(entry);
           saveEntryOpts(entry);
         }
@@ -5882,16 +5896,17 @@
     cardEl.querySelector('.tpl-tf-add-btn').addEventListener('click', function() {
       var weekday = cardEl.querySelector('.tpl-tf-add-weekday').value;
       var period = document.getElementById('tplTfAddPeriod_' + tplId).value.trim();
+      var time = document.getElementById('tplTfAddTime_' + tplId).value.trim();
       var grade = document.getElementById('tplTfAddGrade_' + tplId).value.trim();
       var className = document.getElementById('tplTfAddClass_' + tplId).value.trim();
       var subject = document.getElementById('tplTfAddSubject_' + tplId).value.trim();
       var teacher = document.getElementById('tplTfAddTeacher_' + tplId).value.trim();
       var classroom = document.getElementById('tplTfAddClassroom_' + tplId).value.trim();
-      if (!period && !grade && !className && !subject && !teacher && !classroom) {
+      if (!period && !time && !grade && !className && !subject && !teacher && !classroom) {
         showToast('请至少输入一项内容');
         return;
       }
-      var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+      var entry = { weekday: weekday, period: period, time: time, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
       tpl.courses.push(entry);
       saveTplTemplates(templates);
       saveEntryOpts(entry);
@@ -5925,13 +5940,14 @@
     cards.forEach(function(card) {
       var weekday = card.querySelector('.tpl-fld-weekday').value;
       var period = card.querySelector('.tpl-fld-period').value.trim();
+      var time = card.querySelector('.tpl-fld-time').value.trim();
       var grade = card.querySelector('.tpl-fld-grade').value.trim();
       var className = card.querySelector('.tpl-fld-class').value.trim();
       var subject = card.querySelector('.tpl-fld-subject').value.trim();
       var teacher = card.querySelector('.tpl-fld-teacher').value.trim();
       var classroom = card.querySelector('.tpl-fld-classroom').value.trim();
-      if (weekday || period || grade || className || subject || teacher || classroom) {
-        var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+      if (weekday || period || time || grade || className || subject || teacher || classroom) {
+        var entry = { weekday: weekday, period: period, time: time, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
         newCourses.push(entry);
         saveEntryOpts(entry);
       }
@@ -5976,22 +5992,24 @@
     }
     var weekday = tplAddWeekday.value;
     var period = tplAddPeriod.value.trim();
+    var time = tplAddTime.value.trim();
     var grade = tplAddGrade.value.trim();
     var className = tplAddClass.value.trim();
     var subject = tplAddSubject.value.trim();
     var teacher = tplAddTeacher.value.trim();
     var classroom = tplAddClassroom.value.trim();
-    if (!period && !grade && !className && !subject && !teacher && !classroom) {
+    if (!period && !time && !grade && !className && !subject && !teacher && !classroom) {
       showToast('请至少输入一项内容');
       return;
     }
-    var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+    var entry = { weekday: weekday, period: period, time: time, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
     active.courses.push(entry);
     saveTplActive(active);
     saveEntryOpts(entry);
     refreshAllDatalists();
     // Clear form
     tplAddPeriod.value = '';
+    tplAddTime.value = '';
     tplAddGrade.value = '';
     tplAddClass.value = '';
     tplAddSubject.value = '';
