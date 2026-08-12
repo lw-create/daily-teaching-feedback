@@ -2012,6 +2012,128 @@
     width: 100%;
   }
   .tpl-name-input:focus { border-color: var(--accent); outline: none; }
+
+  /* ===== Schedule Template: Enhanced Entry Cards ===== */
+  .tpl-entry-card {
+    position: relative;
+    padding: 8px 28px 8px 8px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    margin-bottom: 6px;
+  }
+  .tpl-field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 8px;
+  }
+  .tpl-field {
+    display: flex;
+    flex-direction: column;
+  }
+  .tpl-field label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-bottom: 1px;
+    white-space: nowrap;
+  }
+  .tpl-field input, .tpl-field select {
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 0.76rem;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--ink);
+  }
+  .tpl-field input:focus, .tpl-field select:focus {
+    border-color: var(--accent);
+    outline: none;
+    background: var(--bg2);
+  }
+  .tpl-entry-del {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    border: none;
+    background: rgba(217,83,79,0.1);
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.82rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .tpl-entry-del:active { opacity: 0.6; }
+
+  /* View mode: weekday grouped */
+  .tpl-weekday-group {
+    margin-bottom: 10px;
+  }
+  .tpl-weekday-header {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    padding: 4px 8px;
+    background: rgba(45,157,120,0.08);
+    border-radius: 5px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .tpl-view-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+  }
+  .tpl-view-table th {
+    text-align: left;
+    padding: 3px 5px;
+    color: var(--muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+  .tpl-view-table td {
+    padding: 3px 5px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--ink);
+  }
+  .tpl-view-table tr:nth-child(even) td {
+    background: rgba(0,0,0,0.015);
+  }
+  .tpl-view-empty {
+    font-size: 0.74rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 8px;
+  }
+
+  /* Add form */
+  .tpl-add-form {
+    padding: 8px;
+    background: rgba(45,157,120,0.03);
+    border: 1px dashed rgba(45,157,120,0.25);
+    border-radius: 6px;
+    margin-top: 6px;
+  }
+  .tpl-add-form .tpl-field-grid {
+    margin-bottom: 6px;
+  }
+  .tpl-add-form-btn {
+    width: 100%;
+    padding: 6px;
+    border: none;
+    border-radius: 5px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .tpl-add-form-btn:active { opacity: 0.7; }
 </style>
 </head>
 <body>
@@ -2068,7 +2190,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.2">
+    <meta name="app-version" content="20260812.3">
   </div>
 
   <!-- Tabs -->
@@ -2438,8 +2560,15 @@
     <!-- Schedule Template Section -->
     <div class="tpl-section">
       <div class="tpl-section-title">
-        <span>课表模板 <span class="tpl-sub">从已有课程生成模板，编辑后可展示/隐藏</span></span>
+        <span>课表模板 <span class="tpl-sub">按星期/年级/班级编排，科目/老师/教室可复用</span></span>
       </div>
+
+      <!-- Reusable option datalists -->
+      <datalist id="dlGrades"></datalist>
+      <datalist id="dlClasses"></datalist>
+      <datalist id="dlSubjects"></datalist>
+      <datalist id="dlTeachers"></datalist>
+      <datalist id="dlClassrooms"></datalist>
 
       <!-- Template management -->
       <div style="margin-bottom:10px;">
@@ -2472,17 +2601,49 @@
 
         <!-- Edit mode -->
         <div id="tplScheduleEdit" style="display:none;">
-          <div style="display:grid;grid-template-columns:auto 1fr 1fr auto;gap:4px;font-size:0.72rem;color:var(--muted);padding:0 0 4px;border-bottom:1px solid var(--rule);margin-bottom:4px;">
-            <span style="width:24px;text-align:center;">#</span>
-            <span>节次</span>
-            <span>科目/备注</span>
-            <span style="width:20px;"></span>
-          </div>
           <div id="tplEditRows"></div>
-          <div class="tpl-add-row">
-            <input type="text" id="tplAddPeriod" placeholder="节次" style="width:80px;">
-            <input type="text" id="tplAddSubject" placeholder="科目/备注（选填）">
-            <button class="tpl-btn tpl-btn-sm" id="tplAddRowBtn">+ 添加</button>
+          <!-- Add new entry form -->
+          <div class="tpl-add-form">
+            <div class="tpl-field-grid">
+              <div class="tpl-field">
+                <label>星期</label>
+                <select id="tplAddWeekday">
+                  <option value="周一">周一</option>
+                  <option value="周二">周二</option>
+                  <option value="周三">周三</option>
+                  <option value="周四">周四</option>
+                  <option value="周五">周五</option>
+                  <option value="周六">周六</option>
+                  <option value="周日">周日</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label>节次</label>
+                <input type="text" id="tplAddPeriod" placeholder="如：第一节" list="dlPeriods">
+                <datalist id="dlPeriods"></datalist>
+              </div>
+              <div class="tpl-field">
+                <label>年级</label>
+                <input type="text" id="tplAddGrade" placeholder="如：高一" list="dlGrades">
+              </div>
+              <div class="tpl-field">
+                <label>班级</label>
+                <input type="text" id="tplAddClass" placeholder="如：1班" list="dlClasses">
+              </div>
+              <div class="tpl-field">
+                <label>科目</label>
+                <input type="text" id="tplAddSubject" placeholder="如：数学" list="dlSubjects">
+              </div>
+              <div class="tpl-field">
+                <label>老师</label>
+                <input type="text" id="tplAddTeacher" placeholder="如：张老师" list="dlTeachers">
+              </div>
+              <div class="tpl-field" style="grid-column:1 / -1;">
+                <label>教室</label>
+                <input type="text" id="tplAddClassroom" placeholder="如：101" list="dlClassrooms">
+              </div>
+            </div>
+            <button class="tpl-add-form-btn" id="tplAddRowBtn">+ 添加到课表</button>
           </div>
         </div>
       </div>
@@ -4224,7 +4385,13 @@
     'teaching_exams',
     'teaching_violation_types',
     'teaching_sched_templates',
-    'teaching_sched_active'
+    'teaching_sched_active',
+    'tpl_opt_grades',
+    'tpl_opt_classes',
+    'tpl_opt_subjects',
+    'tpl_opt_teachers',
+    'tpl_opt_classrooms',
+    'tpl_opt_periods'
   ];
 
   function getTodayBackupKeys() {
@@ -5251,7 +5418,7 @@
     });
   }
 
-  // ====== Schedule Template System ======
+  // ====== Schedule Template System (Enhanced) ======
   // Local data access (reads same localStorage keys as main IIFE)
   function getTplTemplates() {
     try {
@@ -5275,6 +5442,73 @@
     } catch(e) { return []; }
   }
 
+  // Reusable option management
+  var TPL_OPT_KEYS = ['grades', 'classes', 'subjects', 'teachers', 'classrooms', 'periods'];
+  var TPL_OPT_PREFIX = 'tpl_opt_';
+  function getTplOpt(key) {
+    try {
+      return JSON.parse(localStorage.getItem(TPL_OPT_PREFIX + key) || '[]');
+    } catch(e) { return []; }
+  }
+  function saveTplOpt(key, arr) {
+    try { localStorage.setItem(TPL_OPT_PREFIX + key, JSON.stringify(arr)); } catch(e) {}
+  }
+  function addTplOpt(key, val) {
+    if (!val) return;
+    var arr = getTplOpt(key);
+    if (arr.indexOf(val) === -1) {
+      arr.push(val);
+      saveTplOpt(key, arr);
+    }
+  }
+  function buildDatalist(id, options) {
+    var dl = document.getElementById(id);
+    if (!dl) return;
+    var html = '';
+    options.forEach(function(opt) {
+      html += '<option value="' + escapeHtml(opt) + '">';
+    });
+    dl.innerHTML = html;
+  }
+  function refreshAllDatalists() {
+    buildDatalist('dlGrades', getTplOpt('grades'));
+    buildDatalist('dlClasses', getTplOpt('classes'));
+    buildDatalist('dlSubjects', getTplOpt('subjects'));
+    buildDatalist('dlTeachers', getTplOpt('teachers'));
+    buildDatalist('dlClassrooms', getTplOpt('classrooms'));
+    buildDatalist('dlPeriods', getTplOpt('periods'));
+  }
+  function saveEntryOpts(entry) {
+    addTplOpt('grades', entry.grade);
+    addTplOpt('classes', entry.className);
+    addTplOpt('subjects', entry.subject);
+    addTplOpt('teachers', entry.teacher);
+    addTplOpt('classrooms', entry.classroom);
+    addTplOpt('periods', entry.period);
+  }
+
+  var TPL_WEEKDAYS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+  function buildWeekdaySelect(selected, cls) {
+    var html = '<select class="' + (cls || 'tpl-fld-weekday') + '">';
+    TPL_WEEKDAYS.forEach(function(d) {
+      html += '<option value="' + d + '"' + (selected === d ? ' selected' : '') + '>' + d + '</option>';
+    });
+    html += '</select>';
+    return html;
+  }
+
+  function groupByWeekday(courses) {
+    var groups = {};
+    TPL_WEEKDAYS.forEach(function(d) { groups[d] = []; });
+    courses.forEach(function(c) {
+      var wd = c.weekday || '周一';
+      if (!groups[wd]) groups[wd] = [];
+      groups[wd].push(c);
+    });
+    return groups;
+  }
+
   var tplList = document.getElementById('tplList');
   var tplActiveSection = document.getElementById('tplActiveSection');
   var tplVisibleToggle = document.getElementById('tplVisibleToggle');
@@ -5288,8 +5522,13 @@
   var tplClearActiveBtn = document.getElementById('tplClearActiveBtn');
   var tplCreateFromCoursesBtn = document.getElementById('tplCreateFromCoursesBtn');
   var tplCreateBlankBtn = document.getElementById('tplCreateBlankBtn');
+  var tplAddWeekday = document.getElementById('tplAddWeekday');
   var tplAddPeriod = document.getElementById('tplAddPeriod');
+  var tplAddGrade = document.getElementById('tplAddGrade');
+  var tplAddClass = document.getElementById('tplAddClass');
   var tplAddSubject = document.getElementById('tplAddSubject');
+  var tplAddTeacher = document.getElementById('tplAddTeacher');
+  var tplAddClassroom = document.getElementById('tplAddClassroom');
   var tplAddRowBtn = document.getElementById('tplAddRowBtn');
   var tplIsEditing = false;
 
@@ -5303,20 +5542,31 @@
     templates.forEach(function(tpl) {
       html += '<div class="tpl-card">';
       html += '<div class="tpl-card-header">';
-      html += '<span class="tpl-card-name">' + escapeHtml(tpl.name) + ' <span style="color:var(--muted);font-weight:400;font-size:0.72rem;">(' + tpl.courses.length + '节)</span></span>';
+      html += '<span class="tpl-card-name">' + escapeHtml(tpl.name) + ' <span style="color:var(--muted);font-weight:400;font-size:0.72rem;">(' + tpl.courses.length + '条)</span></span>';
       html += '<div class="tpl-card-actions">';
       html += '<button class="tpl-btn tpl-btn-primary tpl-btn-sm tpl-use-btn" data-id="' + tpl.id + '">使用</button>';
       html += '<button class="tpl-btn tpl-btn-sm tpl-edit-tpl-btn" data-id="' + tpl.id + '">编辑</button>';
       html += '<button class="tpl-btn tpl-btn-danger tpl-btn-sm tpl-del-tpl-btn" data-id="' + tpl.id + '">删除</button>';
       html += '</div>';
       html += '</div>';
+      // Preview grouped by weekday
+      var groups = groupByWeekday(tpl.courses);
       html += '<div class="tpl-schedule-table">';
-      tpl.courses.forEach(function(c) {
-        html += '<div class="tpl-schedule-row">';
-        html += '<span class="tpl-schedule-period">' + escapeHtml(c.period || '') + '</span>';
-        html += '<span class="tpl-schedule-time">' + escapeHtml(c.time || '') + '</span>';
-        html += '<span class="tpl-schedule-subject">' + escapeHtml(c.subject || '') + '</span>';
-        html += '</div>';
+      TPL_WEEKDAYS.forEach(function(d) {
+        if (!groups[d] || groups[d].length === 0) return;
+        html += '<div class="tpl-weekday-header">📅 ' + d + '</div>';
+        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+        groups[d].forEach(function(c) {
+          var gc = escapeHtml((c.grade || '') + (c.className || ''));
+          html += '<tr>';
+          html += '<td>' + (gc || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
       });
       html += '</div>';
       html += '</div>';
@@ -5369,14 +5619,29 @@
     } else {
       tplScheduleView.style.display = 'block';
       tplScheduleEdit.style.display = 'none';
+      var groups = groupByWeekday(active.courses);
       var html = '';
-      active.courses.forEach(function(c) {
-        html += '<div class="tpl-schedule-row">';
-        html += '<span class="tpl-schedule-period">' + escapeHtml(c.period || '') + '</span>';
-        html += '<span class="tpl-schedule-time">' + escapeHtml(c.time || '') + '</span>';
-        html += '<span class="tpl-schedule-subject">' + escapeHtml(c.subject || '') + '</span>';
+      var hasAny = false;
+      TPL_WEEKDAYS.forEach(function(d) {
+        if (!groups[d] || groups[d].length === 0) return;
+        hasAny = true;
+        html += '<div class="tpl-weekday-group">';
+        html += '<div class="tpl-weekday-header">📅 ' + d + ' <span style="font-size:0.7rem;color:var(--muted);font-weight:400;">(' + groups[d].length + '条)</span></div>';
+        html += '<table class="tpl-view-table"><thead><tr><th>年级班级</th><th>节次</th><th>科目</th><th>老师</th><th>教室</th></tr></thead><tbody>';
+        groups[d].forEach(function(c) {
+          var gc = escapeHtml((c.grade || '') + (c.className || ''));
+          html += '<tr>';
+          html += '<td>' + (gc || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.period || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.subject || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.teacher || '-') + '</td>';
+          html += '<td>' + escapeHtml(c.classroom || '-') + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
         html += '</div>';
       });
+      if (!hasAny) html = '<div class="tpl-view-empty">暂无课表内容，点击"编辑"添加</div>';
       tplScheduleView.innerHTML = html;
     }
   }
@@ -5384,16 +5649,27 @@
   function renderTplEditRows(courses) {
     var html = '';
     courses.forEach(function(c, idx) {
-      html += '<div class="tpl-course-row" data-idx="' + idx + '">';
-      html += '<span class="tpl-row-num">' + (idx + 1) + '</span>';
-      html += '<input type="text" class="tpl-input-period" value="' + escapeHtml(c.period || '') + '" placeholder="节次">';
-      html += '<input type="text" class="tpl-input-subject" value="' + escapeHtml(c.subject || '') + '" placeholder="科目/备注">';
-      html += '<button class="tpl-row-del" data-idx="' + idx + '">✕</button>';
+      html += '<div class="tpl-entry-card" data-idx="' + idx + '">';
+      html += '<button class="tpl-entry-del" data-idx="' + idx + '">✕</button>';
+      html += '<div class="tpl-field-grid">';
+      // Row 1: weekday + period
+      html += '<div class="tpl-field"><label>星期</label>' + buildWeekdaySelect(c.weekday || '周一', 'tpl-fld-weekday') + '</div>';
+      html += '<div class="tpl-field"><label>节次</label><input type="text" class="tpl-fld-period" value="' + escapeHtml(c.period || '') + '" placeholder="如：第一节" list="dlPeriods"></div>';
+      // Row 2: grade + class
+      html += '<div class="tpl-field"><label>年级</label><input type="text" class="tpl-fld-grade" value="' + escapeHtml(c.grade || '') + '" placeholder="如：高一" list="dlGrades"></div>';
+      html += '<div class="tpl-field"><label>班级</label><input type="text" class="tpl-fld-class" value="' + escapeHtml(c.className || '') + '" placeholder="如：1班" list="dlClasses"></div>';
+      // Row 3: subject + teacher
+      html += '<div class="tpl-field"><label>科目</label><input type="text" class="tpl-fld-subject" value="' + escapeHtml(c.subject || '') + '" placeholder="如：数学" list="dlSubjects"></div>';
+      html += '<div class="tpl-field"><label>老师</label><input type="text" class="tpl-fld-teacher" value="' + escapeHtml(c.teacher || '') + '" placeholder="如：张老师" list="dlTeachers"></div>';
+      // Row 4: classroom (full width)
+      html += '<div class="tpl-field" style="grid-column:1 / -1;"><label>教室</label><input type="text" class="tpl-fld-classroom" value="' + escapeHtml(c.classroom || '') + '" placeholder="如：101" list="dlClassrooms"></div>';
+      html += '</div>';
       html += '</div>';
     });
     tplEditRows.innerHTML = html;
 
-    tplEditRows.querySelectorAll('.tpl-row-del').forEach(function(btn) {
+    // Bind delete buttons
+    tplEditRows.querySelectorAll('.tpl-entry-del').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var idx = parseInt(btn.dataset.idx);
         var active = getTplActive();
@@ -5405,19 +5681,27 @@
     });
 
     // Auto-save on input blur
-    tplEditRows.querySelectorAll('.tpl-course-row').forEach(function(row) {
+    tplEditRows.querySelectorAll('.tpl-entry-card').forEach(function(row) {
       var idx = parseInt(row.dataset.idx);
-      var periodInput = row.querySelector('.tpl-input-period');
-      var subjectInput = row.querySelector('.tpl-input-subject');
       function saveField() {
         var active = getTplActive();
         if (!active || !active.courses[idx]) return;
-        active.courses[idx].period = periodInput.value.trim();
-        active.courses[idx].subject = subjectInput.value.trim();
+        active.courses[idx].weekday = row.querySelector('.tpl-fld-weekday').value;
+        active.courses[idx].period = row.querySelector('.tpl-fld-period').value.trim();
+        active.courses[idx].grade = row.querySelector('.tpl-fld-grade').value.trim();
+        active.courses[idx].className = row.querySelector('.tpl-fld-class').value.trim();
+        active.courses[idx].subject = row.querySelector('.tpl-fld-subject').value.trim();
+        active.courses[idx].teacher = row.querySelector('.tpl-fld-teacher').value.trim();
+        active.courses[idx].classroom = row.querySelector('.tpl-fld-classroom').value.trim();
         saveTplActive(active);
+        // Save new options
+        saveEntryOpts(active.courses[idx]);
+        refreshAllDatalists();
       }
-      periodInput.addEventListener('blur', saveField);
-      subjectInput.addEventListener('blur', saveField);
+      row.querySelectorAll('input, select').forEach(function(inp) {
+        inp.addEventListener('blur', saveField);
+        inp.addEventListener('change', saveField);
+      });
     });
   }
 
@@ -5435,9 +5719,13 @@
     var name = '模板' + (templates.length + 1);
     var tplCourses = courses.map(function(c) {
       return {
+        weekday: '周一',
         period: c.period || '',
-        time: c.time || '',
-        subject: ''
+        grade: '',
+        className: '',
+        subject: '',
+        teacher: '',
+        classroom: c.time || ''
       };
     });
     var tpl = {
@@ -5470,6 +5758,18 @@
     editTemplate(tpl.id);
   }
 
+  function copyEntry(c) {
+    return {
+      weekday: c.weekday || '周一',
+      period: c.period || '',
+      grade: c.grade || '',
+      className: c.className || '',
+      subject: c.subject || '',
+      teacher: c.teacher || '',
+      classroom: c.classroom || ''
+    };
+  }
+
   function useTemplate(tplId) {
     var templates = getTplTemplates();
     var tpl = templates.find(function(t) { return t.id === tplId; });
@@ -5478,13 +5778,7 @@
       templateId: tpl.id,
       name: tpl.name,
       visible: true,
-      courses: tpl.courses.map(function(c) {
-        return {
-          period: c.period || '',
-          time: c.time || '',
-          subject: c.subject || ''
-        };
-      })
+      courses: tpl.courses.map(copyEntry)
     };
     saveTplActive(active);
     tplIsEditing = false;
@@ -5510,36 +5804,61 @@
     html += '<button class="tpl-btn tpl-btn-sm tpl-cancel-tpl-btn" data-id="' + tplId + '">取消</button>';
     html += '</div>';
     html += '</div>';
+    // Editable entries
     html += '<div id="tplEditCourses_' + tplId + '">';
     tpl.courses.forEach(function(c, idx) {
-      html += '<div class="tpl-course-row" data-idx="' + idx + '">';
-      html += '<span class="tpl-row-num">' + (idx + 1) + '</span>';
-      html += '<input type="text" class="tpl-input-period" value="' + escapeHtml(c.period || '') + '" placeholder="节次" style="width:70px;">';
-      html += '<input type="text" class="tpl-input-time" value="' + escapeHtml(c.time || '') + '" placeholder="时间">';
-      html += '<button class="tpl-row-del" data-idx="' + idx + '">✕</button>';
+      html += '<div class="tpl-entry-card" data-tpl-idx="' + idx + '">';
+      html += '<button class="tpl-entry-del" data-tpl-idx="' + idx + '">✕</button>';
+      html += '<div class="tpl-field-grid">';
+      html += '<div class="tpl-field"><label>星期</label>' + buildWeekdaySelect(c.weekday || '周一', 'tpl-tf-weekday') + '</div>';
+      html += '<div class="tpl-field"><label>节次</label><input type="text" class="tpl-tf-period" value="' + escapeHtml(c.period || '') + '" placeholder="如：第一节" list="dlPeriods"></div>';
+      html += '<div class="tpl-field"><label>年级</label><input type="text" class="tpl-tf-grade" value="' + escapeHtml(c.grade || '') + '" placeholder="如：高一" list="dlGrades"></div>';
+      html += '<div class="tpl-field"><label>班级</label><input type="text" class="tpl-tf-class" value="' + escapeHtml(c.className || '') + '" placeholder="如：1班" list="dlClasses"></div>';
+      html += '<div class="tpl-field"><label>科目</label><input type="text" class="tpl-tf-subject" value="' + escapeHtml(c.subject || '') + '" placeholder="如：数学" list="dlSubjects"></div>';
+      html += '<div class="tpl-field"><label>老师</label><input type="text" class="tpl-tf-teacher" value="' + escapeHtml(c.teacher || '') + '" placeholder="如：张老师" list="dlTeachers"></div>';
+      html += '<div class="tpl-field" style="grid-column:1 / -1;"><label>教室</label><input type="text" class="tpl-tf-classroom" value="' + escapeHtml(c.classroom || '') + '" placeholder="如：101" list="dlClassrooms"></div>';
+      html += '</div>';
       html += '</div>';
     });
     html += '</div>';
-    html += '<div class="tpl-add-row">';
-    html += '<input type="text" id="tplAddPeriod_' + tplId + '" placeholder="节次" style="width:70px;">';
-    html += '<input type="text" id="tplAddTime_' + tplId + '" placeholder="时间">';
-    html += '<button class="tpl-btn tpl-btn-sm tpl-add-course-btn" data-id="' + tplId + '">+ 添加</button>';
+    // Add form for template editing
+    html += '<div class="tpl-add-form">';
+    html += '<div class="tpl-field-grid">';
+    html += '<div class="tpl-field"><label>星期</label>' + buildWeekdaySelect('周一', 'tpl-tf-add-weekday') + '</div>';
+    html += '<div class="tpl-field"><label>节次</label><input type="text" id="tplTfAddPeriod_' + tplId + '" placeholder="如：第一节" list="dlPeriods"></div>';
+    html += '<div class="tpl-field"><label>年级</label><input type="text" id="tplTfAddGrade_' + tplId + '" placeholder="如：高一" list="dlGrades"></div>';
+    html += '<div class="tpl-field"><label>班级</label><input type="text" id="tplTfAddClass_' + tplId + '" placeholder="如：1班" list="dlClasses"></div>';
+    html += '<div class="tpl-field"><label>科目</label><input type="text" id="tplTfAddSubject_' + tplId + '" placeholder="如：数学" list="dlSubjects"></div>';
+    html += '<div class="tpl-field"><label>老师</label><input type="text" id="tplTfAddTeacher_' + tplId + '" placeholder="如：张老师" list="dlTeachers"></div>';
+    html += '<div class="tpl-field" style="grid-column:1 / -1;"><label>教室</label><input type="text" id="tplTfAddClassroom_' + tplId + '" placeholder="如：101" list="dlClassrooms"></div>';
+    html += '</div>';
+    html += '<button class="tpl-add-form-btn tpl-tf-add-btn" data-id="' + tplId + '">+ 添加到模板</button>';
     html += '</div>';
     cardEl.innerHTML = html;
 
     // Bind save
     cardEl.querySelector('.tpl-save-tpl-btn').addEventListener('click', function() {
       var name = document.getElementById('tplNameInput_' + tplId).value.trim() || '未命名模板';
-      var courseRows = cardEl.querySelectorAll('.tpl-course-row');
+      var entryCards = cardEl.querySelectorAll('[data-tpl-idx]');
       var newCourses = [];
-      courseRows.forEach(function(row) {
-        var p = row.querySelector('.tpl-input-period').value.trim();
-        var t = row.querySelector('.tpl-input-time').value.trim();
-        if (p || t) newCourses.push({ period: p, time: t, subject: '' });
+      entryCards.forEach(function(card) {
+        var weekday = card.querySelector('.tpl-tf-weekday').value;
+        var period = card.querySelector('.tpl-tf-period').value.trim();
+        var grade = card.querySelector('.tpl-tf-grade').value.trim();
+        var className = card.querySelector('.tpl-tf-class').value.trim();
+        var subject = card.querySelector('.tpl-tf-subject').value.trim();
+        var teacher = card.querySelector('.tpl-tf-teacher').value.trim();
+        var classroom = card.querySelector('.tpl-tf-classroom').value.trim();
+        if (weekday || period || grade || className || subject || teacher || classroom) {
+          var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+          newCourses.push(entry);
+          saveEntryOpts(entry);
+        }
       });
       tpl.name = name;
       tpl.courses = newCourses;
       saveTplTemplates(templates);
+      refreshAllDatalists();
       renderTplList();
       showToast('模板已保存');
     });
@@ -5550,9 +5869,9 @@
     });
 
     // Bind delete row
-    cardEl.querySelectorAll('.tpl-row-del').forEach(function(btn) {
+    cardEl.querySelectorAll('.tpl-entry-del').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        var idx = parseInt(btn.dataset.idx);
+        var idx = parseInt(btn.dataset.tplIdx);
         tpl.courses.splice(idx, 1);
         saveTplTemplates(templates);
         editTemplate(tplId);
@@ -5560,12 +5879,23 @@
     });
 
     // Bind add course
-    cardEl.querySelector('.tpl-add-course-btn').addEventListener('click', function() {
-      var p = document.getElementById('tplAddPeriod_' + tplId).value.trim();
-      var t = document.getElementById('tplAddTime_' + tplId).value.trim();
-      if (!p && !t) { showToast('请输入节次或时间'); return; }
-      tpl.courses.push({ period: p, time: t, subject: '' });
+    cardEl.querySelector('.tpl-tf-add-btn').addEventListener('click', function() {
+      var weekday = cardEl.querySelector('.tpl-tf-add-weekday').value;
+      var period = document.getElementById('tplTfAddPeriod_' + tplId).value.trim();
+      var grade = document.getElementById('tplTfAddGrade_' + tplId).value.trim();
+      var className = document.getElementById('tplTfAddClass_' + tplId).value.trim();
+      var subject = document.getElementById('tplTfAddSubject_' + tplId).value.trim();
+      var teacher = document.getElementById('tplTfAddTeacher_' + tplId).value.trim();
+      var classroom = document.getElementById('tplTfAddClassroom_' + tplId).value.trim();
+      if (!period && !grade && !className && !subject && !teacher && !classroom) {
+        showToast('请至少输入一项内容');
+        return;
+      }
+      var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+      tpl.courses.push(entry);
       saveTplTemplates(templates);
+      saveEntryOpts(entry);
+      refreshAllDatalists();
       editTemplate(tplId);
     });
   }
@@ -5589,18 +5919,26 @@
   tplSaveActiveBtn.addEventListener('click', function() {
     var active = getTplActive();
     if (!active) return;
-    // Collect from edit rows
-    var rows = tplEditRows.querySelectorAll('.tpl-course-row');
+    // Collect from edit cards
+    var cards = tplEditRows.querySelectorAll('.tpl-entry-card');
     var newCourses = [];
-    rows.forEach(function(row) {
-      var p = row.querySelector('.tpl-input-period').value.trim();
-      var s = row.querySelector('.tpl-input-subject').value.trim();
-      var idx = parseInt(row.dataset.idx);
-      var t = (active.courses[idx] && active.courses[idx].time) || '';
-      if (p || s) newCourses.push({ period: p, time: t, subject: s });
+    cards.forEach(function(card) {
+      var weekday = card.querySelector('.tpl-fld-weekday').value;
+      var period = card.querySelector('.tpl-fld-period').value.trim();
+      var grade = card.querySelector('.tpl-fld-grade').value.trim();
+      var className = card.querySelector('.tpl-fld-class').value.trim();
+      var subject = card.querySelector('.tpl-fld-subject').value.trim();
+      var teacher = card.querySelector('.tpl-fld-teacher').value.trim();
+      var classroom = card.querySelector('.tpl-fld-classroom').value.trim();
+      if (weekday || period || grade || className || subject || teacher || classroom) {
+        var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+        newCourses.push(entry);
+        saveEntryOpts(entry);
+      }
     });
     active.courses = newCourses;
     saveTplActive(active);
+    refreshAllDatalists();
     tplIsEditing = false;
     renderTplActive();
     showToast('课表已保存');
@@ -5614,9 +5952,7 @@
     var templates = getTplTemplates();
     var tpl = templates.find(function(t) { return t.id === active.templateId; });
     if (!tpl) { showToast('原模板已删除'); return; }
-    active.courses = tpl.courses.map(function(c) {
-      return { period: c.period || '', time: c.time || '', subject: c.subject || '' };
-    });
+    active.courses = tpl.courses.map(copyEntry);
     saveTplActive(active);
     renderTplActive();
     showToast('已重置为模板原始内容');
@@ -5634,15 +5970,36 @@
   // Add row in active schedule edit
   tplAddRowBtn.addEventListener('click', function() {
     var active = getTplActive();
-    if (!active) return;
-    var p = tplAddPeriod.value.trim();
-    var s = tplAddSubject.value.trim();
-    if (!p && !s) { showToast('请输入内容'); return; }
-    active.courses.push({ period: p, time: '', subject: s });
+    if (!active) {
+      // Create a new active schedule if none exists
+      active = { templateId: null, name: '当前课表', visible: true, courses: [] };
+    }
+    var weekday = tplAddWeekday.value;
+    var period = tplAddPeriod.value.trim();
+    var grade = tplAddGrade.value.trim();
+    var className = tplAddClass.value.trim();
+    var subject = tplAddSubject.value.trim();
+    var teacher = tplAddTeacher.value.trim();
+    var classroom = tplAddClassroom.value.trim();
+    if (!period && !grade && !className && !subject && !teacher && !classroom) {
+      showToast('请至少输入一项内容');
+      return;
+    }
+    var entry = { weekday: weekday, period: period, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+    active.courses.push(entry);
     saveTplActive(active);
+    saveEntryOpts(entry);
+    refreshAllDatalists();
+    // Clear form
     tplAddPeriod.value = '';
+    tplAddGrade.value = '';
+    tplAddClass.value = '';
     tplAddSubject.value = '';
+    tplAddTeacher.value = '';
+    tplAddClassroom.value = '';
     renderTplEditRows(active.courses);
+    // Make sure section is visible
+    tplActiveSection.style.display = 'block';
   });
 
   // Create template buttons
@@ -5650,6 +6007,7 @@
   tplCreateBlankBtn.addEventListener('click', createBlankTemplate);
 
   // Initial render
+  refreshAllDatalists();
   renderTplList();
   renderTplActive();
 
@@ -5993,6 +6351,14 @@
       var active = getTplActive();
       if (active) data.sched_active = active;
 
+      // Include reusable option data
+      var optData = {};
+      TPL_OPT_KEYS.forEach(function(k) {
+        var opts = getTplOpt(k);
+        if (opts.length > 0) optData[k] = opts;
+      });
+      if (Object.keys(optData).length > 0) data.tpl_options = optData;
+
       if (!schedule && !info && templates.length === 0) {
         showToast('暂无数据可导出');
         return;
@@ -6063,9 +6429,18 @@
         if (data.sched_active) {
           saveTplActive(data.sched_active);
         }
+        // Import reusable option data
+        if (data.tpl_options && typeof data.tpl_options === 'object') {
+          Object.keys(data.tpl_options).forEach(function(k) {
+            if (TPL_OPT_KEYS.indexOf(k) !== -1) {
+              saveTplOpt(k, data.tpl_options[k]);
+            }
+          });
+        }
 
         Promise.all(tasks).then(function() {
           schedLoadViewWithBackup();
+          refreshAllDatalists();
           renderTplList();
           renderTplActive();
           showToast('课表数据导入成功');
