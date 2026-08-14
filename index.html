@@ -68,6 +68,7 @@ body{
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
   <div class="retry-hint" id="retryHint">首次打开可能需要等待几秒，请耐心等待</div>
   <button class="retry-btn" id="retryBtn" onclick="manualRetry()">🔄 手动重试</button>
+  <a href="daily-teaching-feedback.html" id="directLink" style="display:none;margin-top:12px;padding:8px 24px;background:#fff;color:#2d9d78;border:1.5px solid #2d9d78;border-radius:8px;font-size:0.85rem;text-decoration:none;">直接进入工具 →</a>
 </div>
 <noscript>
   <p style="text-align:center;margin-top:20px;">
@@ -142,6 +143,11 @@ body{
             retryHint.textContent = '已自动重试 ' + retryCount + ' 次，即将再次尝试...';
             retryBtn.classList.add('show');
           }
+          if(retryCount >= 3){
+            // 3次重试后显示直接进入链接
+            document.getElementById('directLink').style.display = 'inline-block';
+            retryHint.textContent = '如果持续无法加载，可点击下方按钮直接进入';
+          }
           if(retryCount < maxRetries){
             // 2秒后自动重试（缩短间隔）
             setTimeout(function(){
@@ -169,6 +175,15 @@ body{
 
   // 启动加载
   tryLoad();
+
+  // 注册 Service Worker — 缓存主页面，防止 GitHub Pages 间歇性 403
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(function(reg) {
+      console.log('[SW] 注册成功');
+    }).catch(function(err) {
+      console.warn('[SW] 注册失败:', err);
+    });
+  }
 })();
 
 function manualRetry(){

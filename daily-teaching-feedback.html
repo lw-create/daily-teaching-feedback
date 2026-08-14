@@ -2581,7 +2581,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260814.12">
+    <meta name="app-version" content="20260814.13">
   </div>
 
   <!-- Tabs -->
@@ -8643,6 +8643,15 @@
     }
   } catch(e) {
     console.warn('Auto update check failed:', e);
+  }
+
+  // 注册 Service Worker — 缓存主页面，防止 GitHub Pages 间歇性 403
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(function() {
+      console.log('[SW] 注册成功');
+    }).catch(function(err) {
+      console.warn('[SW] 注册失败:', err);
+    });
   }
 })();
 </script>
