@@ -2549,7 +2549,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260814.06">
+    <meta name="app-version" content="20260814.07">
   </div>
 
   <!-- Tabs -->
@@ -3217,6 +3217,19 @@
     <div id="todayImgFullscreenCounter" style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:#fff;font-size:0.8rem;padding:4px 14px;border-radius:14px;z-index:10;display:none;">1 / 1</div>
     <img id="todayImgFullscreenImg" alt="图片大图" style="transition:transform 0.05s ease-out;touch-action:none;">
     <div style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:rgba(255,255,255,0.7);font-size:0.7rem;padding:4px 14px;border-radius:14px;pointer-events:none;">双指缩放 · 双击放大 · 左右滑动切换</div>
+  </div>
+
+  <!-- Update notification modal -->
+  <div id="updateModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:340px;width:88%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <h3 style="font-size:1.15rem;color:var(--ink);margin-bottom:8px;">发现新版本</h3>
+      <p id="updateModalDesc" style="font-size:0.85rem;color:var(--muted);line-height:1.6;margin-bottom:20px;">检测到新版本可用，建议更新以获取最新功能。</p>
+      <div style="display:flex;gap:10px;">
+        <button id="updateModalCancel" style="flex:1;padding:11px 0;border:1.5px solid var(--rule);border-radius:10px;background:#fff;color:var(--ink);font-size:0.9rem;font-weight:600;cursor:pointer;">稍后再说</button>
+        <button id="updateModalConfirm" style="flex:1;padding:11px 0;border:none;border-radius:10px;background:var(--accent);color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;">立即更新</button>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -5540,41 +5553,129 @@
   var checkUpdateBtn = document.getElementById('checkUpdateBtn');
   var APP_VERSION = document.querySelector('meta[name="app-version"]');
   var currentVersion = APP_VERSION ? APP_VERSION.content : 'unknown';
+  var updateModal = document.getElementById('updateModal');
+  var updateModalCancel = document.getElementById('updateModalCancel');
+  var updateModalConfirm = document.getElementById('updateModalConfirm');
+  var updateModalDesc = document.getElementById('updateModalDesc');
+  var UPDATE_CHECK_KEY = 'last_update_check';
+  var UPDATE_SKIP_KEY = 'skipped_version';
+  var pendingUpdateUrl = null;
 
-  checkUpdateBtn.addEventListener('click', function() {
-    checkUpdateBtn.classList.add('checking');
-    checkUpdateBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 11-3-6.7L21 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> 检查中...';
+  function showUpdateModal(remoteVersion) {
+    pendingUpdateUrl = window.location.href.split('?')[0].split('#')[0] + '?v=' + Date.now();
+    updateModalDesc.textContent = '检测到新版本（v' + remoteVersion + '），建议更新以获取最新功能和优化。';
+    updateModal.style.display = 'flex';
+  }
 
-    // Try to fetch the latest version from the server
+  function hideUpdateModal() {
+    updateModal.style.display = 'none';
+  }
+
+  updateModalCancel.addEventListener('click', function() {
+    hideUpdateModal();
+    // Remember that user skipped this version
+    try {
+      var match = document.querySelector('meta[name="app-version"]');
+      if (match) {
+        safeStorageSet(UPDATE_SKIP_KEY, match.content);
+      }
+    } catch(e) {}
+    showToast('已跳过此版本，可稍后点击「检查更新」手动更新');
+  });
+
+  updateModalConfirm.addEventListener('click', function() {
+    hideUpdateModal();
+    if (pendingUpdateUrl) {
+      showToast('正在更新...');
+      setTimeout(function() {
+        window.location.href = pendingUpdateUrl;
+      }, 600);
+    }
+  });
+
+  // Core version check function — used by both manual and auto checks
+  function performVersionCheck(isAuto) {
     var pageUrl = window.location.href.split('?')[0].split('#')[0];
-    fetch(pageUrl + '?v=' + Date.now(), { cache: 'no-cache' })
+    return fetch(pageUrl + '?v=' + Date.now(), { cache: 'no-cache' })
       .then(function(r) { return r.text(); })
       .then(function(html) {
-        // Extract version from the fetched HTML
         var match = html.match(/app-version[^>]*content=["']([^"']+)["']/);
         var remoteVersion = match ? match[1] : null;
 
         if (remoteVersion && remoteVersion !== currentVersion) {
-          showToast('发现新版本，正在更新...');
-          setTimeout(function() {
-            // Force reload with cache busting - localStorage data is preserved
-            window.location.href = pageUrl + '?v=' + Date.now();
-          }, 1200);
+          // New version found
+          if (isAuto) {
+            // For auto-check: check if user already skipped this version
+            var skipped = null;
+            try { skipped = localStorage.getItem(UPDATE_SKIP_KEY); } catch(e) {}
+            if (skipped === remoteVersion) {
+              // User already skipped, don't bother them
+              return { hasUpdate: false, skipped: true };
+            }
+          }
+          return { hasUpdate: true, remoteVersion: remoteVersion };
         } else if (remoteVersion === currentVersion) {
-          showToast('当前已是最新版本');
-          resetUpdateBtn();
+          return { hasUpdate: false, isLatest: true };
         } else {
-          // Can't determine version — don't force reload, just inform the user
-          showToast('无法获取版本信息，请稍后重试');
-          resetUpdateBtn();
+          return { hasUpdate: false, error: true };
         }
       })
       .catch(function() {
-        // Network error — don't reload, just inform the user
-        showToast('网络异常，请稍后重试');
-        resetUpdateBtn();
+        return { hasUpdate: false, error: true };
       });
+  }
+
+  // Manual check (button click)
+  checkUpdateBtn.addEventListener('click', function() {
+    checkUpdateBtn.classList.add('checking');
+    checkUpdateBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 11-3-6.7L21 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> 检查中...';
+
+    performVersionCheck(false).then(function(result) {
+      if (result.hasUpdate) {
+        showUpdateModal(result.remoteVersion);
+      } else if (result.isLatest) {
+        showToast('当前已是最新版本');
+      } else if (result.skipped) {
+        showToast('新版本已被跳过，可点击「立即更新」获取');
+        // Still show the modal if user manually checks
+        // Re-fetch to get version
+        var pageUrl = window.location.href.split('?')[0].split('#')[0];
+        fetch(pageUrl + '?v=' + Date.now(), { cache: 'no-cache' })
+          .then(function(r) { return r.text(); })
+          .then(function(html) {
+            var match = html.match(/app-version[^>]*content=["']([^"']+)["']/);
+            if (match && match[1] !== currentVersion) {
+              showUpdateModal(match[1]);
+            }
+          });
+      } else {
+        showToast('无法获取版本信息，请稍后重试');
+      }
+      resetUpdateBtn();
+    });
   });
+
+  // Auto-check on page load — at most once per 4 hours
+  function autoCheckUpdate() {
+    try {
+      var lastCheck = parseInt(localStorage.getItem(UPDATE_CHECK_KEY) || '0');
+      var now = Date.now();
+      var fourHours = 4 * 60 * 60 * 1000;
+      if (now - lastCheck < fourHours) {
+        return; // Already checked recently
+      }
+      safeStorageSet(UPDATE_CHECK_KEY, String(now));
+    } catch(e) {}
+
+    // Delay auto-check by 3 seconds after page load to not interfere with initial rendering
+    setTimeout(function() {
+      performVersionCheck(true).then(function(result) {
+        if (result.hasUpdate) {
+          showUpdateModal(result.remoteVersion);
+        }
+      });
+    }, 3000);
+  }
 
   function resetUpdateBtn() {
     checkUpdateBtn.classList.remove('checking');
@@ -8376,6 +8477,7 @@
   // ====== Init ======
   refreshCategorySelect();
   schedLoadViewWithBackup();
+  autoCheckUpdate();
 })();
 </script>
 
