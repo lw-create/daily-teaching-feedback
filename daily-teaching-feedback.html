@@ -2549,7 +2549,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260814.05">
+    <meta name="app-version" content="20260814.06">
   </div>
 
   <!-- Tabs -->
@@ -3178,8 +3178,13 @@
     <!-- Today Images: Display grouped by category -->
     <div id="todayImgDisplayContainer"></div>
 
-    <!-- Today Images: Upload section -->
+    <!-- Today Images: Upload section (collapsible) -->
     <div class="sched-section" id="todayImgUploadSection">
+      <div id="todayImgUploadToggle" style="display:none;cursor:pointer;padding:8px 12px;background:rgba(59,130,246,0.06);border-radius:8px;margin-bottom:8px;font-size:0.85rem;font-weight:600;color:#3b82f6;user-select:none;display:flex;align-items:center;justify-content:space-between;">
+        <span>📤 上传新图片</span>
+        <span id="todayImgUploadArrow" style="transition:transform 0.2s;">▼</span>
+      </div>
+      <div id="todayImgUploadContent">
       <h3>上传图片</h3>
       <div class="sched-upload-area" id="todayImgUploadArea">
         <div class="sched-upload-icon">📷</div>
@@ -3202,13 +3207,16 @@
       </div>
 
       <button class="sched-btn sched-btn-primary" id="todayImgUploadBtn" style="margin-top:12px;">上传并查看</button>
+      </div>
     </div>
   </div><!-- /app-images -->
 
   <!-- Today Images: Fullscreen overlay -->
   <div class="sched-fullscreen-overlay" id="todayImgFullscreen">
     <button class="sched-fullscreen-close" id="todayImgCloseFullscreen">✕</button>
-    <img id="todayImgFullscreenImg" alt="图片大图">
+    <div id="todayImgFullscreenCounter" style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:#fff;font-size:0.8rem;padding:4px 14px;border-radius:14px;z-index:10;display:none;">1 / 1</div>
+    <img id="todayImgFullscreenImg" alt="图片大图" style="transition:transform 0.05s ease-out;touch-action:none;">
+    <div style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:rgba(255,255,255,0.7);font-size:0.7rem;padding:4px 14px;border-radius:14px;pointer-events:none;">双指缩放 · 双击放大 · 左右滑动切换</div>
   </div>
 
 </div>
@@ -7759,6 +7767,20 @@
   var todayImgFullscreen = document.getElementById('todayImgFullscreen');
   var todayImgFullscreenImg = document.getElementById('todayImgFullscreenImg');
   var todayImgCloseFullscreen = document.getElementById('todayImgCloseFullscreen');
+  var todayImgUploadToggle = document.getElementById('todayImgUploadToggle');
+  var todayImgUploadContent = document.getElementById('todayImgUploadContent');
+  var todayImgUploadArrow = document.getElementById('todayImgUploadArrow');
+
+  // Collapsible upload section
+  todayImgUploadToggle.addEventListener('click', function() {
+    if (todayImgUploadContent.style.display === 'none') {
+      todayImgUploadContent.style.display = 'block';
+      todayImgUploadArrow.textContent = '▼';
+    } else {
+      todayImgUploadContent.style.display = 'none';
+      todayImgUploadArrow.textContent = '▶';
+    }
+  });
 
   function getTodayImages() {
     try {
@@ -7845,6 +7867,12 @@
   });
 
   function todayImgRenderPreviews() {
+    // Revoke old object URLs to prevent memory leak
+    todayImgPreviewGrid.querySelectorAll('img').forEach(function(img) {
+      if (img.src && img.src.startsWith('blob:')) {
+        try { URL.revokeObjectURL(img.src); } catch(e) {}
+      }
+    });
     todayImgPreviewGrid.innerHTML = '';
     todayImgSelectedFiles.forEach(function(file, idx) {
       var item = document.createElement('div');
@@ -7940,13 +7968,19 @@
       todayImgDisplayContainer.innerHTML = '';
       todayImgDateSection.style.display = 'none';
       todayImgUploadSection.style.display = 'block';
+      todayImgUploadToggle.style.display = 'none';
+      todayImgUploadContent.style.display = 'block';
       todayImgUploadBtn.textContent = '上传并查看';
       renderCategoryManagement();
       return;
     }
 
     todayImgUploadSection.style.display = 'block';
-    todayImgUploadBtn.textContent = '继续上传（追加图片）';
+    // Show collapsible toggle and collapse upload area by default
+    todayImgUploadToggle.style.display = 'flex';
+    todayImgUploadContent.style.display = 'none';
+    todayImgUploadArrow.textContent = '▶';
+    todayImgUploadBtn.textContent = '上传（替换「' + (todayImgCategorySelect.value || '当前') + '」分类）';
 
     // Show date
     todayImgDateSection.style.display = 'block';
@@ -7994,8 +8028,12 @@
         var card = document.createElement('div');
         card.className = 'sched-img-card';
         card.style.position = 'relative';
-        card.innerHTML = '<img src="' + item.image + '" alt="' + cat.label + (idx + 1) + '" style="width:100%;display:block;border-radius:8px;cursor:pointer;">';
-        card.addEventListener('click', function() { todayImgOpenFullscreen(item.image); });
+        card.innerHTML = '<img src="' + item.image + '" alt="' + cat.label + (idx + 1) + '" style="width:100%;display:block;border-radius:8px;cursor:pointer;">' +
+          '<span style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,0.5);color:#fff;font-size:0.65rem;padding:1px 6px;border-radius:8px;">' + (idx + 1) + '</span>';
+        // Pass the full category items as gallery for swipe navigation
+        (function(gallery, imgSrc) {
+          card.addEventListener('click', function() { todayImgOpenFullscreen(imgSrc, gallery); });
+        })(catItems, item.image);
         grid.appendChild(card);
       });
       content.appendChild(grid);
@@ -8160,21 +8198,178 @@
     todayImgDisplayContainer.appendChild(panel);
   }
 
-  // Fullscreen
-  function todayImgOpenFullscreen(dataURL) {
-    todayImgFullscreenImg.src = dataURL;
+  // Fullscreen viewer with pinch-zoom and swipe support
+  var todayImgFullscreenList = []; // Current gallery images
+  var todayImgFullscreenIdx = 0;   // Current index in gallery
+  var todayImgScale = 1;
+  var todayImgStartScale = 1;
+  var todayImgTranslateX = 0;
+  var todayImgTranslateY = 0;
+  var todayImgStartX = 0;
+  var todayImgStartY = 0;
+  var todayImgLastTap = 0;
+
+  function todayImgOpenFullscreen(dataURL, gallery) {
+    // gallery is an optional array of {image, ...} items for swipe navigation
+    if (gallery && gallery.length > 0) {
+      todayImgFullscreenList = gallery;
+      todayImgFullscreenIdx = gallery.findIndex(function(item) { return item.image === dataURL; });
+      if (todayImgFullscreenIdx < 0) todayImgFullscreenIdx = 0;
+    } else {
+      todayImgFullscreenList = [{ image: dataURL }];
+      todayImgFullscreenIdx = 0;
+    }
+    todayImgResetTransform();
+    todayImgShowImage();
     todayImgFullscreen.classList.add('show');
+  }
+
+  function todayImgShowImage() {
+    todayImgFullscreenImg.src = todayImgFullscreenList[todayImgFullscreenIdx].image;
+    todayImgResetTransform();
+    // Update counter
+    var counter = document.getElementById('todayImgFullscreenCounter');
+    if (counter) {
+      if (todayImgFullscreenList.length > 1) {
+        counter.style.display = 'block';
+        counter.textContent = (todayImgFullscreenIdx + 1) + ' / ' + todayImgFullscreenList.length;
+      } else {
+        counter.style.display = 'none';
+      }
+    }
+  }
+
+  function todayImgResetTransform() {
+    todayImgScale = 1;
+    todayImgTranslateX = 0;
+    todayImgTranslateY = 0;
+    todayImgApplyTransform();
+  }
+
+  function todayImgApplyTransform() {
+    todayImgFullscreenImg.style.transform =
+      'translate(' + todayImgTranslateX + 'px,' + todayImgTranslateY + 'px) scale(' + todayImgScale + ')';
+  }
+
+  function todayImgNextImage() {
+    if (todayImgFullscreenList.length <= 1) return;
+    todayImgFullscreenIdx = (todayImgFullscreenIdx + 1) % todayImgFullscreenList.length;
+    todayImgShowImage();
+  }
+
+  function todayImgPrevImage() {
+    if (todayImgFullscreenList.length <= 1) return;
+    todayImgFullscreenIdx = (todayImgFullscreenIdx - 1 + todayImgFullscreenList.length) % todayImgFullscreenList.length;
+    todayImgShowImage();
   }
 
   todayImgCloseFullscreen.addEventListener('click', function() {
     todayImgFullscreen.classList.remove('show');
     todayImgFullscreenImg.src = '';
+    todayImgFullscreenList = [];
   });
 
   todayImgFullscreen.addEventListener('click', function(e) {
     if (e.target === todayImgFullscreen) {
       todayImgFullscreen.classList.remove('show');
       todayImgFullscreenImg.src = '';
+      todayImgFullscreenList = [];
+    }
+  });
+
+  // Touch handlers for pinch-zoom, swipe, and double-tap
+  var touchState = { touches: [], mode: null, startX: 0, startY: 0, lastDist: 0, moved: false };
+
+  todayImgFullscreen.addEventListener('touchstart', function(e) {
+    if (e.target === todayImgCloseFullscreen) return;
+    e.preventDefault();
+    touchState.touches = Array.from(e.touches);
+    touchState.moved = false;
+
+    if (e.touches.length === 1) {
+      touchState.mode = 'pan';
+      touchState.startX = e.touches[0].clientX;
+      touchState.startY = e.touches[0].clientY;
+
+      // Double-tap detection
+      var now = Date.now();
+      if (now - todayImgLastTap < 300) {
+        // Double tap: toggle zoom
+        if (todayImgScale > 1.5) {
+          todayImgResetTransform();
+        } else {
+          todayImgScale = 2.5;
+          todayImgApplyTransform();
+        }
+      }
+      todayImgLastTap = now;
+    } else if (e.touches.length === 2) {
+      touchState.mode = 'pinch';
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      touchState.lastDist = Math.sqrt(dx * dx + dy * dy);
+      todayImgStartScale = todayImgScale;
+    }
+  }, { passive: false });
+
+  todayImgFullscreen.addEventListener('touchmove', function(e) {
+    if (e.target === todayImgCloseFullscreen) return;
+    e.preventDefault();
+    touchState.moved = true;
+
+    if (touchState.mode === 'pan' && e.touches.length === 1) {
+      var dx = e.touches[0].clientX - touchState.startX;
+      var dy = e.touches[0].clientY - touchState.startY;
+      if (todayImgScale > 1) {
+        // Pan when zoomed in
+        todayImgTranslateX += dx * 0.5;
+        todayImgTranslateY += dy * 0.5;
+        touchState.startX = e.touches[0].clientX;
+        touchState.startY = e.touches[0].clientY;
+        todayImgApplyTransform();
+      } else {
+        // Track horizontal swipe distance
+        touchState.swipeDx = dx;
+        touchState.swipeDy = dy;
+      }
+    } else if (touchState.mode === 'pinch' && e.touches.length === 2) {
+      var dx2 = e.touches[0].clientX - e.touches[1].clientX;
+      var dy2 = e.touches[0].clientY - e.touches[1].clientY;
+      var dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+      var delta = dist - touchState.lastDist;
+      todayImgScale = Math.max(0.5, Math.min(5, todayImgStartScale + (dist / touchState.lastDist - 1) * todayImgStartScale));
+      todayImgApplyTransform();
+      touchState.lastDist = dist;
+    }
+  }, { passive: false });
+
+  todayImgFullscreen.addEventListener('touchend', function(e) {
+    if (touchState.mode === 'pan' && !touchState.moved) {
+      // It was a tap, not a swipe — do nothing (click handler will close if tapping background)
+    } else if (touchState.mode === 'pan' && todayImgScale <= 1 && touchState.swipeDx) {
+      // Swipe to navigate
+      if (Math.abs(touchState.swipeDx) > 50 && Math.abs(touchState.swipeDx) > Math.abs(touchState.swipeDy)) {
+        if (touchState.swipeDx > 0) {
+          todayImgPrevImage();
+        } else {
+          todayImgNextImage();
+        }
+      }
+    }
+    touchState.mode = null;
+    touchState.swipeDx = 0;
+    touchState.swipeDy = 0;
+  });
+
+  // Add navigation arrows for desktop/non-touch
+  todayImgFullscreen.addEventListener('dblclick', function(e) {
+    if (e.target === todayImgFullscreenImg) {
+      if (todayImgScale > 1.5) {
+        todayImgResetTransform();
+      } else {
+        todayImgScale = 2.5;
+        todayImgApplyTransform();
+      }
     }
   });
 
