@@ -2549,7 +2549,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260814.01">
+    <meta name="app-version" content="20260814.02">
   </div>
 
   <!-- Tabs -->
@@ -3165,25 +3165,47 @@
   <div class="app-panel" id="app-images">
     <div class="header">
       <h1>📷 今日图片</h1>
-      <p>上传地图、外卖二维码、扫码图等今日所需图片，点开可放大查看</p>
+      <p>上传地图、外卖券、奶茶券、日程安排等今日所需图片，点开可放大查看</p>
     </div>
 
-    <!-- Today Images: Display -->
-    <div class="sched-section" id="todayImgDisplaySection" style="display:none;">
-      <h3>已上传图片</h3>
-      <div id="todayImgList"></div>
-      <button class="sched-btn sched-btn-danger" id="todayImgDeleteBtn" style="margin-top:10px;">🗑️ 清除全部</button>
+    <!-- Today Images: Date display -->
+    <div class="sched-section" id="todayImgDateSection" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="margin-bottom:0;" id="todayImgDateText">📅 </h3>
+      </div>
     </div>
+
+    <!-- Today Images: Display grouped by category -->
+    <div id="todayImgDisplayContainer"></div>
 
     <!-- Today Images: Upload section -->
     <div class="sched-section" id="todayImgUploadSection">
       <h3>上传图片</h3>
       <div class="sched-upload-area" id="todayImgUploadArea">
         <div class="sched-upload-icon">📷</div>
-        <p>点击选择图片（最多5张，可拍照或相册）</p>
+        <p>点击选择图片（不限张数，可拍照或相册）</p>
       </div>
       <input type="file" id="todayImgFileInput" accept="image/*" multiple style="display:none;">
       <div class="sched-preview-grid" id="todayImgPreviewGrid"></div>
+
+      <!-- Category selector for new uploads -->
+      <div style="margin-top:12px;">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">选择分类</label>
+        <select id="todayImgCategorySelect" style="width:100%;padding:8px 10px;border:1.5px solid var(--rule);border-radius:8px;font-size:0.85rem;background:#fff;">
+          <option value="地图">🗺️ 地图</option>
+          <option value="外卖券">🍔 外卖券</option>
+          <option value="奶茶券">🧋 奶茶券</option>
+          <option value="日程安排">📅 日程安排</option>
+          <option value="其他">📦 其他</option>
+        </select>
+      </div>
+
+      <!-- Optional note -->
+      <div style="margin-top:10px;">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">备注（可选）</label>
+        <textarea id="todayImgNoteInput" rows="2" style="width:100%;padding:8px 10px;border:1.5px solid var(--rule);border-radius:8px;font-size:0.85rem;resize:vertical;" placeholder="比如：取餐码1234、3号门进入..."></textarea>
+      </div>
+
       <button class="sched-btn sched-btn-primary" id="todayImgUploadBtn" style="margin-top:12px;">上传并查看</button>
     </div>
   </div><!-- /app-images -->
@@ -7691,16 +7713,25 @@
   });
 
   // ====== Today Images feature ======
-  var TODAY_IMG_KEY = 'today_images';
+  var TODAY_IMG_KEY = 'today_images_v2';
+  var TODAY_IMG_CATEGORIES = [
+    { key: '地图', icon: '🗺️', label: '地图' },
+    { key: '外卖券', icon: '🍔', label: '外卖券' },
+    { key: '奶茶券', icon: '🧋', label: '奶茶券' },
+    { key: '日程安排', icon: '📅', label: '日程安排' },
+    { key: '其他', icon: '📦', label: '其他' }
+  ];
   var todayImgSelectedFiles = [];
   var todayImgUploadArea = document.getElementById('todayImgUploadArea');
   var todayImgFileInput = document.getElementById('todayImgFileInput');
   var todayImgPreviewGrid = document.getElementById('todayImgPreviewGrid');
   var todayImgUploadBtn = document.getElementById('todayImgUploadBtn');
-  var todayImgDisplaySection = document.getElementById('todayImgDisplaySection');
   var todayImgUploadSection = document.getElementById('todayImgUploadSection');
-  var todayImgList = document.getElementById('todayImgList');
-  var todayImgDeleteBtn = document.getElementById('todayImgDeleteBtn');
+  var todayImgDisplayContainer = document.getElementById('todayImgDisplayContainer');
+  var todayImgDateSection = document.getElementById('todayImgDateSection');
+  var todayImgDateText = document.getElementById('todayImgDateText');
+  var todayImgCategorySelect = document.getElementById('todayImgCategorySelect');
+  var todayImgNoteInput = document.getElementById('todayImgNoteInput');
   var todayImgFullscreen = document.getElementById('todayImgFullscreen');
   var todayImgFullscreenImg = document.getElementById('todayImgFullscreenImg');
   var todayImgCloseFullscreen = document.getElementById('todayImgCloseFullscreen');
@@ -7710,8 +7741,18 @@
       var raw = localStorage.getItem(TODAY_IMG_KEY);
       if (!raw) return null;
       var data = JSON.parse(raw);
-      if (!data || !data.images || data.images.length === 0) return null;
-      return data;
+      if (!data) return null;
+      // Support both old format (flat images array) and new format (items with category)
+      if (data.items && data.items.length > 0) return data;
+      // Migrate old format
+      if (data.images && data.images.length > 0) {
+        data.items = data.images.map(function(img) {
+          return { image: img, category: '其他', note: '' };
+        });
+        delete data.images;
+        return data;
+      }
+      return null;
     } catch(e) { return null; }
   }
 
@@ -7720,7 +7761,7 @@
       localStorage.setItem(TODAY_IMG_KEY, JSON.stringify(data));
       return true;
     } catch(e) {
-      showToast('存储失败，图片可能太大');
+      showToast('存储失败，图片可能太大，请清除旧图片后重试');
       return false;
     }
   }
@@ -7729,13 +7770,51 @@
     localStorage.removeItem(TODAY_IMG_KEY);
   }
 
+  // Compress image for today images — allows much larger dimensions for long screenshots
+  function compressImageLong(file) {
+    var maxSize = 4096; // Allow up to 4096px for long screenshots
+    var quality = 0.75;
+    return new Promise(function(resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var width = img.width, height = img.height;
+          // Only scale down if the longer side exceeds maxSize
+          var longSide = Math.max(width, height);
+          if (longSide > maxSize) {
+            var scale = maxSize / longSide;
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          var canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          // Use PNG for images that might contain text (maps, QR codes)
+          var dataURL = canvas.toDataURL('image/jpeg', quality);
+          // If the JPEG is still too large (>2MB as base64), reduce quality
+          if (dataURL.length > 2 * 1024 * 1024) {
+            dataURL = canvas.toDataURL('image/jpeg', 0.5);
+          }
+          resolve(dataURL);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   // Upload area click
   todayImgUploadArea.addEventListener('click', function() { todayImgFileInput.click(); });
 
   todayImgFileInput.addEventListener('change', function(e) {
     var files = Array.from(e.target.files);
     files.forEach(function(f) {
-      if (todayImgSelectedFiles.length < 5) todayImgSelectedFiles.push(f);
+      todayImgSelectedFiles.push(f); // No limit
     });
     todayImgFileInput.value = '';
     todayImgRenderPreviews();
@@ -7760,7 +7839,7 @@
     });
   }
 
-  // Upload button
+  // Upload button — adds images to selected category with optional note
   todayImgUploadBtn.addEventListener('click', function() {
     if (todayImgSelectedFiles.length === 0) {
       showToast('请先选择至少一张图片');
@@ -7769,19 +7848,22 @@
     todayImgUploadBtn.disabled = true;
     todayImgUploadBtn.textContent = '压缩上传中...';
 
-    var images = [];
+    var category = todayImgCategorySelect.value;
+    var note = todayImgNoteInput.value.trim();
+
+    var newItems = [];
     var chain = Promise.resolve();
     todayImgSelectedFiles.forEach(function(file) {
       chain = chain.then(function() {
-        return compressImage(file).then(function(dataURL) {
-          images.push(dataURL);
+        return compressImageLong(file).then(function(dataURL) {
+          newItems.push({ image: dataURL, category: category, note: note });
         });
       });
     });
 
     chain.then(function() {
-      var totalKB = images.reduce(function(sum, img) {
-        return sum + Math.round((img.length * 3) / 4 / 1024);
+      var totalKB = newItems.reduce(function(sum, item) {
+        return sum + Math.round((item.image.length * 3) / 4 / 1024);
       }, 0);
       if (totalKB > 5000) {
         if (!confirm('图片总大小约 ' + totalKB + 'KB，可能导致存储失败。是否继续？')) {
@@ -7791,10 +7873,16 @@
         }
       }
 
-      var data = { images: images, uploadedAt: Date.now() };
+      // Merge with existing data (append, not replace)
+      var existing = getTodayImages();
+      var allItems = existing && existing.items ? existing.items.slice() : [];
+      allItems = allItems.concat(newItems);
+
+      var data = { items: allItems, uploadedAt: Date.now() };
       if (saveTodayImages(data)) {
         todayImgSelectedFiles = [];
         todayImgRenderPreviews();
+        todayImgNoteInput.value = '';
         todayImgUploadBtn.disabled = false;
         todayImgUploadBtn.textContent = '上传并查看';
         todayImgLoadView();
@@ -7814,44 +7902,109 @@
     });
   });
 
-  // Load view
+  // Load view — display grouped by category
   function todayImgLoadView() {
     var data = getTodayImages();
-    if (!data) {
-      todayImgDisplaySection.style.display = 'none';
+    if (!data || !data.items || data.items.length === 0) {
+      todayImgDisplayContainer.innerHTML = '';
+      todayImgDateSection.style.display = 'none';
       todayImgUploadSection.style.display = 'block';
       todayImgUploadBtn.textContent = '上传并查看';
       return;
     }
 
     todayImgUploadSection.style.display = 'block';
-    todayImgUploadBtn.textContent = '重新上传（替换当前图片）';
-    todayImgDisplaySection.style.display = 'block';
-    todayImgList.innerHTML = '';
-    data.images.forEach(function(dataURL, idx) {
-      var card = document.createElement('div');
-      card.className = 'sched-img-card';
-      card.innerHTML = '<img src="' + dataURL + '" alt="图片' + (idx + 1) + '">';
-      card.addEventListener('click', function() { todayImgOpenFullscreen(dataURL); });
-      todayImgList.appendChild(card);
+    todayImgUploadBtn.textContent = '继续上传（追加图片）';
+
+    // Show date
+    todayImgDateSection.style.display = 'block';
+    var now = new Date();
+    var dateStr = (now.getMonth() + 1) + '月' + now.getDate() + '日 ' + WEEKDAYS[now.getDay()];
+    todayImgDateText.textContent = '📅 ' + dateStr;
+
+    // Clear container
+    todayImgDisplayContainer.innerHTML = '';
+
+    // Group items by category
+    TODAY_IMG_CATEGORIES.forEach(function(cat) {
+      var catItems = data.items.filter(function(item) { return item.category === cat.key; });
+      if (catItems.length === 0) return; // Skip empty categories
+
+      var section = document.createElement('div');
+      section.className = 'sched-section';
+      section.style.marginTop = '12px';
+
+      // Category header
+      var header = document.createElement('div');
+      header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:8px 12px;background:linear-gradient(135deg,rgba(45,157,120,0.08),rgba(45,157,120,0.03));border-radius:8px;border-left:3px solid var(--accent);';
+      header.innerHTML = '<h3 style="margin:0;font-size:0.95rem;color:var(--accent);">' + cat.icon + ' ' + cat.label + ' <span style="font-size:0.75rem;color:var(--muted);font-weight:400;">(' + catItems.length + '张)</span></h3>' +
+        '<button class="sched-btn sched-btn-danger sched-btn-sm" data-del-cat="' + cat.key + '" style="font-size:0.7rem;padding:4px 10px;">删除此分类</button>';
+      section.appendChild(header);
+
+      // Image grid
+      var grid = document.createElement('div');
+      grid.className = 'sched-preview-grid';
+      catItems.forEach(function(item, idx) {
+        var card = document.createElement('div');
+        card.className = 'sched-img-card';
+        card.style.position = 'relative';
+        card.innerHTML = '<img src="' + item.image + '" alt="' + cat.label + (idx + 1) + '" style="width:100%;display:block;border-radius:8px;cursor:pointer;">';
+        card.addEventListener('click', function() { todayImgOpenFullscreen(item.image); });
+        grid.appendChild(card);
+      });
+      section.appendChild(grid);
+
+      // Note display — large, prominent text
+      if (catItems.some(function(i) { return i.note; })) {
+        var noteDiv = document.createElement('div');
+        noteDiv.style.cssText = 'margin-top:10px;padding:10px 14px;background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;border-radius:6px;';
+        catItems.forEach(function(item, idx) {
+          if (item.note) {
+            var noteP = document.createElement('p');
+            noteP.style.cssText = 'font-size:1.05rem;font-weight:600;color:#92400e;line-height:1.6;margin-bottom:4px;word-break:break-all;';
+            noteP.textContent = '📝 ' + item.note;
+            noteDiv.appendChild(noteP);
+          }
+        });
+        section.appendChild(noteDiv);
+      }
+
+      todayImgDisplayContainer.appendChild(section);
     });
 
-    // Show upload time
-    var timeStr = new Date(data.uploadedAt).toLocaleString('zh-CN');
-    var timeDiv = document.createElement('div');
-    timeDiv.style.cssText = 'font-size:0.72rem;color:var(--muted);margin-top:6px;';
-    timeDiv.textContent = '上传时间：' + timeStr;
-    todayImgList.appendChild(timeDiv);
-  }
+    // Delete buttons per category
+    todayImgDisplayContainer.querySelectorAll('[data-del-cat]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var cat = btn.getAttribute('data-del-cat');
+        if (confirm('确定删除「' + cat + '」分类下的所有图片？')) {
+          var current = getTodayImages();
+          if (current && current.items) {
+            current.items = current.items.filter(function(item) { return item.category !== cat; });
+            if (current.items.length === 0) {
+              deleteTodayImages();
+            } else {
+              saveTodayImages(current);
+            }
+            todayImgLoadView();
+            showToast('已删除「' + cat + '」分类');
+          }
+        }
+      });
+    });
 
-  // Delete all
-  todayImgDeleteBtn.addEventListener('click', function() {
-    if (confirm('确定清除全部今日图片？')) {
-      deleteTodayImages();
-      todayImgLoadView();
-      showToast('已清除全部图片');
-    }
-  });
+    // Add "clear all" button at the bottom
+    var clearAllDiv = document.createElement('div');
+    clearAllDiv.style.cssText = 'margin-top:14px;text-align:center;';
+    clearAllDiv.innerHTML = '<button class="sched-btn sched-btn-danger" id="todayImgDeleteAllBtn">🗑️ 清除全部图片</button>';
+    todayImgDisplayContainer.appendChild(clearAllDiv);
+    document.getElementById('todayImgDeleteAllBtn').addEventListener('click', function() {
+      if (confirm('确定清除全部今日图片？')) {
+        deleteTodayImages();
+        todayImgLoadView();
+        showToast('已清除全部图片');
+      }
+    });
+  }
 
   // Fullscreen
   function todayImgOpenFullscreen(dataURL) {
