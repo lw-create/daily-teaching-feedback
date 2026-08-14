@@ -2549,7 +2549,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260814.02">
+    <meta name="app-version" content="20260814.03">
   </div>
 
   <!-- Tabs -->
@@ -3192,11 +3192,6 @@
       <div style="margin-top:12px;">
         <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">选择分类</label>
         <select id="todayImgCategorySelect" style="width:100%;padding:8px 10px;border:1.5px solid var(--rule);border-radius:8px;font-size:0.85rem;background:#fff;">
-          <option value="地图">🗺️ 地图</option>
-          <option value="外卖券">🍔 外卖券</option>
-          <option value="奶茶券">🧋 奶茶券</option>
-          <option value="日程安排">📅 日程安排</option>
-          <option value="其他">📦 其他</option>
         </select>
       </div>
 
@@ -7714,13 +7709,46 @@
 
   // ====== Today Images feature ======
   var TODAY_IMG_KEY = 'today_images_v2';
-  var TODAY_IMG_CATEGORIES = [
+  var TODAY_IMG_CAT_KEY = 'today_img_categories';
+  var DEFAULT_TODAY_IMG_CATEGORIES = [
     { key: '地图', icon: '🗺️', label: '地图' },
     { key: '外卖券', icon: '🍔', label: '外卖券' },
     { key: '奶茶券', icon: '🧋', label: '奶茶券' },
     { key: '日程安排', icon: '📅', label: '日程安排' },
     { key: '其他', icon: '📦', label: '其他' }
   ];
+
+  function getTodayImgCategories() {
+    try {
+      var raw = localStorage.getItem(TODAY_IMG_CAT_KEY);
+      if (raw) {
+        var cats = JSON.parse(raw);
+        if (cats && cats.length > 0) return cats;
+      }
+    } catch(e) {}
+    return DEFAULT_TODAY_IMG_CATEGORIES.slice();
+  }
+
+  function saveTodayImgCategories(cats) {
+    try { safeStorageSet(TODAY_IMG_CAT_KEY, JSON.stringify(cats)); } catch(e) {}
+  }
+
+  function getCatIcon(key) {
+    var cats = getTodayImgCategories();
+    for (var i = 0; i < cats.length; i++) {
+      if (cats[i].key === key) return cats[i].icon;
+    }
+    return '📦';
+  }
+
+  function refreshCategorySelect() {
+    var cats = getTodayImgCategories();
+    var html = '';
+    cats.forEach(function(c) {
+      html += '<option value="' + c.key + '">' + c.icon + ' ' + c.label + '</option>';
+    });
+    todayImgCategorySelect.innerHTML = html;
+  }
   var todayImgSelectedFiles = [];
   var todayImgUploadArea = document.getElementById('todayImgUploadArea');
   var todayImgFileInput = document.getElementById('todayImgFileInput');
@@ -7902,14 +7930,20 @@
     });
   });
 
-  // Load view — display grouped by category
+  // Load view — display grouped by category (collapsible, large labels, single note)
   function todayImgLoadView() {
     var data = getTodayImages();
+    var cats = getTodayImgCategories();
+
+    // Refresh category select dropdown
+    refreshCategorySelect();
+
     if (!data || !data.items || data.items.length === 0) {
       todayImgDisplayContainer.innerHTML = '';
       todayImgDateSection.style.display = 'none';
       todayImgUploadSection.style.display = 'block';
       todayImgUploadBtn.textContent = '上传并查看';
+      renderCategoryManagement();
       return;
     }
 
@@ -7925,8 +7959,15 @@
     // Clear container
     todayImgDisplayContainer.innerHTML = '';
 
-    // Group items by category
-    TODAY_IMG_CATEGORIES.forEach(function(cat) {
+    // Group items by category — also include categories from data that might have been deleted from defaults
+    var allCats = cats.slice();
+    data.items.forEach(function(item) {
+      if (!allCats.some(function(c) { return c.key === item.category; })) {
+        allCats.push({ key: item.category, icon: '📦', label: item.category });
+      }
+    });
+
+    allCats.forEach(function(cat) {
       var catItems = data.items.filter(function(item) { return item.category === cat.key; });
       if (catItems.length === 0) return; // Skip empty categories
 
@@ -7934,12 +7975,19 @@
       section.className = 'sched-section';
       section.style.marginTop = '12px';
 
-      // Category header
+      // Collapsible header — large, prominent
       var header = document.createElement('div');
-      header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:8px 12px;background:linear-gradient(135deg,rgba(45,157,120,0.08),rgba(45,157,120,0.03));border-radius:8px;border-left:3px solid var(--accent);';
-      header.innerHTML = '<h3 style="margin:0;font-size:0.95rem;color:var(--accent);">' + cat.icon + ' ' + cat.label + ' <span style="font-size:0.75rem;color:var(--muted);font-weight:400;">(' + catItems.length + '张)</span></h3>' +
-        '<button class="sched-btn sched-btn-danger sched-btn-sm" data-del-cat="' + cat.key + '" style="font-size:0.7rem;padding:4px 10px;">删除此分类</button>';
+      header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:linear-gradient(135deg,rgba(45,157,120,0.10),rgba(45,157,120,0.03));border-radius:8px;border-left:4px solid var(--accent);user-select:none;';
+      header.innerHTML =
+        '<span style="font-size:1.15rem;font-weight:800;color:var(--accent);">' + cat.icon + ' ' + cat.label +
+        ' <span style="font-size:0.8rem;color:var(--muted);font-weight:400;">(' + catItems.length + '张)</span></span>' +
+        '<span class="today-cat-arrow" style="font-size:0.9rem;color:var(--accent);transition:transform 0.2s;">▼</span>';
       section.appendChild(header);
+
+      // Collapsible content
+      var content = document.createElement('div');
+      content.className = 'today-cat-content';
+      content.style.cssText = 'display:none;padding-top:10px;';
 
       // Image grid
       var grid = document.createElement('div');
@@ -7952,47 +8000,44 @@
         card.addEventListener('click', function() { todayImgOpenFullscreen(item.image); });
         grid.appendChild(card);
       });
-      section.appendChild(grid);
+      content.appendChild(grid);
 
-      // Note display — large, prominent text
-      if (catItems.some(function(i) { return i.note; })) {
+      // Note display — show only once (first non-empty note)
+      var firstNote = null;
+      for (var i = 0; i < catItems.length; i++) {
+        if (catItems[i].note) { firstNote = catItems[i].note; break; }
+      }
+      if (firstNote) {
         var noteDiv = document.createElement('div');
         noteDiv.style.cssText = 'margin-top:10px;padding:10px 14px;background:rgba(245,158,11,0.08);border-left:3px solid #f59e0b;border-radius:6px;';
-        catItems.forEach(function(item, idx) {
-          if (item.note) {
-            var noteP = document.createElement('p');
-            noteP.style.cssText = 'font-size:1.05rem;font-weight:600;color:#92400e;line-height:1.6;margin-bottom:4px;word-break:break-all;';
-            noteP.textContent = '📝 ' + item.note;
-            noteDiv.appendChild(noteP);
+        var noteP = document.createElement('p');
+        noteP.style.cssText = 'font-size:1.05rem;font-weight:600;color:#92400e;line-height:1.6;margin:0;word-break:break-all;';
+        noteP.textContent = '📝 ' + firstNote;
+        noteDiv.appendChild(noteP);
+        content.appendChild(noteDiv);
+      }
+
+      section.appendChild(content);
+
+      // Toggle collapse on header click
+      (function(hdr, cnt, arrow) {
+        hdr.addEventListener('click', function() {
+          if (cnt.style.display === 'none') {
+            cnt.style.display = 'block';
+            arrow.textContent = '▲';
+            arrow.style.transform = 'rotate(180deg)';
+          } else {
+            cnt.style.display = 'none';
+            arrow.textContent = '▼';
+            arrow.style.transform = 'rotate(0deg)';
           }
         });
-        section.appendChild(noteDiv);
-      }
+      })(header, content, header.querySelector('.today-cat-arrow'));
 
       todayImgDisplayContainer.appendChild(section);
     });
 
-    // Delete buttons per category
-    todayImgDisplayContainer.querySelectorAll('[data-del-cat]').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var cat = btn.getAttribute('data-del-cat');
-        if (confirm('确定删除「' + cat + '」分类下的所有图片？')) {
-          var current = getTodayImages();
-          if (current && current.items) {
-            current.items = current.items.filter(function(item) { return item.category !== cat; });
-            if (current.items.length === 0) {
-              deleteTodayImages();
-            } else {
-              saveTodayImages(current);
-            }
-            todayImgLoadView();
-            showToast('已删除「' + cat + '」分类');
-          }
-        }
-      });
-    });
-
-    // Add "clear all" button at the bottom
+    // Bottom: clear all + category management
     var clearAllDiv = document.createElement('div');
     clearAllDiv.style.cssText = 'margin-top:14px;text-align:center;';
     clearAllDiv.innerHTML = '<button class="sched-btn sched-btn-danger" id="todayImgDeleteAllBtn">🗑️ 清除全部图片</button>';
@@ -8004,6 +8049,117 @@
         showToast('已清除全部图片');
       }
     });
+
+    // Render category management panel at the bottom
+    renderCategoryManagement();
+  }
+
+  // Category management panel (add/delete categories at the bottom)
+  function renderCategoryManagement() {
+    // Remove old panel if exists
+    var oldPanel = document.getElementById('todayCatMgmtPanel');
+    if (oldPanel) oldPanel.parentNode.removeChild(oldPanel);
+
+    var cats = getTodayImgCategories();
+    var panel = document.createElement('div');
+    panel.id = 'todayCatMgmtPanel';
+    panel.style.cssText = 'margin-top:16px;padding:12px;background:rgba(0,0,0,0.02);border-radius:8px;';
+
+    // Collapsible toggle
+    var toggle = document.createElement('div');
+    toggle.style.cssText = 'display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;';
+    toggle.innerHTML = '<span style="font-size:0.85rem;font-weight:700;color:var(--ink);">🏷️ 分类管理</span><span id="todayCatMgmtArrow" style="font-size:0.8rem;color:var(--muted);">▶</span>';
+    panel.appendChild(toggle);
+
+    var content = document.createElement('div');
+    content.id = 'todayCatMgmtContent';
+    content.style.cssText = 'display:none;margin-top:10px;';
+
+    // Category tags with delete buttons
+    var tagsDiv = document.createElement('div');
+    tagsDiv.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;';
+    cats.forEach(function(cat) {
+      var tag = document.createElement('span');
+      tag.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(45,157,120,0.1);border:1px solid rgba(45,157,120,0.2);border-radius:14px;font-size:0.8rem;color:var(--accent);';
+      tag.innerHTML = cat.icon + ' ' + cat.label + ' <button data-del-cat="' + cat.key + '" style="background:none;border:none;color:#e53e3e;cursor:pointer;font-size:0.9rem;padding:0 2px;line-height:1;">✕</button>';
+      tagsDiv.appendChild(tag);
+    });
+    content.appendChild(tagsDiv);
+
+    // Add new category
+    var addDiv = document.createElement('div');
+    addDiv.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
+    addDiv.innerHTML =
+      '<input id="todayCatNewName" type="text" placeholder="新分类名称" style="flex:1;min-width:100px;padding:6px 10px;border:1.5px solid var(--rule);border-radius:6px;font-size:0.8rem;">' +
+      '<select id="todayCatNewIcon" style="padding:6px;border:1.5px solid var(--rule);border-radius:6px;font-size:0.8rem;">' +
+      '<option value="📦">📦</option><option value="🗺️">🗺️</option><option value="🍔">🍔</option>' +
+      '<option value="🧋">🧋</option><option value="📅">📅</option><option value="🛒">🛒</option>' +
+      '<option value="💊">💊</option><option value="🎫">🎫</option><option value="📍">📍</option>' +
+      '<option value="📋">📋</option><option value="🔑">🔑</option><option value="📱">📱</option>' +
+      '</select>' +
+      '<button class="sched-btn sched-btn-primary sched-btn-sm" id="todayCatAddBtn" style="white-space:nowrap;">添加</button>';
+    content.appendChild(addDiv);
+
+    panel.appendChild(content);
+
+    // Toggle
+    toggle.addEventListener('click', function() {
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        document.getElementById('todayCatMgmtArrow').textContent = '▼';
+      } else {
+        content.style.display = 'none';
+        document.getElementById('todayCatMgmtArrow').textContent = '▶';
+      }
+    });
+
+    // Delete category handler
+    panel.querySelectorAll('[data-del-cat]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var catKey = btn.getAttribute('data-del-cat');
+        var data = getTodayImages();
+        var hasImages = data && data.items && data.items.some(function(item) { return item.category === catKey; });
+        var msg = hasImages
+          ? '分类「' + catKey + '」下有图片，删除分类将同时删除这些图片。确定删除？'
+          : '确定删除分类「' + catKey + '」？';
+        if (confirm(msg)) {
+          // Remove category
+          var cats2 = getTodayImgCategories().filter(function(c) { return c.key !== catKey; });
+          saveTodayImgCategories(cats2);
+          // Remove images in this category
+          if (data && data.items) {
+            data.items = data.items.filter(function(item) { return item.category !== catKey; });
+            if (data.items.length === 0) {
+              deleteTodayImages();
+            } else {
+              saveTodayImages(data);
+            }
+          }
+          todayImgLoadView();
+          showToast('已删除分类「' + catKey + '」');
+        }
+      });
+    });
+
+    // Add category handler
+    panel.querySelector('#todayCatAddBtn').addEventListener('click', function() {
+      var nameInput = panel.querySelector('#todayCatNewName');
+      var iconSelect = panel.querySelector('#todayCatNewIcon');
+      var name = nameInput.value.trim();
+      if (!name) { showToast('请输入分类名称'); return; }
+      var cats2 = getTodayImgCategories();
+      if (cats2.some(function(c) { return c.key === name; })) {
+        showToast('该分类已存在'); return;
+      }
+      cats2.push({ key: name, icon: iconSelect.value, label: name });
+      saveTodayImgCategories(cats2);
+      nameInput.value = '';
+      todayImgLoadView();
+      showToast('已添加分类「' + name + '」');
+    });
+
+    todayImgDisplayContainer.appendChild(panel);
   }
 
   // Fullscreen
@@ -8025,6 +8181,7 @@
   });
 
   // ====== Init ======
+  refreshCategorySelect();
   schedLoadViewWithBackup();
 })();
 </script>
