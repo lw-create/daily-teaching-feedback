@@ -2549,7 +2549,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260814.07">
+    <meta name="app-version" content="20260814.08">
   </div>
 
   <!-- Tabs -->
@@ -3320,11 +3320,26 @@
     var file = e.filename ? e.filename.split('/').pop() : '';
     var line = e.lineno || '';
     console.error('[全局错误] ' + msg + ' (' + file + ':' + line + ')');
-    // Show user-friendly message for errors that would otherwise silently break functionality
-    if (msg.indexOf('null') !== -1 || msg.indexOf('undefined') !== -1 || msg.indexOf('Cannot read') !== -1) {
-      window.__showToast('页面功能异常，请刷新重试');
-    } else {
-      window.__showToast('发生错误：' + msg);
+    
+    // Don't show non-critical errors to the user
+    // These are often caused by browser cache issues or minor feature failures
+    var nonCriticalPatterns = [
+      'autoCheckUpdate', 'performVersionCheck', 'showUpdateModal',
+      'is not defined', 'Unexpected token', 'JSON'
+    ];
+    var isNonCritical = false;
+    for (var i = 0; i < nonCriticalPatterns.length; i++) {
+      if (msg.indexOf(nonCriticalPatterns[i]) !== -1) {
+        isNonCritical = true;
+        break;
+      }
+    }
+    
+    // Only show user-friendly message for critical errors that would break core functionality
+    if (!isNonCritical) {
+      if (msg.indexOf('null') !== -1 || msg.indexOf('undefined') !== -1 || msg.indexOf('Cannot read') !== -1) {
+        window.__showToast('页面功能异常，请刷新重试');
+      }
     }
     // Prevent default to avoid white screen on critical errors
     e.preventDefault();
@@ -8477,7 +8492,14 @@
   // ====== Init ======
   refreshCategorySelect();
   schedLoadViewWithBackup();
-  autoCheckUpdate();
+  // Auto-check for updates (wrapped in try-catch to prevent breaking the app)
+  try {
+    if (typeof autoCheckUpdate === 'function') {
+      autoCheckUpdate();
+    }
+  } catch(e) {
+    console.warn('Auto update check failed:', e);
+  }
 })();
 </script>
 
