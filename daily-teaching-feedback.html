@@ -2525,6 +2525,10 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 9H21M8 3V7M16 3V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       课表查看
     </button>
+    <button class="app-nav-btn" id="appNavImages">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      今日图片
+    </button>
   </div>
 
   <!-- App Panel: Feedback -->
@@ -2545,7 +2549,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260812.13">
+    <meta name="app-version" content="20260814.01">
   </div>
 
   <!-- Tabs -->
@@ -3155,6 +3159,39 @@
   <div class="sched-fullscreen-overlay" id="schedFullscreen">
     <button class="sched-fullscreen-close" id="schedCloseFullscreen">✕</button>
     <img id="schedFullscreenImg" alt="课表大图">
+  </div>
+
+  <!-- App Panel: Today Images -->
+  <div class="app-panel" id="app-images">
+    <div class="header">
+      <h1>📷 今日图片</h1>
+      <p>上传地图、外卖二维码、扫码图等今日所需图片，点开可放大查看</p>
+    </div>
+
+    <!-- Today Images: Display -->
+    <div class="sched-section" id="todayImgDisplaySection" style="display:none;">
+      <h3>已上传图片</h3>
+      <div id="todayImgList"></div>
+      <button class="sched-btn sched-btn-danger" id="todayImgDeleteBtn" style="margin-top:10px;">🗑️ 清除全部</button>
+    </div>
+
+    <!-- Today Images: Upload section -->
+    <div class="sched-section" id="todayImgUploadSection">
+      <h3>上传图片</h3>
+      <div class="sched-upload-area" id="todayImgUploadArea">
+        <div class="sched-upload-icon">📷</div>
+        <p>点击选择图片（最多5张，可拍照或相册）</p>
+      </div>
+      <input type="file" id="todayImgFileInput" accept="image/*" multiple style="display:none;">
+      <div class="sched-preview-grid" id="todayImgPreviewGrid"></div>
+      <button class="sched-btn sched-btn-primary" id="todayImgUploadBtn" style="margin-top:12px;">上传并查看</button>
+    </div>
+  </div><!-- /app-images -->
+
+  <!-- Today Images: Fullscreen overlay -->
+  <div class="sched-fullscreen-overlay" id="todayImgFullscreen">
+    <button class="sched-fullscreen-close" id="todayImgCloseFullscreen">✕</button>
+    <img id="todayImgFullscreenImg" alt="图片大图">
   </div>
 
 </div>
@@ -5979,22 +6016,30 @@
   // ====== Top-level app navigation ======
   var appNavFeedback = document.getElementById('appNavFeedback');
   var appNavSchedule = document.getElementById('appNavSchedule');
+  var appNavImages = document.getElementById('appNavImages');
   var appFeedback = document.getElementById('app-feedback');
   var appSchedule = document.getElementById('app-schedule');
+  var appImages = document.getElementById('app-images');
+
+  function switchTab(activeNav, activePanel) {
+    [appNavFeedback, appNavSchedule, appNavImages].forEach(function(n) { n.classList.remove('active'); });
+    [appFeedback, appSchedule, appImages].forEach(function(p) { p.classList.remove('active'); });
+    activeNav.classList.add('active');
+    activePanel.classList.add('active');
+  }
 
   appNavFeedback.addEventListener('click', function() {
-    appNavFeedback.classList.add('active');
-    appNavSchedule.classList.remove('active');
-    appFeedback.classList.add('active');
-    appSchedule.classList.remove('active');
+    switchTab(appNavFeedback, appFeedback);
   });
 
   appNavSchedule.addEventListener('click', function() {
-    appNavSchedule.classList.add('active');
-    appNavFeedback.classList.remove('active');
-    appSchedule.classList.add('active');
-    appFeedback.classList.remove('active');
+    switchTab(appNavSchedule, appSchedule);
     schedLoadView();
+  });
+
+  appNavImages.addEventListener('click', function() {
+    switchTab(appNavImages, appImages);
+    todayImgLoadView();
   });
 
   // ====== IndexedDB wrapper ======
@@ -7643,6 +7688,187 @@
       }
     };
     reader.readAsText(file);
+  });
+
+  // ====== Today Images feature ======
+  var TODAY_IMG_KEY = 'today_images';
+  var todayImgSelectedFiles = [];
+  var todayImgUploadArea = document.getElementById('todayImgUploadArea');
+  var todayImgFileInput = document.getElementById('todayImgFileInput');
+  var todayImgPreviewGrid = document.getElementById('todayImgPreviewGrid');
+  var todayImgUploadBtn = document.getElementById('todayImgUploadBtn');
+  var todayImgDisplaySection = document.getElementById('todayImgDisplaySection');
+  var todayImgUploadSection = document.getElementById('todayImgUploadSection');
+  var todayImgList = document.getElementById('todayImgList');
+  var todayImgDeleteBtn = document.getElementById('todayImgDeleteBtn');
+  var todayImgFullscreen = document.getElementById('todayImgFullscreen');
+  var todayImgFullscreenImg = document.getElementById('todayImgFullscreenImg');
+  var todayImgCloseFullscreen = document.getElementById('todayImgCloseFullscreen');
+
+  function getTodayImages() {
+    try {
+      var raw = localStorage.getItem(TODAY_IMG_KEY);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      if (!data || !data.images || data.images.length === 0) return null;
+      return data;
+    } catch(e) { return null; }
+  }
+
+  function saveTodayImages(data) {
+    try {
+      localStorage.setItem(TODAY_IMG_KEY, JSON.stringify(data));
+      return true;
+    } catch(e) {
+      showToast('存储失败，图片可能太大');
+      return false;
+    }
+  }
+
+  function deleteTodayImages() {
+    localStorage.removeItem(TODAY_IMG_KEY);
+  }
+
+  // Upload area click
+  todayImgUploadArea.addEventListener('click', function() { todayImgFileInput.click(); });
+
+  todayImgFileInput.addEventListener('change', function(e) {
+    var files = Array.from(e.target.files);
+    files.forEach(function(f) {
+      if (todayImgSelectedFiles.length < 5) todayImgSelectedFiles.push(f);
+    });
+    todayImgFileInput.value = '';
+    todayImgRenderPreviews();
+  });
+
+  function todayImgRenderPreviews() {
+    todayImgPreviewGrid.innerHTML = '';
+    todayImgSelectedFiles.forEach(function(file, idx) {
+      var item = document.createElement('div');
+      item.className = 'sched-preview-item';
+      var url = URL.createObjectURL(file);
+      item.innerHTML = '<img src="' + url + '" alt="预览"><button class="sched-rm-btn" data-idx="' + idx + '">✕</button>';
+      todayImgPreviewGrid.appendChild(item);
+    });
+    todayImgPreviewGrid.querySelectorAll('.sched-rm-btn').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var idx = parseInt(btn.dataset.idx);
+        todayImgSelectedFiles.splice(idx, 1);
+        todayImgRenderPreviews();
+      });
+    });
+  }
+
+  // Upload button
+  todayImgUploadBtn.addEventListener('click', function() {
+    if (todayImgSelectedFiles.length === 0) {
+      showToast('请先选择至少一张图片');
+      return;
+    }
+    todayImgUploadBtn.disabled = true;
+    todayImgUploadBtn.textContent = '压缩上传中...';
+
+    var images = [];
+    var chain = Promise.resolve();
+    todayImgSelectedFiles.forEach(function(file) {
+      chain = chain.then(function() {
+        return compressImage(file).then(function(dataURL) {
+          images.push(dataURL);
+        });
+      });
+    });
+
+    chain.then(function() {
+      var totalKB = images.reduce(function(sum, img) {
+        return sum + Math.round((img.length * 3) / 4 / 1024);
+      }, 0);
+      if (totalKB > 5000) {
+        if (!confirm('图片总大小约 ' + totalKB + 'KB，可能导致存储失败。是否继续？')) {
+          todayImgUploadBtn.disabled = false;
+          todayImgUploadBtn.textContent = '上传并查看';
+          return;
+        }
+      }
+
+      var data = { images: images, uploadedAt: Date.now() };
+      if (saveTodayImages(data)) {
+        todayImgSelectedFiles = [];
+        todayImgRenderPreviews();
+        todayImgUploadBtn.disabled = false;
+        todayImgUploadBtn.textContent = '上传并查看';
+        todayImgLoadView();
+        showToast('图片上传成功');
+      } else {
+        todayImgUploadBtn.disabled = false;
+        todayImgUploadBtn.textContent = '上传并查看';
+      }
+    }).catch(function(err) {
+      todayImgUploadBtn.disabled = false;
+      todayImgUploadBtn.textContent = '上传并查看';
+      var msg = err.message || '未知错误';
+      if (msg.indexOf('Quota') !== -1 || msg.indexOf('quota') !== -1) {
+        msg = '存储空间不足，请清除旧图片后重试';
+      }
+      showToast('上传失败：' + msg);
+    });
+  });
+
+  // Load view
+  function todayImgLoadView() {
+    var data = getTodayImages();
+    if (!data) {
+      todayImgDisplaySection.style.display = 'none';
+      todayImgUploadSection.style.display = 'block';
+      todayImgUploadBtn.textContent = '上传并查看';
+      return;
+    }
+
+    todayImgUploadSection.style.display = 'block';
+    todayImgUploadBtn.textContent = '重新上传（替换当前图片）';
+    todayImgDisplaySection.style.display = 'block';
+    todayImgList.innerHTML = '';
+    data.images.forEach(function(dataURL, idx) {
+      var card = document.createElement('div');
+      card.className = 'sched-img-card';
+      card.innerHTML = '<img src="' + dataURL + '" alt="图片' + (idx + 1) + '">';
+      card.addEventListener('click', function() { todayImgOpenFullscreen(dataURL); });
+      todayImgList.appendChild(card);
+    });
+
+    // Show upload time
+    var timeStr = new Date(data.uploadedAt).toLocaleString('zh-CN');
+    var timeDiv = document.createElement('div');
+    timeDiv.style.cssText = 'font-size:0.72rem;color:var(--muted);margin-top:6px;';
+    timeDiv.textContent = '上传时间：' + timeStr;
+    todayImgList.appendChild(timeDiv);
+  }
+
+  // Delete all
+  todayImgDeleteBtn.addEventListener('click', function() {
+    if (confirm('确定清除全部今日图片？')) {
+      deleteTodayImages();
+      todayImgLoadView();
+      showToast('已清除全部图片');
+    }
+  });
+
+  // Fullscreen
+  function todayImgOpenFullscreen(dataURL) {
+    todayImgFullscreenImg.src = dataURL;
+    todayImgFullscreen.classList.add('show');
+  }
+
+  todayImgCloseFullscreen.addEventListener('click', function() {
+    todayImgFullscreen.classList.remove('show');
+    todayImgFullscreenImg.src = '';
+  });
+
+  todayImgFullscreen.addEventListener('click', function(e) {
+    if (e.target === todayImgFullscreen) {
+      todayImgFullscreen.classList.remove('show');
+      todayImgFullscreenImg.src = '';
+    }
   });
 
   // ====== Init ======
