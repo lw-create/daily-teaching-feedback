@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta http-equiv="refresh" content="15; url=daily-teaching-feedback.html">
+<meta name="cache-control" content="no-cache, no-store, must-revalidate">
 <title>每日教学反馈生成器</title>
 <link rel="canonical" href="daily-teaching-feedback.html">
 <style>
@@ -64,9 +66,14 @@ body{
   <div class="title">每日教学反馈生成器</div>
   <div class="status" id="statusText">正在加载中，请稍候<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-  <div class="retry-hint" id="retryHint"></div>
+  <div class="retry-hint" id="retryHint">首次打开可能需要等待几秒，请耐心等待</div>
   <button class="retry-btn" id="retryBtn" onclick="manualRetry()">🔄 手动重试</button>
 </div>
+<noscript>
+  <p style="text-align:center;margin-top:20px;">
+    <a href="daily-teaching-feedback.html" style="color:#2d9d78;font-size:1.1rem;">点击进入工具</a>
+  </p>
+</noscript>
 <script>
 (function(){
   var MAIN_PAGE = 'daily-teaching-feedback.html';
@@ -75,19 +82,18 @@ body{
   var retryHint = document.getElementById('retryHint');
   var retryBtn = document.getElementById('retryBtn');
   var retryCount = 0;
-  var maxRetries = 20; // 20次 × 3秒 = 最多等60秒
+  var maxRetries = 30; // 30次 × 2秒 = 最多等60秒
   var progress = 0;
+  var redirected = false;
 
   // 进度条动画
   var progressTimer = setInterval(function(){
     if(progress < 90){
-      progress += Math.random() * 8;
+      progress += Math.random() * 6;
       if(progress > 90) progress = 90;
       progressFill.style.width = progress + '%';
     }
-  }, 400);
-
-  var redirected = false;
+  }, 300);
 
   function goToMain(){
     if(redirected) return;
@@ -104,24 +110,22 @@ body{
     retryCount++;
     var url = MAIN_PAGE + '?t=' + Date.now();
 
-    // 用 Image 对象探测服务器是否可用（不受 CORS 限制）
+    // 方式1: 用 Image 对象探测（不受 CORS 限制）
     var img = new Image();
     var done = false;
     
     img.onload = function(){
-      // 服务器有响应（即使是404，也说明服务器在线）
       done = true;
       goToMain();
     };
     img.onerror = function(){
-      // onerror 也说明服务器有响应（只是返回的不是图片）
-      // 对于 HTML 页面，这实际上是正常情况
+      // onerror 也说明服务器有响应（HTML 页面不是图片，所以 onerror 是正常的）
       done = true;
       goToMain();
     };
     img.src = url + '&img=1';
 
-    // 同时用 fetch 做更准确的检测
+    // 方式2: fetch HEAD 检测
     fetch(url, { method: 'HEAD', cache: 'no-store' })
       .then(function(resp){
         if(!done && (resp.ok || resp.status === 200 || resp.status === 304)){
@@ -129,23 +133,25 @@ body{
         }
       })
       .catch(function(err){
-        // fetch 失败，但 Image 可能已经触发了 onerror
         if(!done){
-          if(retryCount >= 2){
+          // 更新提示文字
+          if(retryCount === 1){
+            statusText.innerHTML = '正在连接服务器...';
+          } else if(retryCount >= 2){
             statusText.innerHTML = '服务器正在准备中，请稍候';
             retryHint.textContent = '已自动重试 ' + retryCount + ' 次，即将再次尝试...';
             retryBtn.classList.add('show');
           }
           if(retryCount < maxRetries){
-            // 3秒后自动重试
+            // 2秒后自动重试（缩短间隔）
             setTimeout(function(){
               if(!redirected) tryLoad();
-            }, 3000);
+            }, 2000);
           } else {
-            // 超过最大重试次数，尝试直接跳转作为最后手段
+            // 超过最大重试次数，尝试直接跳转
             clearInterval(progressTimer);
             statusText.innerHTML = '⚠️ 加载时间较长，正在尝试直接进入...';
-            retryHint.textContent = '';
+            retryHint.textContent = '如果页面空白，请刷新重试';
             setTimeout(function(){
               if(!redirected) window.location.replace(MAIN_PAGE);
             }, 1000);
@@ -153,12 +159,12 @@ body{
         }
       });
 
-    // 5秒超时：如果 Image 和 fetch 都没有触发，也尝试直接跳转
+    // 4秒超时：如果 Image 和 fetch 都没触发，也尝试跳转
     setTimeout(function(){
       if(!redirected && retryCount === 1){
         goToMain();
       }
-    }, 5000);
+    }, 4000);
   }
 
   // 启动加载
@@ -166,7 +172,6 @@ body{
 })();
 
 function manualRetry(){
-  // 重置状态，重新尝试
   location.reload();
 }
 </script>

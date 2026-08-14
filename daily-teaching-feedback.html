@@ -2549,7 +2549,7 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 12a9 9 0 11-3-6.7L21 8M21 3v5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       检查更新
     </button>
-    <meta name="app-version" content="20260814.03">
+    <meta name="app-version" content="20260814.04">
   </div>
 
   <!-- Tabs -->
@@ -7901,10 +7901,12 @@
         }
       }
 
-      // Merge with existing data (append, not replace)
+      // Replace items in the same category, keep other categories untouched
       var existing = getTodayImages();
-      var allItems = existing && existing.items ? existing.items.slice() : [];
-      allItems = allItems.concat(newItems);
+      var allItems = existing && existing.items ? existing.items.filter(function(item) {
+        return item.category !== category; // Remove old items in this category only
+      }) : [];
+      allItems = allItems.concat(newItems); // Add new items for this category
 
       var data = { items: allItems, uploadedAt: Date.now() };
       if (saveTodayImages(data)) {
