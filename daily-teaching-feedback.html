@@ -128,7 +128,7 @@
     flex-wrap: wrap;
   }
   .header-install-btn {
-    display: none;
+    display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 4px 12px;
@@ -2581,7 +2581,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260814.11">
+    <meta name="app-version" content="20260814.12">
   </div>
 
   <!-- Tabs -->
@@ -5765,23 +5765,33 @@
            window.navigator.standalone === true;
   }
 
-  // iOS 安装引导弹窗
-  function showIOSInstallGuide() {
+  // 通用安装引导弹窗（支持 iOS 和 Android）
+  function showInstallGuide() {
+    var isIOSDevice = isIOS();
     var modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    var steps = '';
+    if (isIOSDevice) {
+      steps =
+        '<b>步骤 1：</b>点击浏览器底部的<b>「分享」</b>按钮 <span style="display:inline-block;font-size:1.1rem;">⬆️</span><br>' +
+        '<b>步骤 2：</b>在弹出菜单中找到并点击<b>「添加到主屏幕」</b> <span style="display:inline-block;font-size:1.1rem;">➕</span><br>' +
+        '<b>步骤 3：</b>点击「添加」，桌面即出现工具图标';
+    } else {
+      steps =
+        '<b>步骤 1：</b>点击浏览器菜单按钮（通常在右上角或右下角）<span style="display:inline-block;font-size:1.1rem;">⋮</span><br>' +
+        '<b>步骤 2：</b>在菜单中找到<b>「添加到主屏幕」</b>或<b>「添加到桌面」</b>选项<br>' +
+        '<b>步骤 3：</b>点击确认，桌面即出现工具图标';
+    }
     modal.innerHTML =
       '<div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:360px;width:100%;text-align:center;font-family:inherit;">' +
         '<div style="font-size:2.2rem;margin-bottom:8px;">📱</div>' +
         '<h3 style="font-size:1.1rem;font-weight:700;color:#2d9d78;margin-bottom:16px;">添加到桌面</h3>' +
-        '<p style="font-size:0.88rem;color:#555;line-height:1.7;margin-bottom:16px;text-align:left;">' +
-          '<b>步骤 1：</b>点击浏览器底部的<b>「分享」</b>按钮 <span style="display:inline-block;font-size:1.1rem;">⬆️</span><br>' +
-          '<b>步骤 2：</b>在弹出菜单中找到<b>「添加到主屏幕」</b>选项 <span style="display:inline-block;font-size:1.1rem;">➕</span><br>' +
-          '<b>步骤 3：</b>点击确认，即可在桌面看到本工具图标' +
-        '</p>' +
-        '<button id="iosInstallCloseBtn" style="margin-top:8px;padding:10px 32px;background:#2d9d78;color:#fff;border:none;border-radius:10px;font-size:0.92rem;cursor:pointer;font-family:inherit;">我知道了</button>' +
+        '<p style="font-size:0.88rem;color:#555;line-height:1.8;margin-bottom:16px;text-align:left;">' + steps + '</p>' +
+        '<div style="font-size:0.78rem;color:#999;margin-bottom:12px;">添加后可像 App 一样从桌面直接打开</div>' +
+        '<button id="installGuideCloseBtn" style="margin-top:4px;padding:10px 32px;background:#2d9d78;color:#fff;border:none;border-radius:10px;font-size:0.92rem;cursor:pointer;font-family:inherit;">我知道了</button>' +
       '</div>';
     document.body.appendChild(modal);
-    var closeBtn = document.getElementById('iosInstallCloseBtn');
+    var closeBtn = document.getElementById('installGuideCloseBtn');
     closeBtn.addEventListener('click', function() {
       document.body.removeChild(modal);
     });
@@ -5796,20 +5806,16 @@
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredInstallPrompt = e;
-    // 已安装则不显示按钮
-    if (!isStandalone()) {
-      installAppBtn.classList.add('show');
-    }
   });
 
   // 按钮点击处理
   installAppBtn.addEventListener('click', function() {
-    // iOS 不支持 beforeinstallprompt，显示引导
-    if (isIOS()) {
-      showIOSInstallGuide();
+    // 已安装则提示
+    if (isStandalone()) {
+      showToast('本应用已添加到桌面');
       return;
     }
-    // Android/Chrome: 触发安装提示
+    // 如果浏览器支持一键安装（Chrome等）
     if (deferredInstallPrompt) {
       deferredInstallPrompt.prompt();
       deferredInstallPrompt.userChoice.then(function(choiceResult) {
@@ -5817,29 +5823,22 @@
           showToast('已添加到桌面，可在桌面打开使用');
         }
         deferredInstallPrompt = null;
-        installAppBtn.classList.remove('show');
       });
     } else {
-      // 已经安装过或环境不支持
-      if (isStandalone()) {
-        showToast('本应用已添加到桌面');
-      } else {
-        // 非 iOS 也未触发 beforeinstallprompt，可能浏览器不支持
-        showToast('当前浏览器不支持一键添加，请使用浏览器菜单中的「添加到主屏幕」功能');
-      }
+      // 不支持一键安装（iOS、小米浏览器等），显示图文引导
+      showInstallGuide();
     }
   });
 
   // 监听 appinstalled 事件
   window.addEventListener('appinstalled', function() {
-    installAppBtn.classList.remove('show');
     deferredInstallPrompt = null;
     showToast('安装成功！可在桌面找到本工具');
   });
 
-  // 页面加载后：如果是 iOS 且未安装，直接显示按钮（点击后显示引导）
-  if (isIOS() && !isStandalone()) {
-    installAppBtn.classList.add('show');
+  // 如果已安装，隐藏按钮
+  if (isStandalone()) {
+    installAppBtn.style.display = 'none';
   }
 
   // --- Reset ---
