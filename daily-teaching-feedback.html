@@ -2351,6 +2351,49 @@
   .tpl-collapsible-content.collapsed {
     display: none;
   }
+
+  /* Feature card system — clean collapsible cards */
+  .sched-feature-card {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: #fff;
+  }
+  .sched-feature-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .sched-feature-toggle:active { background: rgba(0,0,0,0.03); }
+  .sched-feature-toggle .sched-feature-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .sched-feature-toggle .sched-feature-arrow {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+  }
+  .sched-feature-toggle.open .sched-feature-arrow {
+    transform: rotate(90deg);
+  }
+  .sched-feature-body {
+    display: none;
+    padding: 12px 14px;
+    border-top: 1px solid var(--rule);
+  }
+  .sched-feature-body.open {
+    display: block;
+  }
   /* Edit section: distinct background to separate from display */
   #tplEditContent {
     background: rgba(59,130,246,0.03);
@@ -2604,7 +2647,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260815.01">
+    <meta name="app-version" content="20260815.02">
   </div>
 
   <!-- Tabs -->
@@ -2995,6 +3038,14 @@
     </div>
 
     <!-- Schedule Template Section -->
+    <div class="sched-feature-card" id="schedTemplateCard">
+      <div class="sched-feature-toggle" id="schedTemplateToggle">
+        <span class="sched-feature-icon">📋</span>
+        <span>课表模板管理</span>
+        <span class="sched-feature-arrow">▶</span>
+      </div>
+      <div class="sched-feature-body" id="schedTemplateBody">
+    <!-- Schedule Template Section (inner) -->
     <div class="tpl-section">
       <div class="tpl-section-title">
         <span>课表模板 <span class="tpl-sub">按星期/年级/班级编排，科目/老师/教室可复用</span></span>
@@ -3093,8 +3144,9 @@
         </div>
         <div class="tpl-collapsible-content" id="tplEditContent" style="display:none;">
           <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;">
-            <button class="tpl-btn tpl-btn-primary tpl-btn-sm" id="tplSaveActiveBtn">💾 保存全部</button>
-            <button class="tpl-btn tpl-btn-sm" id="tplDoneEditBtn">✅ 完成编辑</button>
+            <button class="tpl-btn tpl-btn-primary tpl-btn-sm" id="tplSaveActiveBtn">💾 保存课表</button>
+            <button class="tpl-btn tpl-btn-sm" id="tplSaveToTemplateBtn" style="background:#3b82f6;color:#fff;border-color:#3b82f6;">📌 保存到模板</button>
+            <button class="tpl-btn tpl-btn-sm" id="tplDoneEditBtn">✅ 完成</button>
             <button class="tpl-btn tpl-btn-sm" id="tplResetActiveBtn">🔄 重置</button>
             <button class="tpl-btn tpl-btn-danger tpl-btn-sm" id="tplClearActiveBtn">🗑️ 清除</button>
           </div>
@@ -3163,6 +3215,8 @@
         </div>
       </div>
     </div>
+      </div><!-- /schedTemplateBody -->
+    </div><!-- /schedTemplateCard -->
 
     <!-- Schedule: Images -->
     <div class="sched-section" id="schedImagesSection" style="display:none;">
@@ -3180,7 +3234,14 @@
     <button class="sched-btn sched-btn-danger" id="schedDeleteBtn" style="display:none;">删除当前课表</button>
 
     <!-- Schedule: Upload section -->
-    <div class="sched-section" id="schedUploadSection" style="margin-top:16px;">
+    <div class="sched-feature-card" id="schedUploadCard">
+      <div class="sched-feature-toggle" id="schedUploadToggle">
+        <span class="sched-feature-icon">📷</span>
+        <span>上传课表图片</span>
+        <span class="sched-feature-arrow">▶</span>
+      </div>
+      <div class="sched-feature-body" id="schedUploadBody">
+    <div class="sched-section" id="schedUploadSection">
       <h3>上传课表</h3>
       <div class="sched-upload-area" id="schedUploadArea">
         <div class="sched-upload-icon">📷</div>
@@ -3195,10 +3256,19 @@
       </div>
 
       <button class="sched-btn sched-btn-primary" id="schedUploadBtn" style="margin-top:12px;">上传并查看</button>
-    </div>
+      </div>
+    </div><!-- /schedUploadBody -->
+    </div><!-- /schedUploadCard -->
 
     <!-- Schedule: Data backup -->
-    <div class="sched-section" style="margin-top:16px;">
+    <div class="sched-feature-card" id="schedBackupCard">
+      <div class="sched-feature-toggle" id="schedBackupToggle">
+        <span class="sched-feature-icon">💾</span>
+        <span>数据备份与导入</span>
+        <span class="sched-feature-arrow">▶</span>
+      </div>
+      <div class="sched-feature-body" id="schedBackupBody">
+    <div class="sched-section">
       <div style="display:flex;align-items:center;margin-bottom:8px;">
         <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">课表数据备份</span>
         <span style="font-size:0.72rem;color:var(--muted);margin-left:6px;">导出/导入课表及常驻信息</span>
@@ -3209,7 +3279,9 @@
         <input type="file" id="schedImportFileInput" accept=".json" style="display:none;">
       </div>
       <div id="schedBackupInfo" style="font-size:0.72rem;color:var(--muted);margin-top:6px;"></div>
-    </div>
+      </div>
+    </div><!-- /schedBackupBody -->
+    </div><!-- /schedBackupCard -->
 
   </div><!-- /app-schedule -->
 
@@ -6547,6 +6619,26 @@
     }
   });
 
+  // Feature card toggle system
+  function setupFeatureCard(toggleId, bodyId) {
+    var toggle = document.getElementById(toggleId);
+    var body = document.getElementById(bodyId);
+    if (!toggle || !body) return;
+    toggle.addEventListener('click', function() {
+      var isOpen = body.classList.contains('open');
+      if (isOpen) {
+        body.classList.remove('open');
+        toggle.classList.remove('open');
+      } else {
+        body.classList.add('open');
+        toggle.classList.add('open');
+      }
+    });
+  }
+  setupFeatureCard('schedTemplateToggle', 'schedTemplateBody');
+  setupFeatureCard('schedUploadToggle', 'schedUploadBody');
+  setupFeatureCard('schedBackupToggle', 'schedBackupBody');
+
   function renderPresetTags() {
     TPL_OPT_KEYS.forEach(function(key) {
       var tagContainer = document.getElementById('tplPresetTags' + key.charAt(0).toUpperCase() + key.slice(1));
@@ -7334,6 +7426,52 @@
     tplIsEditing = false;
     renderTplActive();
     showToast('课表已保存');
+  });
+
+  // Save active schedule back to template (fixes: modifications lost when re-using template)
+  var tplSaveToTemplateBtn = document.getElementById('tplSaveToTemplateBtn');
+  tplSaveToTemplateBtn.addEventListener('click', function() {
+    var active = getTplActive();
+    if (!active || !active.templateId) {
+      showToast('当前课表未关联模板，无法保存');
+      return;
+    }
+    // Collect from edit cards (same logic as save active)
+    var cards = tplEditRows.querySelectorAll('.tpl-entry-card');
+    var newCourses = [];
+    cards.forEach(function(card) {
+      var weekday = card.querySelector('.tpl-fld-weekday').value;
+      var period = readOptVal(card, 'tpl-fld-period');
+      var time = card.querySelector('.tpl-fld-time').value.trim();
+      var grade = readOptVal(card, 'tpl-fld-grade');
+      var className = readOptVal(card, 'tpl-fld-class');
+      var subject = readOptVal(card, 'tpl-fld-subject');
+      var teacher = readOptVal(card, 'tpl-fld-teacher');
+      var classroom = readOptVal(card, 'tpl-fld-classroom');
+      if (weekday || period || time || grade || className || subject || teacher || classroom) {
+        var entry = { weekday: weekday, period: period, time: time, grade: grade, className: className, subject: subject, teacher: teacher, classroom: classroom };
+        newCourses.push(entry);
+        saveEntryOpts(entry);
+      }
+    });
+    // Save to BOTH active and template
+    active.courses = newCourses;
+    saveTplActive(active);
+
+    var templates = getTplTemplates();
+    var tpl = templates.find(function(t) { return t.id === active.templateId; });
+    if (!tpl) {
+      showToast('原模板已删除，仅保存到当前课表');
+      return;
+    }
+    tpl.name = active.name || tpl.name;
+    tpl.courses = newCourses.map(copyEntry);
+    saveTplTemplates(templates);
+    refreshAllDatalists();
+    tplIsEditing = false;
+    renderTplActive();
+    renderTplList();
+    showToast('已保存到当前课表和模板「' + tpl.name + '」');
   });
 
   // Done editing — back to display mode
