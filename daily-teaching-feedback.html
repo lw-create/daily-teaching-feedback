@@ -1631,6 +1631,58 @@
     font-size: 2rem;
     margin-bottom: 4px;
   }
+  /* Tech-style upload button */
+  .tech-upload-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    padding: 18px 16px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1a8b5f 0%, #2d9d78 50%, #36b88a 100%);
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 12px rgba(45,157,120,0.25);
+  }
+  .tech-upload-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.5s;
+  }
+  .tech-upload-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 6px rgba(45,157,120,0.2);
+  }
+  .tech-upload-btn:hover::before {
+    left: 120%;
+  }
+  .tech-upload-btn .tech-upload-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+  .tech-upload-btn .tech-upload-sub {
+    font-size: 0.72rem;
+    font-weight: 400;
+    opacity: 0.85;
+  }
   .sched-preview-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -2332,21 +2384,66 @@
   .tpl-collapsible-toggle {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     cursor: pointer;
-    padding: 8px 10px;
-    background: rgba(0,0,0,0.03);
-    border-radius: 6px;
-    margin-bottom: 8px;
-    font-size: 0.8rem;
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.025);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--ink);
     user-select: none;
+    transition: all 0.2s;
+    position: relative;
   }
-  .tpl-collapsible-toggle:active { opacity: 0.7; }
+  .tpl-collapsible-toggle:hover {
+    background: rgba(45,157,120,0.05);
+    border-color: var(--accent);
+  }
+  .tpl-collapsible-toggle.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+    margin-bottom: 0;
+    border-radius: 8px 8px 0 0;
+  }
+  .tpl-collapsible-toggle .tpl-toggle-icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .tpl-collapsible-toggle .tpl-toggle-badge {
+    margin-left: auto;
+    font-size: 0.68rem;
+    font-weight: 400;
+    opacity: 0.7;
+  }
+  .tpl-collapsible-toggle.active .tpl-toggle-badge {
+    opacity: 0.9;
+  }
+  .tpl-collapsible-toggle .tpl-toggle-close {
+    display: none;
+    margin-left: auto;
+    font-size: 0.8rem;
+    padding: 2px 10px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.2);
+  }
+  .tpl-collapsible-toggle.active .tpl-toggle-close {
+    display: inline-block;
+  }
+  .tpl-collapsible-toggle.active .tpl-toggle-badge {
+    display: none;
+  }
   .tpl-collapsible-content {
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    border: 1px solid var(--rule);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    margin-bottom: 8px;
+    padding: 12px;
+    background: #fff;
   }
   .tpl-collapsible-content.collapsed {
     display: none;
@@ -2441,11 +2538,12 @@
   .tpl-preset-toggle:active { opacity: 0.7; }
   .tpl-preset-panel {
     display: none;
-    padding: 10px;
-    background: #f8faf9;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    padding: 12px;
+    background: #fff;
     border: 1px solid var(--rule);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    margin-bottom: 8px;
   }
   .tpl-preset-panel.open { display: block; }
   .tpl-preset-row {
@@ -2647,7 +2745,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260815.02">
+    <meta name="app-version" content="20260815.03">
   </div>
 
   <!-- Tabs -->
@@ -3060,9 +3158,11 @@
       <datalist id="dlPeriods"></datalist>
 
       <!-- Preset options management -->
-      <div class="tpl-preset-toggle" id="tplPresetToggle">
-        <span>⚙️ 常用选项设置（年级/科目/老师/教室等）</span>
-        <span id="tplPresetArrow">▼</span>
+      <div class="tpl-collapsible-toggle" id="tplPresetToggle">
+        <span class="tpl-toggle-icon">⚙️</span>
+        <span>常用选项设置</span>
+        <span class="tpl-toggle-badge">年级/科目/老师/教室等</span>
+        <span class="tpl-toggle-close">收起 ✕</span>
       </div>
       <div class="tpl-preset-panel" id="tplPresetPanel">
         <div class="tpl-preset-row">
@@ -3139,10 +3239,12 @@
 
         <!-- Edit mode (collapsible, hidden by default) -->
         <div class="tpl-collapsible-toggle" id="tplEditToggle" style="display:none;">
-          <span>✏️ 编辑课表内容</span>
-          <span id="tplEditArrow">▼</span>
+          <span class="tpl-toggle-icon">✏️</span>
+          <span>编辑课表内容</span>
+          <span class="tpl-toggle-badge">修改后点保存</span>
+          <span class="tpl-toggle-close">收起 ✕</span>
         </div>
-        <div class="tpl-collapsible-content" id="tplEditContent" style="display:none;">
+        <div class="tpl-collapsible-content collapsed" id="tplEditContent" style="display:none;">
           <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;">
             <button class="tpl-btn tpl-btn-primary tpl-btn-sm" id="tplSaveActiveBtn">💾 保存课表</button>
             <button class="tpl-btn tpl-btn-sm" id="tplSaveToTemplateBtn" style="background:#3b82f6;color:#fff;border-color:#3b82f6;">📌 保存到模板</button>
@@ -3202,10 +3304,12 @@
 
       <!-- Template management (collapsible) — below active schedule -->
       <div class="tpl-collapsible-toggle" id="tplMgmtToggle">
-        <span>📋 课表模板管理（创建/编辑/使用模板）</span>
-        <span id="tplMgmtArrow">▼</span>
+        <span class="tpl-toggle-icon">📋</span>
+        <span>课表模板管理</span>
+        <span class="tpl-toggle-badge">创建/编辑/使用模板</span>
+        <span class="tpl-toggle-close">收起 ✕</span>
       </div>
-      <div class="tpl-collapsible-content" id="tplMgmtContent">
+      <div class="tpl-collapsible-content collapsed" id="tplMgmtContent">
         <div style="margin-bottom:10px;">
           <div style="display:flex;gap:6px;margin-bottom:8px;">
             <button class="tpl-btn tpl-btn-primary tpl-btn-sm" id="tplCreateFromCoursesBtn">从课程生成模板</button>
@@ -3243,10 +3347,13 @@
       <div class="sched-feature-body" id="schedUploadBody">
     <div class="sched-section" id="schedUploadSection">
       <h3>上传课表</h3>
-      <div class="sched-upload-area" id="schedUploadArea">
-        <div class="sched-upload-icon">📷</div>
-        <p>点击选择图片（最多5张，可拍照或相册）</p>
-      </div>
+      <button class="tech-upload-btn" id="schedUploadArea" type="button">
+        <div class="tech-upload-icon-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4l-4 4m4-4l4 4M4 20h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span>上传课表图片</span>
+        <span class="tech-upload-sub">支持拍照或相册选择，最多5张</span>
+      </button>
       <input type="file" id="schedFileInput" accept="image/*" multiple style="display:none;">
       <div class="sched-preview-grid" id="schedPreviewGrid"></div>
 
@@ -6609,12 +6716,13 @@
   };
 
   tplPresetToggle.addEventListener('click', function() {
-    if (tplPresetPanel.classList.contains('open')) {
+    var isOpen = tplPresetPanel.classList.contains('open');
+    if (isOpen) {
       tplPresetPanel.classList.remove('open');
-      tplPresetArrow.textContent = '▼';
+      tplPresetToggle.classList.remove('active');
     } else {
       tplPresetPanel.classList.add('open');
-      tplPresetArrow.textContent = '▲';
+      tplPresetToggle.classList.add('active');
       renderPresetTags();
     }
   });
@@ -6748,23 +6856,26 @@
 
   // Template management collapsible
   tplMgmtToggle.addEventListener('click', function() {
-    if (tplMgmtContent.classList.contains('collapsed')) {
+    var isCollapsed = tplMgmtContent.classList.contains('collapsed');
+    if (isCollapsed) {
       tplMgmtContent.classList.remove('collapsed');
-      tplMgmtArrow.textContent = '▼';
+      tplMgmtToggle.classList.add('active');
     } else {
       tplMgmtContent.classList.add('collapsed');
-      tplMgmtArrow.textContent = '▶';
+      tplMgmtToggle.classList.remove('active');
     }
   });
 
   // Edit section collapsible
   tplEditToggle.addEventListener('click', function() {
-    if (tplEditContent.classList.contains('collapsed')) {
+    var isCollapsed = tplEditContent.classList.contains('collapsed');
+    if (isCollapsed) {
       tplEditContent.classList.remove('collapsed');
-      tplEditArrow.textContent = '▲';
+      tplEditContent.style.display = 'block';
+      tplEditToggle.classList.add('active');
     } else {
       tplEditContent.classList.add('collapsed');
-      tplEditArrow.textContent = '▼';
+      tplEditToggle.classList.remove('active');
     }
   });
 
@@ -6888,7 +6999,7 @@
       tplActiveSection.style.display = 'none';
       // No active schedule — expand template management so user can create/use
       tplMgmtContent.classList.remove('collapsed');
-      tplMgmtArrow.textContent = '▼';
+      tplMgmtToggle.classList.add('active');
       return;
     }
     tplActiveSection.style.display = 'block';
@@ -6899,7 +7010,7 @@
       tplEditToggle.style.display = 'flex';
       tplEditContent.classList.remove('collapsed');
       tplEditContent.style.display = 'block';
-      tplEditArrow.textContent = '▲';
+      tplEditToggle.classList.add('active');
       if (tplActiveBadge) tplActiveBadge.textContent = '编辑中';
       if (tplActiveBadge) tplActiveBadge.style.background = '#f59e0b';
       renderTplEditRows(active.courses);
@@ -6908,11 +7019,12 @@
       tplEditToggle.style.display = 'none';
       tplEditContent.classList.add('collapsed');
       tplEditContent.style.display = 'none';
+      tplEditToggle.classList.remove('active');
       if (tplActiveBadge) tplActiveBadge.textContent = '当前使用';
       if (tplActiveBadge) tplActiveBadge.style.background = '';
       // Auto-collapse template management when schedule is displayed
       tplMgmtContent.classList.add('collapsed');
-      tplMgmtArrow.textContent = '▶';
+      tplMgmtToggle.classList.remove('active');
 
       // Extract unique grades and weekdays
       var allGrades = [];
@@ -7246,7 +7358,7 @@
     tplIsEditing = false;
     // Auto-collapse template management — user just selected a schedule to view
     tplMgmtContent.classList.add('collapsed');
-    tplMgmtArrow.textContent = '▶';
+    tplMgmtToggle.classList.remove('active');
     renderTplActive();
     showToast('已使用模板：' + tpl.name);
     // Scroll to top of schedule section so user sees the displayed schedule
