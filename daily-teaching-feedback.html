@@ -1782,21 +1782,44 @@
     margin-bottom: 8px;
   }
   .sched-persistent-text {
-    font-size: 0.95rem;
+    font-size: 1.08rem;
     color: var(--ink);
     white-space: pre-wrap;
-    line-height: 1.8;
+    line-height: 1.9;
     min-height: 1.5rem;
-    padding: 12px 14px;
+    padding: 14px 16px;
     background: rgba(45,157,120,0.05);
-    border-left: 3px solid var(--accent);
+    border-left: 4px solid var(--accent);
     border-radius: 0 8px 8px 0;
+    font-weight: 500;
   }
   .sched-persistent-text.placeholder {
     color: var(--muted);
     background: rgba(0,0,0,0.02);
     border-left-color: var(--rule);
-    font-size: 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 400;
+  }
+  .sched-persistent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .sched-persistent-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+  .sched-persistent-date {
+    font-size: 0.72rem;
+    color: #fff;
+    background: var(--accent);
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 500;
+    white-space: nowrap;
   }
   .sched-note-display {
     font-size: 0.95rem;
@@ -2581,7 +2604,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260814.15">
+    <meta name="app-version" content="20260815.01">
   </div>
 
   <!-- Tabs -->
@@ -2930,6 +2953,27 @@
   <!-- App Panel: Schedule -->
   <div class="app-panel" id="app-schedule">
 
+    <!-- Schedule: Persistent info (置顶) -->
+    <div class="sched-section" id="schedPersistentSection" style="order:-1;">
+      <div class="sched-persistent-header">
+        <div class="sched-persistent-title">
+          <h3 style="margin-bottom:0;">常驻信息</h3>
+          <span class="sched-persistent-date" id="schedPersistentDate"></span>
+        </div>
+        <button class="sched-edit-link" id="schedEditPersistentBtn">编辑</button>
+      </div>
+      <div class="sched-persistent-text placeholder" id="schedPersistentDisplay">点击「编辑」添加课时安排、教室、学生姓名等信息</div>
+
+      <div class="sched-editor-box" id="schedPersistentEditor" style="display:none;margin-top:10px;">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">编辑常驻信息</label>
+        <textarea class="sched-textarea" id="schedPersistentInput" rows="8" placeholder="例如：&#10;第一节课 08:00-08:45&#10;第二节课 08:55-09:40&#10;教室：3号楼201&#10;学生：张三、李四"></textarea>
+        <div class="sched-btn-row" style="margin-top:10px;">
+          <button class="sched-btn sched-btn-primary" id="schedSavePersistentBtn">保存</button>
+          <button class="sched-btn sched-btn-secondary" id="schedCancelPersistentBtn">取消</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Schedule: View section -->
     <div class="sched-section" id="schedViewSection">
       <div class="sched-date-card">
@@ -3130,24 +3174,6 @@
     <div class="sched-section" id="schedNoteSection" style="display:none;">
       <h3>每日备注</h3>
       <div class="sched-note-display" id="schedNoteText"></div>
-    </div>
-
-    <!-- Schedule: Persistent info -->
-    <div class="sched-section">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <h3 style="margin-bottom:0;">常驻信息</h3>
-        <button class="sched-edit-link" id="schedEditPersistentBtn">编辑</button>
-      </div>
-      <div class="sched-persistent-text placeholder" id="schedPersistentDisplay">点击「编辑」添加课时安排、教室、学生姓名等信息</div>
-
-      <div class="sched-editor-box" id="schedPersistentEditor" style="display:none;margin-top:10px;">
-        <label style="font-size:0.8rem;font-weight:600;color:var(--ink);display:block;margin-bottom:6px;">编辑常驻信息</label>
-        <textarea class="sched-textarea" id="schedPersistentInput" rows="8" placeholder="例如：&#10;第一节课 08:00-08:45&#10;第二节课 08:55-09:40&#10;教室：3号楼201&#10;学生：张三、李四"></textarea>
-        <div class="sched-btn-row" style="margin-top:10px;">
-          <button class="sched-btn sched-btn-primary" id="schedSavePersistentBtn">保存</button>
-          <button class="sched-btn sched-btn-secondary" id="schedCancelPersistentBtn">取消</button>
-        </div>
-      </div>
     </div>
 
     <!-- Schedule: Delete button -->
@@ -7765,8 +7791,19 @@
   });
 
   // ====== Persistent info ======
+  function schedGetTodayStr() {
+    var d = new Date();
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    var weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+    return m + '月' + day + '日 ' + weekdays[d.getDay()];
+  }
+
   function schedLoadPersistentInfo() {
     var info = localStorage.getItem('persistent_info') || '';
+    // 更新日期标签
+    var dateEl = document.getElementById('schedPersistentDate');
+    if (dateEl) dateEl.textContent = schedGetTodayStr();
     if (info) {
       schedPersistentDisplay.textContent = info;
       schedPersistentDisplay.classList.remove('placeholder');
@@ -7777,19 +7814,28 @@
   }
 
   schedEditPersistentBtn.addEventListener('click', function() {
-    schedPersistentInput.value = localStorage.getItem('persistent_info') || '';
-    schedPersistentEditor.style.display = 'block';
+    var isHidden = schedPersistentEditor.style.display === 'none' || !schedPersistentEditor.style.display;
+    if (isHidden) {
+      schedPersistentInput.value = localStorage.getItem('persistent_info') || '';
+      schedPersistentEditor.style.display = 'block';
+      schedEditPersistentBtn.textContent = '收起';
+    } else {
+      schedPersistentEditor.style.display = 'none';
+      schedEditPersistentBtn.textContent = '编辑';
+    }
   });
 
   schedSavePersistentBtn.addEventListener('click', function() {
     safeStorageSet('persistent_info', schedPersistentInput.value.trim());
     schedPersistentEditor.style.display = 'none';
+    schedEditPersistentBtn.textContent = '编辑';
     schedLoadPersistentInfo();
     showToast('常驻信息已保存');
   });
 
   schedCancelPersistentBtn.addEventListener('click', function() {
     schedPersistentEditor.style.display = 'none';
+    schedEditPersistentBtn.textContent = '编辑';
   });
 
   // ====== Delete schedule ======
