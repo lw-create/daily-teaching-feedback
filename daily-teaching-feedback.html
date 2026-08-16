@@ -501,6 +501,249 @@
   }
   .prompt-copy-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(45, 157, 120, 0.3); }
 
+  /* ===== Quote Library ===== */
+  .quote-display-box {
+    background: linear-gradient(135deg, rgba(45,157,120,0.08), rgba(45,157,120,0.02));
+    border: 1.5px solid rgba(45,157,120,0.2);
+    border-radius: 10px;
+    padding: 16px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .quote-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .quote-meta {
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: flex;
+    gap: 6px;
+  }
+  .quote-meta-tag {
+    background: rgba(45,157,120,0.12);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .quote-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .quote-refresh-btn:hover { background: #258565; }
+  .quote-insert-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--accent), #258565);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(45,157,120,0.2);
+  }
+  .quote-insert-btn:hover { transform: translateY(-1px); }
+  .quote-save-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: #fff;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .quote-save-btn:hover { background: rgba(45,157,120,0.05); }
+  .quote-category-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .quote-category-chip {
+    padding: 5px 14px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1.5px solid var(--rule);
+    background: #fff;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quote-category-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .quote-category-chip.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .quote-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .quote-item {
+    background: #fafbfc;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: all 0.15s;
+  }
+  .quote-item:hover { border-color: var(--accent); background: rgba(45,157,120,0.03); }
+  .quote-item-text {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .quote-item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .quote-item-cat {
+    font-size: 0.68rem;
+    color: var(--accent);
+    background: rgba(45,157,120,0.1);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+  .quote-item-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .quote-item-btn {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .quote-item-btn:hover { color: var(--accent); background: rgba(45,157,120,0.08); }
+  .quote-item-btn.danger:hover { color: var(--danger); background: rgba(217,83,79,0.08); }
+  .quote-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    background: rgba(45,157,120,0.1);
+    color: var(--accent);
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .quote-add-btn:hover { background: rgba(45,157,120,0.2); }
+  .quote-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .quote-modal {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  }
+  .quote-modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 14px;
+  }
+  .quote-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+    line-height: 1.6;
+  }
+  .quote-textarea:focus { outline: none; border-color: var(--accent); }
+  .quote-select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    background: #fff;
+    box-sizing: border-box;
+  }
+  .quote-select:focus { outline: none; border-color: var(--accent); }
+  .quote-cancel-btn {
+    padding: 8px 16px;
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .quote-confirm-btn {
+    padding: 8px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .quote-confirm-btn:hover { background: #258565; }
+
   /* Student name dropdown */
   .field-with-dropdown { position: relative; }
   .student-dropdown-btn {
@@ -1048,6 +1291,27 @@
     padding: 12px 0;
     text-align: center;
   }
+  .feedback-filter-select {
+    flex: 1;
+    min-width: 100px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-family: inherit;
+    background: #fff;
+  }
+  .feedback-filter-select:focus { outline: none; border-color: var(--accent); }
+  .feedback-filter-input {
+    flex: 2;
+    min-width: 140px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--rule);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-family: inherit;
+  }
+  .feedback-filter-input:focus { outline: none; border-color: var(--accent); }
 
   /* Exam manager */
   .exam-mgr-toggle {
@@ -2851,8 +3115,8 @@
       手动填写
     </button>
     <button class="tab" id="tab-prompt">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M8 10L10 12L14 8M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      AI提示语
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      评语库
     </button>
     <button class="tab" id="tab-save">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" stroke="currentColor" stroke-width="1.5"/></svg>
@@ -3092,40 +3356,80 @@
 
   <!-- Tab Panel: AI Prompt -->
   <div class="tab-panel" id="panel-prompt">
+    <!-- 随机推荐区 -->
     <div class="card">
-      <p class="prompt-intro">不想手动填写？复制下方提示语，填入今天的课堂信息后发给 AI，即可自动生成格式统一的教学反馈。</p>
-
-      <div class="prompt-steps">
-        <div class="prompt-step"><span class="step-num">1</span><span>点击下方"复制提示语"按钮</span></div>
-        <div class="prompt-step"><span class="step-num">2</span><span>粘贴到对话框，将绿色标记处替换为今天的实际信息</span></div>
-        <div class="prompt-step"><span class="step-num">3</span><span>发送后 AI 会自动生成完整的教学反馈，直接转发给家长即可</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:0.9rem;">✨</span>
+          <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">今日推荐</span>
+          <span style="font-size:0.7rem;color:var(--muted);background:rgba(45,157,120,0.1);padding:2px 8px;border-radius:10px;">点击换一条</span>
+        </div>
+        <button class="quote-refresh-btn" id="quoteRefreshBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          换一条
+        </button>
       </div>
+      <div class="quote-display-box" id="quoteDisplayBox">
+        <div class="quote-text" id="quoteCurrentText">点击「换一条」随机获取一条个性化评语</div>
+        <div class="quote-meta" id="quoteCurrentMeta"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="quote-insert-btn" id="quoteInsertBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          插入到教师评价
+        </button>
+        <button class="quote-save-btn" id="quoteSaveBtn" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          收藏到我的评语
+        </button>
+      </div>
+    </div>
 
-      <div class="prompt-box" id="promptBox">你是一位专业的教师助手，请根据我提供的课堂信息，生成一份发给家长的教学反馈。
+    <!-- 分类筛选 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">📚 评语分类</span>
+        <span style="font-size:0.72rem;color:var(--muted);" id="quoteCountLabel">共 0 条</span>
+      </div>
+      <div class="quote-category-chips" id="quoteCategoryChips"></div>
+    </div>
 
-【输出格式要求】
-- 第一行：每日教学反馈
-- 第二行：日期 | 科目 | 学生姓名
-- 然后依次输出四个板块：学习内容、学生状态、作业、教师评价
-- 每个板块用【】标注标题
-- 每个板块内容控制在30~40字
-- 语言简洁专业，语气亲切自然
+    <!-- 评语列表 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">💬 评语列表</span>
+        <button class="quote-add-btn" id="quoteAddBtn" type="button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          添加评语
+        </button>
+      </div>
+      <div class="quote-list" id="quoteList"></div>
+    </div>
 
-【我提供的信息】
-日期：<span class="ph">填日期，如8月5日</span>
-科目：<span class="ph">填科目，如数学</span>
-学生姓名：<span class="ph">填学生姓名</span>
-学习内容：<span class="ph">简单写今天讲了什么，如分数加减法</span>
-学生状态：<span class="ph">简单写表现，如专注度、互动、走神等</span>
-作业：<span class="ph">简单写布置了什么作业</span>
-教师评价：<span class="ph">简单写评价和建议</span>
-
-请根据以上信息，生成格式规范的教学反馈，每个板块30~40字，可直接发给家长。</div>
-
-      <button class="prompt-copy-btn" id="promptCopyBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M9 6V4C9 3.44772 9.44772 3 10 3H18C18.5523 3 19 3.44772 19 4V16" stroke="currentColor" stroke-width="1.5"/></svg>
-        复制提示语
-      </button>
+    <!-- 添加评语弹窗 -->
+    <div class="quote-modal-overlay" id="quoteAddOverlay" style="display:none;">
+      <div class="quote-modal">
+        <div class="quote-modal-title">添加新评语</div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:0.78rem;font-weight:600;color:var(--ink);display:block;margin-bottom:5px;">评语内容</label>
+          <textarea class="quote-textarea" id="quoteAddInput" rows="4" placeholder="输入你想保存的评语..."></textarea>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="font-size:0.78rem;font-weight:600;color:var(--ink);display:block;margin-bottom:5px;">分类</label>
+          <select class="quote-select" id="quoteAddCategory">
+            <option value="表扬鼓励">表扬鼓励</option>
+            <option value="学习建议">学习建议</option>
+            <option value="课堂表现">课堂表现</option>
+            <option value="作业情况">作业情况</option>
+            <option value="习惯养成">习惯养成</option>
+            <option value="温馨关怀">温馨关怀</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="quote-cancel-btn" id="quoteAddCancel" type="button">取消</button>
+          <button class="quote-confirm-btn" id="quoteAddConfirm" type="button">保存</button>
+        </div>
+      </div>
     </div>
   </div><!-- /panel-prompt -->
 
@@ -3167,11 +3471,17 @@
     </div>
 
     <div class="card" id="overviewFeedbackCard">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">教学反馈记录</span>
-        <select id="overviewFeedbackDate" style="font-size:0.76rem;padding:3px 8px;border:1px solid var(--rule);border-radius:5px;">
-          <option value="">全部日期</option>
-        </select>
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">📝 教学反馈记录</span>
+          <span style="font-size:0.72rem;color:var(--muted);" id="feedbackCountLabel">共 0 条</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select id="overviewFeedbackDate" class="feedback-filter-select">
+            <option value="">全部日期</option>
+          </select>
+          <input type="text" id="overviewFeedbackSearch" class="feedback-filter-input" placeholder="🔍 搜索学生姓名...">
+        </div>
       </div>
       <div id="overviewFeedbackList"></div>
     </div>
@@ -6199,11 +6509,414 @@
   }
 
   tabManual.addEventListener('click', function() { switchTab(tabManual, panelManual); });
-  tabPrompt.addEventListener('click', function() { switchTab(tabPrompt, panelPrompt); });
+  tabPrompt.addEventListener('click', function() { switchTab(tabPrompt, panelPrompt); renderQuoteLibrary(); });
   tabSave.addEventListener('click', function() {
     switchTab(tabSave, panelSave);
     renderOverview();
   });
+
+  // ====== Quote Library ======
+  var QUOTE_CATEGORIES = ['全部', '表扬鼓励', '学习建议', '课堂表现', '作业情况', '习惯养成', '温馨关怀', '我的收藏'];
+  var quoteSelectedCategory = '全部';
+  var quoteCurrentText = '';
+
+  // Preset quotes library — curated, natural-sounding, no AI feel
+  var PRESET_QUOTES = [
+    // 表扬鼓励
+    { text: '孩子今天课堂上表现特别积极，思路清晰，继续保持这个状态，进步会越来越明显！', category: '表扬鼓励' },
+    { text: '这节课孩子的专注度很高，回答问题也很踊跃，看得出来是真的用心在学，值得表扬。', category: '表扬鼓励' },
+    { text: '今天的课堂练习完成得又快又好，基础打得很扎实，继续加油！', category: '表扬鼓励' },
+    { text: '孩子最近进步很大，从课堂表现就能看出来越来越投入了，再接再厉！', category: '表扬鼓励' },
+    { text: '今天提问的时候孩子主动举手了，而且回答得很到位，勇气可嘉，继续保持！', category: '表扬鼓励' },
+    { text: '这节课孩子吸收得特别好，知识点掌握得很牢固，是个好兆头。', category: '表扬鼓励' },
+    { text: '孩子今天状态特别好，全程跟上节奏不说，还能举一反三，非常棒！', category: '表扬鼓励' },
+    { text: '看得出来孩子这段时间在这门课上花了心思，进步是实实在在的，为他高兴。', category: '表扬鼓励' },
+    { text: '今天课堂上孩子的思路特别活跃，能提出自己的想法，这一点非常难得。', category: '表扬鼓励' },
+    { text: '孩子的学习态度一直很端正，今天的表现再次印证了这一点，继续保持！', category: '表扬鼓励' },
+    { text: '今天讲的内容有点难度，但孩子都跟上了，说明平时基础打得好，继续加油。', category: '表扬鼓励' },
+    { text: '孩子今天在课堂上的表现让我印象很深，专注又认真，是其他同学的好榜样。', category: '表扬鼓励' },
+    { text: '最近孩子的状态越来越好，课堂参与度明显提高了，真的很欣慰。', category: '表扬鼓励' },
+    { text: '今天孩子主动帮同学解答问题，既乐于助人又巩固了自己，一举两得。', category: '表扬鼓励' },
+    { text: '孩子的悟性很好，一点就通，今天的新知识掌握得非常到位。', category: '表扬鼓励' },
+    { text: '每节课都能看到孩子的进步，这种稳扎稳打的状态特别好。', category: '表扬鼓励' },
+    { text: '今天课堂上孩子眼神一直跟着我，看得出来是真的在认真思考，非常好。', category: '表扬鼓励' },
+    { text: '孩子今天的课堂练习正确率很高，说明知识点吃透了，继续保持。', category: '表扬鼓励' },
+    { text: '这段时间孩子进步肉眼可见，学习劲头越来越足了，值得肯定。', category: '表扬鼓励' },
+    { text: '孩子今天不仅完成了自己的任务，还主动拓展了更多内容，求知欲很强。', category: '表扬鼓励' },
+
+    // 学习建议
+    { text: '建议课后把今天讲的重点再梳理一遍，尤其是基础概念，吃透了后面学起来更轻松。', category: '学习建议' },
+    { text: '这部分内容需要多练才能熟练，建议每天抽15分钟做几道题巩固一下。', category: '学习建议' },
+    { text: '孩子理解能力没问题，就是有时候有点粗心，平时做题的时候多检查一遍会更好。', category: '学习建议' },
+    { text: '建议孩子养成课前预习的习惯，带着问题来听课，效果会好很多。', category: '学习建议' },
+    { text: '最近内容难度上来了，建议每周花点时间复习一下之前的知识点，温故而知新。', category: '学习建议' },
+    { text: '孩子思路是对的，但做题速度可以再提一提，平时可以限时练习一下。', category: '学习建议' },
+    { text: '建议孩子准备一个错题本，把做错的题整理出来，定期回顾，避免再犯同样的错。', category: '学习建议' },
+    { text: '这部分内容前后关联性很强，前面的基础一定要打牢，有不懂的地方及时问。', category: '学习建议' },
+    { text: '孩子挺聪明的，就是有时候容易满足，建议可以适当拔高，挑战一下更难的题。', category: '学习建议' },
+    { text: '平时做题的时候可以多想想为什么这么做，理解了原理才能举一反三。', category: '学习建议' },
+    { text: '建议孩子把字写得再工整一点，卷面清晰对考试也有帮助，平时多注意。', category: '学习建议' },
+    { text: '孩子接受新知识很快，但忘得也快，一定要及时复习，不然就白学了。', category: '学习建议' },
+    { text: '建议孩子读题的时候慢一点，把题目意思看清楚再动笔，很多错误都是审题不仔细造成的。', category: '学习建议' },
+    { text: '这门课重在积累，建议每天都花点时间，不要临时抱佛脚。', category: '学习建议' },
+    { text: '孩子学习挺努力的，但方法可以再优化一下，效率提高了就事半功倍了。', category: '学习建议' },
+    { text: '建议孩子遇到不懂的问题及时提出来，不要攒着，越攒越多后面就难补了。', category: '学习建议' },
+    { text: '平时可以让孩子多讲讲自己的思路，讲得清楚才是真的懂了。', category: '学习建议' },
+    { text: '建议适当增加课外阅读量，知识面广了，理解能力自然就上去了。', category: '学习建议' },
+    { text: '孩子基础不错，就是拔高题做得少，建议平时可以适当挑战一下难题。', category: '学习建议' },
+    { text: '学习贵在坚持，每天进步一点点，时间长了效果就很明显了。', category: '学习建议' },
+
+    // 课堂表现
+    { text: '今天课堂上孩子有点坐不住，注意力容易分散，提醒后能调整过来，下次继续加油。', category: '课堂表现' },
+    { text: '孩子今天上课状态一般，可能是没休息好，建议早点睡，精神好效率才高。', category: '课堂表现' },
+    { text: '课堂上孩子比较安静，其实他是有想法的，鼓励他多开口，大胆表达自己。', category: '课堂表现' },
+    { text: '今天孩子和同桌说话有点多，影响了听课效果，已经提醒过了，家长也可以跟孩子聊聊。', category: '课堂表现' },
+    { text: '孩子今天上课有点走神，我点了他两次回答问题，都答上来了，说明人挺聪明的，就是要更专注。', category: '课堂表现' },
+    { text: '课堂上孩子属于慢热型，进入状态比较慢，后面跟上了就好了。', category: '课堂表现' },
+    { text: '今天孩子听课很认真，就是不怎么举手回答问题，其实他都会的，就是有点害羞。', category: '课堂表现' },
+    { text: '孩子课堂参与度还可以，就是有时候思路容易跑偏，拉回来就好了。', category: '课堂表现' },
+    { text: '今天课堂讨论的时候孩子特别积极，分享了自己的想法，表现很好。', category: '课堂表现' },
+    { text: '孩子上课习惯很好，坐得端正，笔记也记得认真，继续保持。', category: '课堂表现' },
+    { text: '今天讲新课的时候孩子有点跟不上，我放慢速度了，课后建议再复习一下。', category: '课堂表现' },
+    { text: '孩子课堂上很活跃，就是有时候太着急了，想清楚再举手回答会更好。', category: '课堂表现' },
+    { text: '今天孩子身体有点不舒服，但还是坚持听课了，精神可嘉，注意休息。', category: '课堂表现' },
+    { text: '孩子上课很认真，就是不太敢问问题，其实不懂就问是好习惯，鼓励他大胆一点。', category: '课堂表现' },
+    { text: '今天分组活动的时候孩子表现很好，和同学配合默契，团队意识很强。', category: '课堂表现' },
+    { text: '孩子课堂上很自律，不用老师多操心，自己就能管好自己。', category: '课堂表现' },
+    { text: '今天孩子上课频频点头，看来是听进去了，这种状态特别好。', category: '课堂表现' },
+    { text: '孩子今天有点不在状态，问了问说是有点事情绪不高，已经安抚过了，家长也可以关心一下。', category: '课堂表现' },
+    { text: '课堂上孩子特别喜欢问问题，这是好事，说明他在动脑筋思考。', category: '课堂表现' },
+    { text: '孩子今天上课前半段状态很好，后半段有点疲劳，可能是中午没休息好。', category: '课堂表现' },
+
+    // 作业情况
+    { text: '今天的作业完成得很认真，字迹工整，正确率也高，继续保持这个好习惯。', category: '作业情况' },
+    { text: '孩子作业完成得不错，就是有点粗心，错的都是不该错的，下次写完检查一下就更好了。', category: '作业情况' },
+    { text: '最近作业质量有所下降，错的题不少是之前讲过的，说明复习不到位，要注意。', category: '作业情况' },
+    { text: '孩子作业一直很让人放心，每次都按时完成，而且质量很高。', category: '作业情况' },
+    { text: '今天的作业孩子写得特别用心，看得出来是花了时间的，值得表扬。', category: '作业情况' },
+    { text: '作业完成了，就是有点敷衍，字写得比较潦草，建议严格要求一下书写。', category: '作业情况' },
+    { text: '孩子最近作业拖得比较晚，建议合理安排时间，早点写完早点休息。', category: '作业情况' },
+    { text: '作业正确率很高，就是步骤写得太简略了，考试的时候可能会扣分，要注意过程完整。', category: '作业情况' },
+    { text: '孩子主动把昨天错的题重新做了一遍，这种订正的习惯特别好。', category: '作业情况' },
+    { text: '基础题都做对了，就是拔高题空着没写，建议孩子多思考一下，实在不会再空着。', category: '作业情况' },
+    { text: '作业整体不错，就是有几道题是抄答案的感觉，过程都没写，建议家长多留意一下。', category: '作业情况' },
+    { text: '孩子作业进步很大，比上周认真多了，这种向好的趋势要保持住。', category: '作业情况' },
+    { text: '今天的作业有点难，孩子能做到这个程度已经很不错了，值得肯定。', category: '作业情况' },
+    { text: '孩子作业速度很快，就是质量一般，建议慢下来，做一道对一道。', category: '作业情况' },
+    { text: '最近作业完成得不太理想，缺了好几次，家长可以问问孩子是什么原因。', category: '作业情况' },
+    { text: '孩子做作业很独立，不用家长催，这种自觉性特别难得。', category: '作业情况' },
+    { text: '作业里的错题都订正了，而且订得很认真，说明孩子知道查漏补缺。', category: '作业情况' },
+    { text: '今天的作业孩子全做对了，进步很大，看得出来是下功夫了。', category: '作业情况' },
+    { text: '孩子作业写得太慢了，经常写到很晚，建议练练速度，提高效率。', category: '作业情况' },
+    { text: '作业态度很端正，哪怕不会的题也会写上自己的思路，这一点特别好。', category: '作业情况' },
+
+    // 习惯养成
+    { text: '孩子最近学习习惯好了很多，知道主动预习复习了，这个变化特别好。', category: '习惯养成' },
+    { text: '建议孩子养成每天整理书包的习惯，第二天要用的东西前一天晚上准备好。', category: '习惯养成' },
+    { text: '孩子做事有点拖拉，建议给任务设个时间限制，培养时间观念。', category: '习惯养成' },
+    { text: '孩子的作息不太规律，建议固定睡觉和起床时间，精神好学习效率才高。', category: '习惯养成' },
+    { text: '孩子丢三落四的毛病得改改，今天又忘带东西了，家长可以多提醒。', category: '习惯养成' },
+    { text: '最近孩子主动看书的时间多了，阅读习惯慢慢养成了，继续保持。', category: '习惯养成' },
+    { text: '孩子遇到问题总想着找大人，建议先让他自己想想办法，培养独立思考的习惯。', category: '习惯养成' },
+    { text: '孩子坐姿不太对，写作业的时候头太低了，家长要多提醒，保护视力很重要。', category: '习惯养成' },
+    { text: '孩子学东西很快，但就是不扎实，建议养成复习的好习惯，学过的要及时巩固。', category: '习惯养成' },
+    { text: '孩子平时做事比较毛躁，建议从生活小事入手，培养认真细致的习惯。', category: '习惯养成' },
+    { text: '孩子现在每天都会主动写作业，不用催了，这个好习惯一定要保持住。', category: '习惯养成' },
+    { text: '建议孩子用完的东西放回原位，找东西就不用浪费时间了。', category: '习惯养成' },
+    { text: '孩子有不懂的地方会主动问，这个勤学好问的习惯特别好。', category: '习惯养成' },
+    { text: '孩子写作业的时候一会儿喝水一会儿上厕所，注意力不集中，建议学习前先把琐事处理好。', category: '习惯养成' },
+    { text: '孩子现在学会做计划了，每天要做什么列得清清楚楚，进步很大。', category: '习惯养成' },
+    { text: '建议孩子每天抽10分钟回顾一下当天学了什么，这个小习惯坚持下来效果很明显。', category: '习惯养成' },
+    { text: '孩子吃饭的时候总想看手机，建议吃饭的时候把手机收起来，专心吃饭。', category: '习惯养成' },
+    { text: '孩子爱读书是好事，就是不要躺着看，对眼睛不好，姿势要端正。', category: '习惯养成' },
+    { text: '孩子现在每天都会运动一会儿，这个习惯特别好，身体好学习才有本钱。', category: '习惯养成' },
+    { text: '孩子做事没什么条理，东一下西一下的，建议培养列清单的习惯，一件一件来。', category: '习惯养成' },
+
+    // 温馨关怀
+    { text: '今天孩子说有点头疼，我让他休息了一会儿，家长接回去后多留意一下。', category: '温馨关怀' },
+    { text: '孩子最近看起来有点疲惫，可能是睡得太晚了，一定要保证睡眠时间。', category: '温馨关怀' },
+    { text: '今天天气变化大，孩子穿得有点少，明天记得多穿点，别着凉了。', category: '温馨关怀' },
+    { text: '孩子今天心情不太好，问了问说是和同学闹别扭了，已经开导过了，家长也可以聊聊。', category: '温馨关怀' },
+    { text: '孩子说最近家里事情比较多，有点分心，我会多关注的，家长也辛苦了。', category: '温馨关怀' },
+    { text: '今天孩子生日，全班一起给他唱了生日歌，特别开心，也祝孩子生日快乐！', category: '温馨关怀' },
+    { text: '孩子最近咳嗽挺厉害的，建议带孩子去看看，别拖严重了。', category: '温馨关怀' },
+    { text: '孩子说眼睛有点酸，可能是最近用眼太多了，建议多看看远处，做做眼保健操。', category: '温馨关怀' },
+    { text: '今天孩子主动帮老师擦黑板，特别懂事，是个暖心的好孩子。', category: '温馨关怀' },
+    { text: '孩子最近学习压力好像有点大，家长可以多和孩子聊聊，适当放松一下。', category: '温馨关怀' },
+    { text: '孩子今天摔了一下，膝盖擦破点皮，已经消过毒了，不严重，家长放心。', category: '温馨关怀' },
+    { text: '孩子很懂事，今天看到同学不舒服主动帮忙，这种品质比成绩更重要。', category: '温馨关怀' },
+    { text: '最近天气热，孩子出汗多，记得让他多喝水，别中暑了。', category: '温馨关怀' },
+    { text: '孩子说有点想家了，我安慰了一下，家长有空多给孩子打打电话。', category: '温馨关怀' },
+    { text: '今天运动会孩子特别努力，虽然没拿名次，但坚持跑完全程就很棒了！', category: '温馨关怀' },
+    { text: '孩子最近长高了不少，裤子都短了，家长记得给孩子添新衣服～', category: '温馨关怀' },
+    { text: '孩子很有爱心，今天带了小零食还想着分给同学，特别可爱。', category: '温馨关怀' },
+    { text: '孩子最近有点敏感，可能是到了这个年纪，家长多理解多沟通就好。', category: '温馨关怀' },
+    { text: '孩子今天帮了我一个大忙，真是老师的小助手，特别贴心。', category: '温馨关怀' },
+    { text: '看着孩子一天天长大，越来越懂事，作为老师真的很欣慰。', category: '温馨关怀' }
+  ];
+
+  // Quote storage helpers
+  function getQuotes() {
+    try {
+      var custom = JSON.parse(localStorage.getItem('teaching_quotes_custom') || '[]');
+      var savedIds = JSON.parse(localStorage.getItem('teaching_quotes_saved') || '[]');
+      // Combine presets + custom, mark saved ones
+      var all = PRESET_QUOTES.map(function(q, i) {
+        return { id: 'preset_' + i, text: q.text, category: q.category, custom: false, saved: savedIds.indexOf('preset_' + i) !== -1 };
+      });
+      custom.forEach(function(q, i) {
+        all.push({ id: 'custom_' + i, text: q.text, category: q.category, custom: true, saved: true });
+      });
+      return all;
+    } catch(e) { return []; }
+  }
+
+  function saveCustomQuotes(quotes) {
+    localStorage.setItem('teaching_quotes_custom', JSON.stringify(quotes));
+  }
+
+  function getSavedQuoteIds() {
+    try { return JSON.parse(localStorage.getItem('teaching_quotes_saved') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  function saveQuoteId(id) {
+    var ids = getSavedQuoteIds();
+    if (ids.indexOf(id) === -1) ids.push(id);
+    localStorage.setItem('teaching_quotes_saved', JSON.stringify(ids));
+  }
+
+  function unsaveQuoteId(id) {
+    var ids = getSavedQuoteIds().filter(function(x) { return x !== id; });
+    localStorage.setItem('teaching_quotes_saved', JSON.stringify(ids));
+  }
+
+  function getCustomQuotes() {
+    try { return JSON.parse(localStorage.getItem('teaching_quotes_custom') || '[]'); }
+    catch(e) { return []; }
+  }
+
+  // Get random quote from current category
+  function getRandomQuote() {
+    var all = getQuotes();
+    var pool;
+    if (quoteSelectedCategory === '全部') {
+      pool = all;
+    } else if (quoteSelectedCategory === '我的收藏') {
+      pool = all.filter(function(q) { return q.saved; });
+    } else {
+      pool = all.filter(function(q) { return q.category === quoteSelectedCategory; });
+    }
+    if (pool.length === 0) return null;
+    // Pick a random one, try not to repeat the current one
+    var next;
+    if (pool.length === 1) {
+      next = pool[0];
+    } else {
+      do {
+        next = pool[Math.floor(Math.random() * pool.length)];
+      } while (next.text === quoteCurrentText && pool.length > 1);
+    }
+    return next;
+  }
+
+  // Render category chips
+  function renderQuoteCategories() {
+    var container = document.getElementById('quoteCategoryChips');
+    if (!container) return;
+    var html = '';
+    QUOTE_CATEGORIES.forEach(function(cat) {
+      var count = 0;
+      var all = getQuotes();
+      if (cat === '全部') count = all.length;
+      else if (cat === '我的收藏') count = all.filter(function(q) { return q.saved; }).length;
+      else count = all.filter(function(q) { return q.category === cat; }).length;
+      html += '<span class="quote-category-chip' + (quoteSelectedCategory === cat ? ' active' : '') + '" data-cat="' + cat + '">' + cat + ' (' + count + ')</span>';
+    });
+    container.innerHTML = html;
+    container.querySelectorAll('.quote-category-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        quoteSelectedCategory = chip.dataset.cat;
+        renderQuoteLibrary();
+      });
+    });
+  }
+
+  // Render quote list
+  function renderQuoteList() {
+    var container = document.getElementById('quoteList');
+    if (!container) return;
+    var all = getQuotes();
+    var list;
+    if (quoteSelectedCategory === '全部') list = all;
+    else if (quoteSelectedCategory === '我的收藏') list = all.filter(function(q) { return q.saved; });
+    else list = all.filter(function(q) { return q.category === quoteSelectedCategory; });
+
+    var countLabel = document.getElementById('quoteCountLabel');
+    if (countLabel) countLabel.textContent = '共 ' + list.length + ' 条';
+
+    if (list.length === 0) {
+      container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:0.8rem;padding:30px 0;">暂无评语，点右上角添加吧～</div>';
+      return;
+    }
+
+    var html = '';
+    list.forEach(function(q) {
+      html += '<div class="quote-item" data-id="' + q.id + '">';
+      html += '<div class="quote-item-text">' + escapeHtml(q.text) + '</div>';
+      html += '<div class="quote-item-footer">';
+      html += '<span class="quote-item-cat">' + q.category + '</span>';
+      html += '<div class="quote-item-actions">';
+      html += '<button class="quote-item-btn" data-action="insert">插入</button>';
+      if (q.saved) {
+        html += '<button class="quote-item-btn" data-action="unsave">取消收藏</button>';
+      } else {
+        html += '<button class="quote-item-btn" data-action="save">收藏</button>';
+      }
+      if (q.custom) {
+        html += '<button class="quote-item-btn danger" data-action="delete">删除</button>';
+      }
+      html += '</div></div></div>';
+    });
+    container.innerHTML = html;
+
+    // Bind actions
+    container.querySelectorAll('.quote-item').forEach(function(item) {
+      var id = item.dataset.id;
+      var q = getQuotes().find(function(x) { return x.id === id; });
+      item.querySelector('[data-action="insert"]').addEventListener('click', function() {
+        insertQuoteToSection(q.text);
+        showToast('已插入到教师评价');
+      });
+      item.querySelector('[data-action="save"]').addEventListener('click', function() {
+        saveQuoteId(id);
+        renderQuoteLibrary();
+        showToast('已收藏');
+      });
+      item.querySelector('[data-action="unsave"]').addEventListener('click', function() {
+        unsaveQuoteId(id);
+        renderQuoteLibrary();
+        showToast('已取消收藏');
+      });
+      var delBtn = item.querySelector('[data-action="delete"]');
+      if (delBtn) {
+        delBtn.addEventListener('click', function() {
+          if (!confirm('确定删除这条评语吗？')) return;
+          var idx = parseInt(id.replace('custom_', ''));
+          var custom = getCustomQuotes();
+          custom.splice(idx, 1);
+          saveCustomQuotes(custom);
+          renderQuoteLibrary();
+          showToast('已删除');
+        });
+      }
+    });
+  }
+
+  // Insert quote text to section 4 (teacher evaluation)
+  function insertQuoteToSection(text) {
+    var textarea = document.getElementById('section-4');
+    if (!textarea) return;
+    var current = textarea.value.trim();
+    if (current) {
+      textarea.value = current + ' ' + text;
+    } else {
+      textarea.value = text;
+    }
+    // Trigger input event for char counter etc.
+    textarea.dispatchEvent(new Event('input'));
+    // Switch to manual tab
+    switchTab(tabManual, panelManual);
+  }
+
+  // Refresh random quote
+  function refreshRandomQuote() {
+    var q = getRandomQuote();
+    var textEl = document.getElementById('quoteCurrentText');
+    var metaEl = document.getElementById('quoteCurrentMeta');
+    if (!q) {
+      quoteCurrentText = '';
+      if (textEl) textEl.textContent = '当前分类下暂无评语';
+      if (metaEl) metaEl.innerHTML = '';
+      return;
+    }
+    quoteCurrentText = q.text;
+    if (textEl) textEl.textContent = q.text;
+    if (metaEl) {
+      metaEl.innerHTML = '<span class="quote-meta-tag">' + q.category + '</span>' +
+        (q.saved ? '<span class="quote-meta-tag" style="background:rgba(245,158,11,0.15);color:#f59e0b;">已收藏</span>' : '');
+    }
+  }
+
+  // Render entire quote library
+  function renderQuoteLibrary() {
+    renderQuoteCategories();
+    renderQuoteList();
+    refreshRandomQuote();
+  }
+
+  // Add quote modal
+  var quoteAddBtn = document.getElementById('quoteAddBtn');
+  var quoteAddOverlay = document.getElementById('quoteAddOverlay');
+  var quoteAddCancel = document.getElementById('quoteAddCancel');
+  var quoteAddConfirm = document.getElementById('quoteAddConfirm');
+  var quoteAddInput = document.getElementById('quoteAddInput');
+  var quoteAddCategory = document.getElementById('quoteAddCategory');
+
+  if (quoteAddBtn) quoteAddBtn.addEventListener('click', function() {
+    if (quoteAddOverlay) quoteAddOverlay.style.display = 'flex';
+    if (quoteAddInput) quoteAddInput.value = '';
+    if (quoteAddInput) quoteAddInput.focus();
+  });
+  if (quoteAddCancel) quoteAddCancel.addEventListener('click', function() {
+    if (quoteAddOverlay) quoteAddOverlay.style.display = 'none';
+  });
+  if (quoteAddOverlay) quoteAddOverlay.addEventListener('click', function(e) {
+    if (e.target === quoteAddOverlay) quoteAddOverlay.style.display = 'none';
+  });
+  if (quoteAddConfirm) quoteAddConfirm.addEventListener('click', function() {
+    var text = quoteAddInput.value.trim();
+    var cat = quoteAddCategory.value;
+    if (!text) { showToast('请输入评语内容'); return; }
+    var custom = getCustomQuotes();
+    custom.push({ text: text, category: cat });
+    saveCustomQuotes(custom);
+    quoteAddOverlay.style.display = 'none';
+    renderQuoteLibrary();
+    showToast('添加成功');
+  });
+
+  // Random quote button
+  var quoteRefreshBtn = document.getElementById('quoteRefreshBtn');
+  if (quoteRefreshBtn) quoteRefreshBtn.addEventListener('click', refreshRandomQuote);
+
+  // Insert current quote button
+  var quoteInsertBtn = document.getElementById('quoteInsertBtn');
+  if (quoteInsertBtn) quoteInsertBtn.addEventListener('click', function() {
+    if (!quoteCurrentText) { showToast('暂无评语可插入'); return; }
+    insertQuoteToSection(quoteCurrentText);
+    showToast('已插入到教师评价');
+  });
+
+  // Save current quote
+  var quoteSaveBtn = document.getElementById('quoteSaveBtn');
+  if (quoteSaveBtn) quoteSaveBtn.addEventListener('click', function() {
+    var q = getRandomQuote();
+    // Find the current quote
+    var all = getQuotes();
+    var current = all.find(function(x) { return x.text === quoteCurrentText; });
+    if (!current) { showToast('请先选择一条评语'); return; }
+    if (current.saved) {
+      unsaveQuoteId(current.id);
+      showToast('已取消收藏');
+    } else {
+      saveQuoteId(current.id);
+      showToast('已收藏');
+    }
+    renderQuoteLibrary();
+  });
+
+  // ====== End Quote Library ======
 
   // ====== Centralized exam management ======
   function getExams() {
@@ -6283,6 +6996,8 @@
   var batchScoreList = document.getElementById('batchScoreList');
   var overviewFeedbackDate = document.getElementById('overviewFeedbackDate');
   var overviewFeedbackList = document.getElementById('overviewFeedbackList');
+  var overviewFeedbackSearch = document.getElementById('overviewFeedbackSearch');
+  var feedbackSearchKeyword = '';
 
   // Set today's date as default for exam date input
   (function() {
@@ -6542,19 +7257,42 @@
   }
 
   overviewFeedbackDate.addEventListener('change', renderOverviewFeedback);
+  if (overviewFeedbackSearch) {
+    overviewFeedbackSearch.addEventListener('input', function() {
+      feedbackSearchKeyword = this.value.trim();
+      renderOverviewFeedback();
+    });
+  }
 
   function renderOverviewFeedback() {
     var filterDate = overviewFeedbackDate.value;
     var records = getAllFeedbackRecords();
+    // Filter by date
     if (filterDate) {
       records = records.filter(function(r) { return r.date === filterDate; });
     }
+    // Filter by student name search
+    if (feedbackSearchKeyword) {
+      var kw = feedbackSearchKeyword.toLowerCase();
+      records = records.filter(function(r) {
+        return (r.student || '').toLowerCase().indexOf(kw) !== -1;
+      });
+    }
+    // Update count label
+    var countLabel = document.getElementById('feedbackCountLabel');
+    if (countLabel) countLabel.textContent = '共 ' + records.length + ' 条';
     if (records.length === 0) {
       overviewFeedbackList.innerHTML = '<div class="ov-empty">暂无教学反馈记录</div>';
       return;
     }
-    // Show most recent first
-    records.reverse();
+    // Show most recent first (newest on top)
+    records.sort(function(a, b) {
+      // First by date descending
+      if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+      // Then by order of creation (later ones first) — use index from getAllFeedbackRecords which is chronological
+      return 0;
+    });
+    records.reverse(); // getAllFeedbackRecords already sorts ascending, so reverse for newest first
     var html = '';
     records.forEach(function(r) {
       html += '<div class="ov-feedback-item">';
@@ -6575,23 +7313,25 @@
     exportStudentListWithScores();
   });
 
-  // --- Copy prompt ---
+  // --- Copy prompt (legacy, kept for compatibility) ---
   var promptCopyBtn = document.getElementById('promptCopyBtn');
   var promptBox = document.getElementById('promptBox');
 
-  promptCopyBtn.addEventListener('click', function() {
-    // Get text content without HTML tags, but clean up the placeholder text
-    var text = promptBox.innerText;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() {
-        showToast('提示语已复制，去对话框粘贴并填写信息吧');
-      }).catch(function() {
+  if (promptCopyBtn && promptBox) {
+    promptCopyBtn.addEventListener('click', function() {
+      // Get text content without HTML tags, but clean up the placeholder text
+      var text = promptBox.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+          showToast('提示语已复制，去对话框粘贴并填写信息吧');
+        }).catch(function() {
+          fallbackCopy(text);
+        });
+      } else {
         fallbackCopy(text);
-      });
-    } else {
-      fallbackCopy(text);
-    }
-  });
+      }
+    });
+  }
 
   // Export shared functions for the schedule viewer IIFE
   window.showToast = showToast;
