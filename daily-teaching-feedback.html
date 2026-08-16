@@ -3293,7 +3293,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260816.04">
+    <meta name="app-version" content="20260816.05">
   </div>
 
   <!-- Tabs -->
@@ -7325,6 +7325,7 @@
   // Get random quote from a category, with smart subject filtering
   // If category is not provided, uses the global quoteSelectedCategory (for quote library page)
   function getRandomQuote(category) {
+    try {
     var cat = category || quoteSelectedCategory;
     var all = getQuotes();
     var currentSubject = getCurrentSubject();
@@ -7385,6 +7386,10 @@
       } while (next.text === quoteCurrentText && attempts < 10 && pool.length > 1);
     }
     return next;
+    } catch(e) {
+      console.error('[getRandomQuote] error:', e);
+      return null;
+    }
   }
 
   // Render category chips
@@ -7519,9 +7524,13 @@
 
   // Render entire quote library
   function renderQuoteLibrary() {
-    renderQuoteCategories();
-    renderQuoteList();
-    refreshRandomQuote();
+    try {
+      renderQuoteCategories();
+      renderQuoteList();
+      refreshRandomQuote();
+    } catch(e) {
+      console.error('[评语库] 渲染失败:', e);
+    }
   }
 
   // Add quote modal
