@@ -891,6 +891,59 @@
     border: 1px solid var(--rule);
     border-radius: var(--radius-sm);
   }
+  .quick-quote-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, rgba(45,157,120,0.06), rgba(45,157,120,0.02));
+    border: 1.5px solid rgba(45,157,120,0.2);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .quick-quote-text {
+    flex: 1;
+    font-size: 0.82rem;
+    color: var(--ink);
+    line-height: 1.5;
+    font-weight: 500;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .quick-quote-actions {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .quick-quote-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 10px;
+    background: #fff;
+    color: var(--accent);
+    border: 1.5px solid var(--accent);
+    border-radius: 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .quick-quote-btn:hover { background: rgba(45,157,120,0.05); }
+  .quick-quote-btn.primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .quick-quote-btn.primary:hover { background: #258565; }
+  .quick-quote-btn.save {
+    color: #f59e0b;
+    border-color: #f59e0b;
+  }
+  .quick-quote-btn.save:hover { background: rgba(245,158,11,0.08); }
   .guided-dim {
     margin-bottom: 10px;
   }
@@ -3105,7 +3158,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260815.03">
+    <meta name="app-version" content="20260816.01">
   </div>
 
   <!-- Tabs -->
@@ -3270,6 +3323,24 @@
     <!-- Guided selector -->
     <div class="guided-section" id="guided-4">
       <!-- Dimensions will be rendered by JS -->
+    </div>
+
+    <!-- Quick quote bar -->
+    <div class="quick-quote-bar">
+      <div class="quick-quote-text" id="quickQuoteText">点右侧「换一条」随机获取个性化评语 ✨</div>
+      <div class="quick-quote-actions">
+        <button class="quick-quote-btn" id="quickQuoteRefreshBtn" type="button" title="换一条">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="quick-quote-btn primary" id="quickQuoteInsertBtn" type="button" title="插入">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          插入
+        </button>
+        <button class="quick-quote-btn save" id="quickQuoteSaveBtn" type="button" title="保存当前内容到评语库">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          存到评语库
+        </button>
+      </div>
     </div>
 
     <textarea id="section-4" placeholder="点击上方选项自动生成，也可在此手动修改或补充" ></textarea>
@@ -6917,6 +6988,62 @@
   });
 
   // ====== End Quote Library ======
+
+  // ====== Quick Quote Bar (in manual section) ======
+  var quickQuoteText = document.getElementById('quickQuoteText');
+  var quickQuoteRefreshBtn = document.getElementById('quickQuoteRefreshBtn');
+  var quickQuoteInsertBtn = document.getElementById('quickQuoteInsertBtn');
+  var quickQuoteSaveBtn = document.getElementById('quickQuoteSaveBtn');
+  var quickCurrentQuote = null;
+
+  function refreshQuickQuote() {
+    var q = getRandomQuote();
+    quickCurrentQuote = q;
+    if (quickQuoteText && q) {
+      quickQuoteText.textContent = q.text;
+      quickQuoteText.title = q.text;
+    } else if (quickQuoteText) {
+      quickQuoteText.textContent = '暂无评语，去评语库添加吧 ✨';
+    }
+  }
+
+  if (quickQuoteRefreshBtn) {
+    quickQuoteRefreshBtn.addEventListener('click', refreshQuickQuote);
+  }
+  if (quickQuoteInsertBtn) {
+    quickQuoteInsertBtn.addEventListener('click', function() {
+      if (!quickCurrentQuote) { showToast('先点「换一条」获取一条评语吧'); return; }
+      insertQuoteToSection(quickCurrentQuote.text);
+      showToast('已插入到教师评价');
+    });
+  }
+  if (quickQuoteSaveBtn) {
+    quickQuoteSaveBtn.addEventListener('click', function() {
+      var textarea = document.getElementById('section-4');
+      if (!textarea) return;
+      var text = textarea.value.trim();
+      if (!text) { showToast('教师评价内容为空，没法保存哦'); return; }
+      // Show a simple category selector
+      var cat = prompt('选择一个分类（直接回车默认存到「我的收藏」）：\n\n1. 表扬鼓励\n2. 学习建议\n3. 课堂表现\n4. 作业情况\n5. 习惯养成\n6. 温馨关怀\n\n输入数字或分类名，或直接回车', '');
+      if (cat === null) return;
+      var category = '我的收藏';
+      var catMap = { '1': '表扬鼓励', '2': '学习建议', '3': '课堂表现', '4': '作业情况', '5': '习惯养成', '6': '温馨关怀' };
+      if (catMap[cat]) category = catMap[cat];
+      else if (cat && cat.trim()) category = cat.trim();
+      // Save as custom quote
+      var custom = getCustomQuotes();
+      custom.push({ text: text, category: category });
+      saveCustomQuotes(custom);
+      showToast('已保存到「' + category + '」分类');
+    });
+  }
+
+  // Auto-load a random quote on page load
+  if (quickQuoteText) {
+    setTimeout(refreshQuickQuote, 500);
+  }
+
+  // ====== End Quick Quote Bar ======
 
   // ====== Centralized exam management ======
   function getExams() {
