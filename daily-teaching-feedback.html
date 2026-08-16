@@ -645,6 +645,21 @@
     display: flex;
     gap: 4px;
   }
+  .quote-load-more-btn {
+    padding: 8px 20px;
+    background: rgba(45,157,120,0.08);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .quote-load-more-btn:hover {
+    background: rgba(45,157,120,0.15);
+  }
   .quote-item-btn {
     font-size: 0.7rem;
     padding: 3px 8px;
@@ -3293,7 +3308,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260816.05">
+    <meta name="app-version" content="20260816.06">
   </div>
 
   <!-- Tabs -->
@@ -4271,6 +4286,18 @@
     }
   };
 
+  // Safe JSON parse with fallback default
+  window.safeJsonParse = function(str, fallback) {
+    try {
+      if (!str) return fallback;
+      var val = JSON.parse(str);
+      return (val === null || val === undefined) ? fallback : val;
+    } catch(e) {
+      console.warn('[JSON解析失败] 数据已损坏，使用默认值:', e.message);
+      return fallback;
+    }
+  };
+
   window.safeStorageSet = function(key, value) {
     try {
       localStorage.setItem(key, value);
@@ -4290,17 +4317,31 @@
   };
 
   // Global error handler - prevents silent script crashes
+  var __errorCount = 0;
+  var __lastErrorTime = 0;
   window.addEventListener('error', function(e) {
     var msg = e.message || '未知错误';
     var file = e.filename ? e.filename.split('/').pop() : '';
     var line = e.lineno || '';
     console.error('[全局错误] ' + msg + ' (' + file + ':' + line + ')');
-    
+
+    // Track error frequency
+    var now = Date.now();
+    if (now - __lastErrorTime < 5000) {
+      __errorCount++;
+    } else {
+      __errorCount = 1;
+    }
+    __lastErrorTime = now;
+
     // Don't show non-critical errors to the user
     // These are often caused by browser cache issues or minor feature failures
     var nonCriticalPatterns = [
       'autoCheckUpdate', 'performVersionCheck', 'showUpdateModal',
-      'is not defined', 'Unexpected token', 'JSON'
+      'is not defined', 'Unexpected token',
+      'Script error.', 'ResizeObserver',
+      'getImageData', 'canvas',
+      'google-analytics', 'googletag', 'gtag'
     ];
     var isNonCritical = false;
     for (var i = 0; i < nonCriticalPatterns.length; i++) {
@@ -4309,11 +4350,19 @@
         break;
       }
     }
-    
+
     // Only show user-friendly message for critical errors that would break core functionality
-    if (!isNonCritical) {
-      if (msg.indexOf('null') !== -1 || msg.indexOf('undefined') !== -1 || msg.indexOf('Cannot read') !== -1) {
+    // Only show toast if we haven't shown too many recently (avoid toast spam)
+    if (!isNonCritical && __errorCount <= 3) {
+      if (msg.indexOf('null') !== -1 || msg.indexOf('undefined') !== -1 || msg.indexOf('Cannot read') !== -1 || msg.indexOf('not a function') !== -1) {
         window.__showToast('页面功能异常，请刷新重试');
+      }
+    }
+    // If too many errors in short time, suggest refresh
+    if (__errorCount >= 5) {
+      __errorCount = 0; // reset to avoid infinite loop
+      if (confirm('页面似乎遇到了一些问题，建议刷新页面后继续使用。是否立即刷新？')) {
+        location.reload();
       }
     }
     // Prevent default to avoid white screen on critical errors
@@ -4377,7 +4426,7 @@
 
   // --- Load saved data ---
   try {
-    var saved = JSON.parse(localStorage.getItem('teaching_feedback') || '{}');
+    var saved = safeJsonParse(localStorage.getItem('teaching_feedback'), {});
     if (saved.subject) subjectInput.value = saved.subject;
     if (saved.student) studentInput.value = saved.student;
     if (saved.studentTags) {
@@ -4405,9 +4454,10 @@
   function updateCounter(s) {
     var el = document.getElementById(s.id);
     var counter = document.getElementById(s.counter);
+    if (!el || !counter) return;
     var len = el.value.length;
     var currentSpan = counter.querySelector('.current');
-    currentSpan.textContent = len;
+    if (currentSpan) currentSpan.textContent = len;
     // No warnings - just informational
     counter.classList.remove('warn', 'over');
   }
@@ -7223,8 +7273,8 @@
   // Quote storage helpers
   function getQuotes() {
     try {
-      var custom = JSON.parse(localStorage.getItem('teaching_quotes_custom') || '[]');
-      var savedIds = JSON.parse(localStorage.getItem('teaching_quotes_saved') || '[]');
+      var custom = safeJsonParse(localStorage.getItem('teaching_quotes_custom'), []);
+      var savedIds = safeJsonParse(localStorage.getItem('teaching_quotes_saved'), []);
       // Combine presets + custom, mark saved ones
       var all = PRESET_QUOTES.map(function(q, i) {
         return { id: 'preset_' + i, text: q.text, category: q.category, custom: false, saved: savedIds.indexOf('preset_' + i) !== -1 };
@@ -7237,7 +7287,7 @@
   }
 
   function saveCustomQuotes(quotes) {
-    localStorage.setItem('teaching_quotes_custom', JSON.stringify(quotes));
+    try { safeStorageSet('teaching_quotes_custom', JSON.stringify(quotes)); } catch(e) {}
   }
 
   // Quote usage frequency tracking
@@ -7246,9 +7296,11 @@
     catch(e) { return {}; }
   }
   function incrementQuoteUsage(text) {
-    var usage = getQuoteUsage();
-    usage[text] = (usage[text] || 0) + 1;
-    localStorage.setItem('teaching_quotes_usage', JSON.stringify(usage));
+    try {
+      var usage = getQuoteUsage();
+      usage[text] = (usage[text] || 0) + 1;
+      safeStorageSet('teaching_quotes_usage', JSON.stringify(usage));
+    } catch(e) {}
   }
   function getQuoteUsageCount(text) {
     var usage = getQuoteUsage();
@@ -7261,14 +7313,18 @@
   }
 
   function saveQuoteId(id) {
-    var ids = getSavedQuoteIds();
-    if (ids.indexOf(id) === -1) ids.push(id);
-    localStorage.setItem('teaching_quotes_saved', JSON.stringify(ids));
+    try {
+      var ids = getSavedQuoteIds();
+      if (ids.indexOf(id) === -1) ids.push(id);
+      safeStorageSet('teaching_quotes_saved', JSON.stringify(ids));
+    } catch(e) {}
   }
 
   function unsaveQuoteId(id) {
-    var ids = getSavedQuoteIds().filter(function(x) { return x !== id; });
-    localStorage.setItem('teaching_quotes_saved', JSON.stringify(ids));
+    try {
+      var ids = getSavedQuoteIds().filter(function(x) { return x !== id; });
+      safeStorageSet('teaching_quotes_saved', JSON.stringify(ids));
+    } catch(e) {}
   }
 
   function getCustomQuotes() {
@@ -7432,57 +7488,190 @@
       return;
     }
 
-    var html = '';
-    list.forEach(function(q) {
-      html += '<div class="quote-item" data-id="' + q.id + '">';
-      html += '<div class="quote-item-text">' + escapeHtml(q.text) + '</div>';
-      html += '<div class="quote-item-footer">';
-      html += '<span class="quote-item-cat">' + q.category + '</span>';
-      html += '<div class="quote-item-actions">';
-      html += '<button class="quote-item-btn" data-action="insert">插入</button>';
-      if (q.saved) {
-        html += '<button class="quote-item-btn" data-action="unsave">取消收藏</button>';
-      } else {
-        html += '<button class="quote-item-btn" data-action="save">收藏</button>';
-      }
-      if (q.custom) {
-        html += '<button class="quote-item-btn danger" data-action="delete">删除</button>';
-      }
-      html += '</div></div></div>';
-    });
-    container.innerHTML = html;
+    // Use DocumentFragment for better performance with large lists
+    var frag = document.createDocumentFragment();
+    var PAGE_SIZE = 100;
+    var displayCount = Math.min(list.length, PAGE_SIZE);
 
-    // Bind actions
-    container.querySelectorAll('.quote-item').forEach(function(item) {
-      var id = item.dataset.id;
-      var q = getQuotes().find(function(x) { return x.id === id; });
-      item.querySelector('[data-action="insert"]').addEventListener('click', function() {
-        insertQuoteToSection(q.text);
-        showToast('已插入到教师评价');
-      });
-      item.querySelector('[data-action="save"]').addEventListener('click', function() {
-        saveQuoteId(id);
-        renderQuoteLibrary();
-        showToast('已收藏');
-      });
-      item.querySelector('[data-action="unsave"]').addEventListener('click', function() {
-        unsaveQuoteId(id);
-        renderQuoteLibrary();
-        showToast('已取消收藏');
-      });
-      var delBtn = item.querySelector('[data-action="delete"]');
-      if (delBtn) {
-        delBtn.addEventListener('click', function() {
-          if (!confirm('确定删除这条评语吗？')) return;
-          var idx = parseInt(id.replace('custom_', ''));
-          var custom = getCustomQuotes();
-          custom.splice(idx, 1);
-          saveCustomQuotes(custom);
-          renderQuoteLibrary();
-          showToast('已删除');
-        });
+    for (var i = 0; i < displayCount; i++) {
+      var q = list[i];
+      var item = document.createElement('div');
+      item.className = 'quote-item';
+      item.dataset.id = q.id;
+
+      var textDiv = document.createElement('div');
+      textDiv.className = 'quote-item-text';
+      textDiv.textContent = q.text;
+      item.appendChild(textDiv);
+
+      var footer = document.createElement('div');
+      footer.className = 'quote-item-footer';
+
+      var catSpan = document.createElement('span');
+      catSpan.className = 'quote-item-cat';
+      catSpan.textContent = q.category;
+      footer.appendChild(catSpan);
+
+      var actions = document.createElement('div');
+      actions.className = 'quote-item-actions';
+
+      var insertBtn = document.createElement('button');
+      insertBtn.className = 'quote-item-btn';
+      insertBtn.textContent = '插入';
+      insertBtn.addEventListener('click', function(quote) {
+        return function() {
+          insertQuoteToSection(quote.text);
+          showToast('已插入到教师评价');
+        };
+      }(q));
+      actions.appendChild(insertBtn);
+
+      if (q.saved) {
+        var unsaveBtn = document.createElement('button');
+        unsaveBtn.className = 'quote-item-btn';
+        unsaveBtn.textContent = '取消收藏';
+        unsaveBtn.addEventListener('click', function(qid) {
+          return function() {
+            unsaveQuoteId(qid);
+            renderQuoteLibrary();
+            showToast('已取消收藏');
+          };
+        }(q.id));
+        actions.appendChild(unsaveBtn);
+      } else {
+        var saveBtn = document.createElement('button');
+        saveBtn.className = 'quote-item-btn';
+        saveBtn.textContent = '收藏';
+        saveBtn.addEventListener('click', function(qid) {
+          return function() {
+            saveQuoteId(qid);
+            renderQuoteLibrary();
+            showToast('已收藏');
+          };
+        }(q.id));
+        actions.appendChild(saveBtn);
       }
-    });
+
+      if (q.custom) {
+        var delBtn = document.createElement('button');
+        delBtn.className = 'quote-item-btn danger';
+        delBtn.textContent = '删除';
+        delBtn.addEventListener('click', function(qid) {
+          return function() {
+            if (!confirm('确定删除这条评语吗？')) return;
+            var idx = parseInt(qid.replace('custom_', ''));
+            var custom = getCustomQuotes();
+            custom.splice(idx, 1);
+            saveCustomQuotes(custom);
+            renderQuoteLibrary();
+            showToast('已删除');
+          };
+        }(q.id));
+        actions.appendChild(delBtn);
+      }
+
+      footer.appendChild(actions);
+      item.appendChild(footer);
+      frag.appendChild(item);
+    }
+
+    container.innerHTML = '';
+    container.appendChild(frag);
+
+    // "Load more" button if there are more items
+    if (list.length > PAGE_SIZE) {
+      var moreDiv = document.createElement('div');
+      moreDiv.style.textAlign = 'center';
+      moreDiv.style.padding = '12px 0';
+      var moreBtn = document.createElement('button');
+      moreBtn.className = 'quote-load-more-btn';
+      moreBtn.textContent = '加载更多（还有 ' + (list.length - PAGE_SIZE) + ' 条）';
+      moreBtn.addEventListener('click', function() {
+        // Render all remaining items on click
+        var restFrag = document.createDocumentFragment();
+        for (var j = PAGE_SIZE; j < list.length; j++) {
+          var q2 = list[j];
+          var item2 = document.createElement('div');
+          item2.className = 'quote-item';
+          item2.dataset.id = q2.id;
+          var textDiv2 = document.createElement('div');
+          textDiv2.className = 'quote-item-text';
+          textDiv2.textContent = q2.text;
+          item2.appendChild(textDiv2);
+          var footer2 = document.createElement('div');
+          footer2.className = 'quote-item-footer';
+          var catSpan2 = document.createElement('span');
+          catSpan2.className = 'quote-item-cat';
+          catSpan2.textContent = q2.category;
+          footer2.appendChild(catSpan2);
+          var actions2 = document.createElement('div');
+          actions2.className = 'quote-item-actions';
+
+          var insertBtn2 = document.createElement('button');
+          insertBtn2.className = 'quote-item-btn';
+          insertBtn2.textContent = '插入';
+          insertBtn2.addEventListener('click', function(quote) {
+            return function() {
+              insertQuoteToSection(quote.text);
+              showToast('已插入到教师评价');
+            };
+          }(q2));
+          actions2.appendChild(insertBtn2);
+
+          if (q2.saved) {
+            var unsaveBtn2 = document.createElement('button');
+            unsaveBtn2.className = 'quote-item-btn';
+            unsaveBtn2.textContent = '取消收藏';
+            unsaveBtn2.addEventListener('click', function(qid) {
+              return function() {
+                unsaveQuoteId(qid);
+                renderQuoteLibrary();
+                showToast('已取消收藏');
+              };
+            }(q2.id));
+            actions2.appendChild(unsaveBtn2);
+          } else {
+            var saveBtn2 = document.createElement('button');
+            saveBtn2.className = 'quote-item-btn';
+            saveBtn2.textContent = '收藏';
+            saveBtn2.addEventListener('click', function(qid) {
+              return function() {
+                saveQuoteId(qid);
+                renderQuoteLibrary();
+                showToast('已收藏');
+              };
+            }(q2.id));
+            actions2.appendChild(saveBtn2);
+          }
+
+          if (q2.custom) {
+            var delBtn2 = document.createElement('button');
+            delBtn2.className = 'quote-item-btn danger';
+            delBtn2.textContent = '删除';
+            delBtn2.addEventListener('click', function(qid) {
+              return function() {
+                if (!confirm('确定删除这条评语吗？')) return;
+                var idx2 = parseInt(qid.replace('custom_', ''));
+                var custom2 = getCustomQuotes();
+                custom2.splice(idx2, 1);
+                saveCustomQuotes(custom2);
+                renderQuoteLibrary();
+                showToast('已删除');
+              };
+            }(q2.id));
+            actions2.appendChild(delBtn2);
+          }
+
+          footer2.appendChild(actions2);
+          item2.appendChild(footer2);
+          restFrag.appendChild(item2);
+        }
+        container.appendChild(restFrag);
+        moreDiv.remove();
+      });
+      moreDiv.appendChild(moreBtn);
+      container.appendChild(moreDiv);
+    }
   }
 
   // Insert quote text to section 4 (teacher evaluation)
