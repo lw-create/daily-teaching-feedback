@@ -674,6 +674,22 @@
     transition: all 0.15s;
   }
   .quote-add-btn:hover { background: rgba(45,157,120,0.2); }
+  .quote-batch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .quote-batch-btn:hover { background: rgba(245, 158, 11, 0.2); }
   .quote-modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -914,6 +930,22 @@
     font-weight: 700;
     color: #b45309;
   }
+  .quick-quote-cat-select {
+    margin-left: auto;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    border: 1px solid #f5c26b;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.8);
+    color: #92400e;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+  .quick-quote-cat-select:focus {
+    border-color: #d97706;
+  }
   .quick-quote-card .quick-quote-bar {
     background: rgba(255, 255, 255, 0.7);
     border-color: rgba(245, 158, 11, 0.3);
@@ -942,6 +974,40 @@
   }
   .quick-quote-card .quick-quote-btn.save:hover {
     background: rgba(220, 38, 38, 0.08);
+  }
+  .quick-phrases {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+  }
+  .quick-phrases-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .quick-phrase {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .quick-phrase:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
   }
   .quick-quote-bar {
     display: flex;
@@ -3227,7 +3293,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260816.03">
+    <meta name="app-version" content="20260816.04">
   </div>
 
   <!-- Tabs -->
@@ -3267,6 +3333,9 @@
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div class="student-dropdown" id="studentDropdown"></div>
+        <div style="margin-top:4px;">
+          <input type="text" id="studentTagsInput" placeholder="🏷️ 特点标签，用逗号分隔（如：内向,爱走神,数学好）" style="font-size:0.75rem;padding:6px 10px;">
+        </div>
       </div>
     </div>
     <div style="margin-top:6px;">
@@ -3399,6 +3468,19 @@
       <div class="quick-quote-card-header">
         <span class="quick-quote-card-icon">✨</span>
         <span class="quick-quote-card-title">选一句评语，评价学生今天的表现</span>
+        <select class="quick-quote-cat-select" id="quickQuoteCatSelect">
+          <option value="全部">全部分类</option>
+          <option value="表扬鼓励">表扬鼓励</option>
+          <option value="学习建议">学习建议</option>
+          <option value="课堂表现">课堂表现</option>
+          <option value="作业情况">作业情况</option>
+          <option value="习惯养成">习惯养成</option>
+          <option value="温馨关怀">温馨关怀</option>
+          <option value="批评建议">批评建议</option>
+          <option value="心理关怀">心理关怀</option>
+          <option value="家校沟通">家校沟通</option>
+          <option value="我的收藏">我的收藏</option>
+        </select>
       </div>
       <div class="quick-quote-bar">
         <div class="quick-quote-text" id="quickQuoteText">点右侧「换一条」随机获取个性化评语 ✨</div>
@@ -3416,6 +3498,21 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- Quick phrases -->
+    <div class="quick-phrases">
+      <span class="quick-phrases-label">快捷短语：</span>
+      <span class="quick-phrase" data-text="继续保持，再接再厉！">继续保持</span>
+      <span class="quick-phrase" data-text="整体表现不错。">表现不错</span>
+      <span class="quick-phrase" data-text="仍有提升空间。">有待提高</span>
+      <span class="quick-phrase" data-text="值得肯定和表扬。">值得肯定</span>
+      <span class="quick-phrase" data-text="希望能引起重视。">引起重视</span>
+      <span class="quick-phrase" data-text="望继续努力。">继续努力</span>
+      <span class="quick-phrase" data-text="有明显进步。">明显进步</span>
+      <span class="quick-phrase" data-text="需加强监督。">加强监督</span>
+      <span class="quick-phrase" data-text="请家长予以关注。">请家长关注</span>
+      <span class="quick-phrase" data-text="总体来说表现良好。">总体良好</span>
     </div>
 
     <textarea id="section-4" placeholder="点击上方选项自动生成，也可在此手动修改或补充" ></textarea>
@@ -3574,10 +3671,16 @@
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <span style="font-size:0.88rem;font-weight:700;color:var(--ink);">💬 评语列表</span>
-        <button class="quote-add-btn" id="quoteAddBtn" type="button">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          添加评语
-        </button>
+        <div style="display:flex;gap:6px;">
+          <button class="quote-batch-btn" id="quoteBatchBtn" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            批量导入
+          </button>
+          <button class="quote-add-btn" id="quoteAddBtn" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            添加评语
+          </button>
+        </div>
       </div>
       <div class="quote-list" id="quoteList"></div>
     </div>
@@ -3604,6 +3707,36 @@
         <div style="display:flex;gap:8px;justify-content:flex-end;">
           <button class="quote-cancel-btn" id="quoteAddCancel" type="button">取消</button>
           <button class="quote-confirm-btn" id="quoteAddConfirm" type="button">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 批量导入评语弹窗 -->
+    <div class="quote-modal-overlay" id="quoteBatchOverlay" style="display:none;">
+      <div class="quote-modal" style="max-width:520px;">
+        <div class="quote-modal-title">批量导入评语</div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:0.78rem;font-weight:600;color:var(--ink);display:block;margin-bottom:5px;">选择分类</label>
+          <select class="quote-select" id="quoteBatchCategory">
+            <option value="表扬鼓励">表扬鼓励</option>
+            <option value="学习建议">学习建议</option>
+            <option value="课堂表现">课堂表现</option>
+            <option value="作业情况">作业情况</option>
+            <option value="习惯养成">习惯养成</option>
+            <option value="温馨关怀">温馨关怀</option>
+            <option value="批评建议">批评建议</option>
+            <option value="心理关怀">心理关怀</option>
+            <option value="家校沟通">家校沟通</option>
+          </select>
+        </div>
+        <div style="margin-bottom:8px;">
+          <label style="font-size:0.78rem;font-weight:600;color:var(--ink);display:block;margin-bottom:5px;">评语内容（每行一条）</label>
+          <textarea class="quote-textarea" id="quoteBatchInput" rows="10" placeholder="每行一条评语，例如：&#10;孩子今天课堂表现很积极，值得表扬。&#10;建议课后多复习，巩固今天学的知识点。&#10;..."></textarea>
+        </div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-bottom:14px;">💡 粘贴多条评语，每行一条，系统会自动保存到上面选择的分类中</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="quote-cancel-btn" id="quoteBatchCancel" type="button">取消</button>
+          <button class="quote-confirm-btn" id="quoteBatchConfirm" type="button">全部导入</button>
         </div>
       </div>
     </div>
@@ -4247,6 +4380,10 @@
     var saved = JSON.parse(localStorage.getItem('teaching_feedback') || '{}');
     if (saved.subject) subjectInput.value = saved.subject;
     if (saved.student) studentInput.value = saved.student;
+    if (saved.studentTags) {
+      var tagsInput = document.getElementById('studentTagsInput');
+      if (tagsInput) tagsInput.value = saved.studentTags;
+    }
     sections.forEach(function(s) {
       var el = document.getElementById(s.id);
       if (saved[s.id]) el.value = saved[s.id];
@@ -4285,9 +4422,11 @@
 
   // --- Save data ---
   function saveData() {
+    var tagsInput = document.getElementById('studentTagsInput');
     var data = {
       subject: subjectInput.value,
-      student: studentInput.value
+      student: studentInput.value,
+      studentTags: tagsInput ? tagsInput.value : ''
     };
     sections.forEach(function(s) {
       data[s.id] = document.getElementById(s.id).value;
@@ -4298,6 +4437,9 @@
   subjectInput.addEventListener('input', saveData);
   studentInput.addEventListener('input', saveData);
   dateInput.addEventListener('change', saveData);
+  // Student tags input save
+  var studentTagsInput = document.getElementById('studentTagsInput');
+  if (studentTagsInput) studentTagsInput.addEventListener('input', saveData);
 
   // --- Guided selectors for 学生状态 & 教师评价 ---
   var guidedConfig = {
@@ -7098,6 +7240,21 @@
     localStorage.setItem('teaching_quotes_custom', JSON.stringify(quotes));
   }
 
+  // Quote usage frequency tracking
+  function getQuoteUsage() {
+    try { return JSON.parse(localStorage.getItem('teaching_quotes_usage') || '{}'); }
+    catch(e) { return {}; }
+  }
+  function incrementQuoteUsage(text) {
+    var usage = getQuoteUsage();
+    usage[text] = (usage[text] || 0) + 1;
+    localStorage.setItem('teaching_quotes_usage', JSON.stringify(usage));
+  }
+  function getQuoteUsageCount(text) {
+    var usage = getQuoteUsage();
+    return usage[text] || 0;
+  }
+
   function getSavedQuoteIds() {
     try { return JSON.parse(localStorage.getItem('teaching_quotes_saved') || '[]'); }
     catch(e) { return []; }
@@ -7154,17 +7311,30 @@
     return '';
   }
 
-  // Get random quote from current category, with smart subject filtering
-  function getRandomQuote() {
+  // Get student tags as array
+  function getStudentTags() {
+    try {
+      var input = document.getElementById('studentTagsInput');
+      if (!input) return [];
+      var raw = input.value.trim();
+      if (!raw) return [];
+      return raw.split(/[,，、\s]+/).filter(function(t) { return t.length > 0; });
+    } catch(e) { return []; }
+  }
+
+  // Get random quote from a category, with smart subject filtering
+  // If category is not provided, uses the global quoteSelectedCategory (for quote library page)
+  function getRandomQuote(category) {
+    var cat = category || quoteSelectedCategory;
     var all = getQuotes();
     var currentSubject = getCurrentSubject();
     var pool;
-    if (quoteSelectedCategory === '全部') {
+    if (cat === '全部') {
       pool = all;
-    } else if (quoteSelectedCategory === '我的收藏') {
+    } else if (cat === '我的收藏') {
       pool = all.filter(function(q) { return q.saved; });
     } else {
-      pool = all.filter(function(q) { return q.category === quoteSelectedCategory; });
+      pool = all.filter(function(q) { return q.category === cat; });
     }
     // Smart filtering: if a subject is selected, filter out quotes from OTHER subjects
     if (currentSubject) {
@@ -7177,14 +7347,42 @@
       });
     }
     if (pool.length === 0) return null;
-    // Pick a random one, try not to repeat the current one
+    // Weighted random: frequently used quotes have higher chance of being picked
+    // Weight = 1 + usageCount * 0.5 + tagMatchBonus, so frequently used ones are more likely but new ones still show up
+    var studentTags = getStudentTags();
+    var weights = pool.map(function(q) {
+      var count = getQuoteUsageCount(q.text);
+      var w = 1 + count * 0.5;
+      // Student tag matching bonus
+      if (studentTags.length > 0) {
+        for (var ti = 0; ti < studentTags.length; ti++) {
+          if (q.text.indexOf(studentTags[ti]) !== -1) {
+            w += 2; // Each matching tag adds +2 weight
+            break;
+          }
+        }
+      }
+      return w;
+    });
+    var totalWeight = weights.reduce(function(sum, w) { return sum + w; }, 0);
+    // Weighted random selection, try not to repeat current
+    function pickWeighted() {
+      var r = Math.random() * totalWeight;
+      for (var i = 0; i < pool.length; i++) {
+        r -= weights[i];
+        if (r <= 0) return pool[i];
+      }
+      return pool[pool.length - 1];
+    }
     var next;
     if (pool.length === 1) {
       next = pool[0];
     } else {
+      var attempts = 0;
       do {
-        next = pool[Math.floor(Math.random() * pool.length)];
-      } while (next.text === quoteCurrentText && pool.length > 1);
+        next = pickWeighted();
+        attempts++;
+      } while (next.text === quoteCurrentText && attempts < 10 && pool.length > 1);
     }
     return next;
   }
@@ -7292,6 +7490,8 @@
     } else {
       textarea.value = text;
     }
+    // Increment usage count
+    incrementQuoteUsage(text);
     // Trigger input event for char counter etc.
     textarea.dispatchEvent(new Event('input'));
     // Switch to manual tab
@@ -7355,6 +7555,48 @@
     showToast('添加成功');
   });
 
+  // Batch import quotes
+  var quoteBatchBtn = document.getElementById('quoteBatchBtn');
+  var quoteBatchOverlay = document.getElementById('quoteBatchOverlay');
+  var quoteBatchCancel = document.getElementById('quoteBatchCancel');
+  var quoteBatchConfirm = document.getElementById('quoteBatchConfirm');
+  var quoteBatchInput = document.getElementById('quoteBatchInput');
+  var quoteBatchCategory = document.getElementById('quoteBatchCategory');
+
+  if (quoteBatchBtn) quoteBatchBtn.addEventListener('click', function() {
+    if (quoteBatchOverlay) quoteBatchOverlay.style.display = 'flex';
+    if (quoteBatchInput) quoteBatchInput.value = '';
+    if (quoteBatchInput) quoteBatchInput.focus();
+  });
+  if (quoteBatchCancel) quoteBatchCancel.addEventListener('click', function() {
+    if (quoteBatchOverlay) quoteBatchOverlay.style.display = 'none';
+  });
+  if (quoteBatchOverlay) quoteBatchOverlay.addEventListener('click', function(e) {
+    if (e.target === quoteBatchOverlay) quoteBatchOverlay.style.display = 'none';
+  });
+  if (quoteBatchConfirm) quoteBatchConfirm.addEventListener('click', function() {
+    var raw = quoteBatchInput.value.trim();
+    var cat = quoteBatchCategory.value;
+    if (!raw) { showToast('请输入评语内容'); return; }
+    // Split by newline, filter empty lines
+    var lines = raw.split('\n').map(function(line) { return line.trim(); }).filter(function(line) { return line.length > 0; });
+    if (lines.length === 0) { showToast('没有有效的评语内容'); return; }
+    var custom = getCustomQuotes();
+    var added = 0;
+    lines.forEach(function(line) {
+      // Avoid duplicates
+      var exists = custom.some(function(q) { return q.text === line; });
+      if (!exists) {
+        custom.push({ text: line, category: cat });
+        added++;
+      }
+    });
+    saveCustomQuotes(custom);
+    quoteBatchOverlay.style.display = 'none';
+    renderQuoteLibrary();
+    showToast('成功导入 ' + added + ' 条评语' + (added < lines.length ? '（' + (lines.length - added) + ' 条重复已跳过）' : ''));
+  });
+
   // Random quote button
   var quoteRefreshBtn = document.getElementById('quoteRefreshBtn');
   if (quoteRefreshBtn) quoteRefreshBtn.addEventListener('click', refreshRandomQuote);
@@ -7411,13 +7653,15 @@
   }
 
   function refreshQuickQuote() {
-    var q = getRandomQuote();
+    var catSelect = document.getElementById('quickQuoteCatSelect');
+    var cat = catSelect ? catSelect.value : '全部';
+    var q = getRandomQuote(cat);
     quickCurrentQuote = q;
     if (quickQuoteText && q) {
       quickQuoteText.textContent = q.text;
       quickQuoteText.title = '点击查看完整内容';
     } else if (quickQuoteText) {
-      quickQuoteText.textContent = '暂无评语，去评语库添加吧 ✨';
+      quickQuoteText.textContent = '当前分类下暂无评语，换个分类试试吧 ✨';
     }
     // Collapse after refresh
     if (quickQuoteBar && quickQuoteExpanded) {
@@ -7432,6 +7676,22 @@
       refreshQuickQuote();
     });
   }
+  // Category select change event
+  var quickQuoteCatSelect = document.getElementById('quickQuoteCatSelect');
+  if (quickQuoteCatSelect) {
+    quickQuoteCatSelect.addEventListener('change', function() {
+      refreshQuickQuote();
+    });
+  }
+
+  // Quick phrases click to insert
+  var quickPhrases = document.querySelectorAll('.quick-phrase');
+  quickPhrases.forEach(function(phrase) {
+    phrase.addEventListener('click', function() {
+      var text = phrase.dataset.text || phrase.textContent;
+      insertQuoteToSection(text);
+    });
+  });
   if (quickQuoteInsertBtn) {
     quickQuoteInsertBtn.addEventListener('click', function() {
       if (!quickCurrentQuote) { showToast('先点「换一条」获取一条评语吧'); return; }
