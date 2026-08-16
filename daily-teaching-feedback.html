@@ -1954,6 +1954,37 @@
   .tpl-btn-danger { background: rgba(217,83,79,0.1); color: var(--danger); border-color: rgba(217,83,79,0.2); }
   .tpl-btn-sm { padding: 3px 8px; font-size: 0.72rem; }
 
+  /* Export dropdown menu */
+  .tpl-export-menu { position: relative; display: inline-block; }
+  .tpl-export-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    padding: 4px;
+    display: none;
+    z-index: 100;
+    min-width: 160px;
+  }
+  .tpl-export-dropdown.show { display: block; }
+  .tpl-export-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: var(--ink);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tpl-export-item:hover { background: rgba(45,157,120,0.1); color: var(--accent); }
+
   .tpl-list {
     display: flex;
     flex-direction: column;
@@ -2395,29 +2426,56 @@
   }
   .tpl-display-filters {
     display: flex;
-    gap: 6px;
+    gap: 10px 14px;
     flex-wrap: wrap;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 10px;
+    border: 1px solid rgba(45,157,120,0.15);
+  }
+  .tpl-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .tpl-filter-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: flex;
     align-items: center;
-    margin-bottom: 8px;
+    gap: 4px;
+  }
+  .tpl-filter-chips {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
   }
   .tpl-weekday-chip {
     display: inline-flex;
     align-items: center;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.7rem;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-size: 0.75rem;
     font-weight: 600;
-    border: 1px solid var(--rule);
+    border: 1.5px solid var(--rule);
     background: #fff;
-    color: var(--muted);
+    color: #555;
     cursor: pointer;
     transition: all 0.15s;
     user-select: none;
+  }
+  .tpl-weekday-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
   }
   .tpl-weekday-chip.active {
     background: var(--accent);
     color: #fff;
     border-color: var(--accent);
+    box-shadow: 0 2px 8px rgba(45,157,120,0.3);
   }
   .tpl-collapsible-toggle {
     display: flex;
@@ -3260,18 +3318,38 @@
           <div class="tpl-display-header" id="tplPreviewHeader">
             <span class="tpl-display-title" id="tplActiveTitle">📋 我的课表 <span class="tpl-preview-toggle-icon">▼</span></span>
             <span class="tpl-display-badge" id="tplActiveBadge">当前使用</span>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-left:auto;align-items:center;">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-left:auto;align-items:center;position:relative;">
               <button class="tpl-preview-toggle-btn" id="tplPreviewToggleBtn" type="button">收起预览</button>
               <button class="tpl-btn tpl-btn-sm" id="tplEditBtn">✏️ 编辑</button>
               <button class="tpl-btn tpl-btn-sm" id="tplFullscreenBtn">🔍 全屏</button>
-              <button class="tpl-btn tpl-btn-sm" id="tplExportCsvBtn">📊 导出</button>
+              <div class="tpl-export-menu">
+                <button class="tpl-btn tpl-btn-sm" id="tplExportBtn" type="button">📊 导出 ▾</button>
+                <div class="tpl-export-dropdown" id="tplExportDropdown">
+                  <button class="tpl-export-item" data-type="csv" type="button">📊 导出 Excel (CSV)</button>
+                  <button class="tpl-export-item" data-type="image" type="button">🖼️ 导出图片 (PNG)</button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="tpl-display-body">
-          <!-- Weekday + Grade filters -->
+          <!-- Filters: weekday, grade, subject, class -->
           <div class="tpl-display-filters" id="tplFilterBar">
-            <div id="tplWeekdayFilterChips" style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;"></div>
-            <div id="tplGradeFilterChips" style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-left:8px;"></div>
+            <div class="tpl-filter-group" id="weekdayFilterGroup">
+              <span class="tpl-filter-label">📅 星期</span>
+              <div class="tpl-filter-chips" id="tplWeekdayFilterChips"></div>
+            </div>
+            <div class="tpl-filter-group" id="gradeFilterGroup">
+              <span class="tpl-filter-label">📚 年级</span>
+              <div class="tpl-filter-chips" id="tplGradeFilterChips"></div>
+            </div>
+            <div class="tpl-filter-group" id="subjectFilterGroup">
+              <span class="tpl-filter-label">📖 科目</span>
+              <div class="tpl-filter-chips" id="tplSubjectFilterChips"></div>
+            </div>
+            <div class="tpl-filter-group" id="classFilterGroup">
+              <span class="tpl-filter-label">🏫 班级</span>
+              <div class="tpl-filter-chips" id="tplClassFilterChips"></div>
+            </div>
           </div>
           <!-- Schedule table -->
           <div class="tpl-schedule-table" id="tplScheduleView"></div>
@@ -6869,6 +6947,8 @@
   var tplFilterBar = document.getElementById('tplFilterBar');
   var tplSelectedGrade = ''; // empty = show all grades
   var tplSelectedWeekday = ''; // empty = show all weekdays
+  var tplSelectedSubject = ''; // empty = show all subjects
+  var tplSelectedClass = ''; // empty = show all classes
   var tplEditBtn = document.getElementById('tplEditBtn');
   var tplSaveActiveBtn = document.getElementById('tplSaveActiveBtn');
   var tplResetActiveBtn = document.getElementById('tplResetActiveBtn');
@@ -7111,69 +7191,89 @@
       tplMgmtContent.classList.add('collapsed');
       tplMgmtToggle.classList.remove('active');
 
-      // Extract unique grades and weekdays
+      // Extract unique filter values
       var allGrades = [];
       var allWeekdays = [];
+      var allSubjects = [];
+      var allClasses = [];
       active.courses.forEach(function(c) {
         var g = (c.grade || '').trim();
         if (g && allGrades.indexOf(g) === -1) allGrades.push(g);
         var wd = c.weekday || '周一';
         if (allWeekdays.indexOf(wd) === -1) allWeekdays.push(wd);
+        var s = (c.subject || '').trim();
+        if (s && allSubjects.indexOf(s) === -1) allSubjects.push(s);
+        var cl = (c.className || '').trim();
+        if (cl && allClasses.indexOf(cl) === -1) allClasses.push(cl);
       });
       allGrades.sort();
+      allSubjects.sort();
+      allClasses.sort();
       allWeekdays.sort(function(a, b) { return TPL_WEEKDAYS.indexOf(a) - TPL_WEEKDAYS.indexOf(b); });
 
       // Reset filters if values no longer exist
       if (tplSelectedGrade && allGrades.indexOf(tplSelectedGrade) === -1) tplSelectedGrade = '';
       if (tplSelectedWeekday && allWeekdays.indexOf(tplSelectedWeekday) === -1) tplSelectedWeekday = '';
+      if (tplSelectedSubject && allSubjects.indexOf(tplSelectedSubject) === -1) tplSelectedSubject = '';
+      if (tplSelectedClass && allClasses.indexOf(tplSelectedClass) === -1) tplSelectedClass = '';
 
-      // Build weekday filter chips (always show if 2+ weekdays)
-      var wdHtml = '';
-      if (allWeekdays.length >= 2) {
-        wdHtml += '<span style="font-size:0.68rem;color:var(--muted);margin-right:2px;">星期：</span>';
-        wdHtml += '<span class="tpl-weekday-chip' + (tplSelectedWeekday === '' ? ' active' : '') + '" data-wd="">全部</span>';
-        allWeekdays.forEach(function(d) {
-          wdHtml += '<span class="tpl-weekday-chip' + (tplSelectedWeekday === d ? ' active' : '') + '" data-wd="' + escapeHtml(d) + '">' + d + '</span>';
+      // Helper: build chip HTML
+      function buildChips(items, selectedVal, dataAttr, allLabel) {
+        if (items.length < 2) return '';
+        var html = '';
+        html += '<span class="tpl-weekday-chip' + (selectedVal === '' ? ' active' : '') + '" data-' + dataAttr + '="">全部</span>';
+        items.forEach(function(item) {
+          html += '<span class="tpl-weekday-chip' + (selectedVal === item ? ' active' : '') + '" data-' + dataAttr + '="' + escapeHtml(item) + '">' + escapeHtml(item) + '</span>';
         });
+        return html;
       }
-      tplWeekdayFilterChips.innerHTML = wdHtml;
 
-      // Build grade filter chips
-      var gradeHtml = '';
-      if (allGrades.length >= 2) {
-        gradeHtml += '<span style="font-size:0.68rem;color:var(--muted);margin-right:2px;">年级：</span>';
-        gradeHtml += '<span class="tpl-weekday-chip' + (tplSelectedGrade === '' ? ' active' : '') + '" data-grade="">全部</span>';
-        allGrades.forEach(function(g) {
-          gradeHtml += '<span class="tpl-weekday-chip' + (tplSelectedGrade === g ? ' active' : '') + '" data-grade="' + escapeHtml(g) + '">' + escapeHtml(g) + '</span>';
-        });
-      }
+      // Build all filter chips
+      var weekdayHtml = buildChips(allWeekdays, tplSelectedWeekday, 'wd', '全部星期');
+      var gradeHtml = buildChips(allGrades, tplSelectedGrade, 'grade', '全部年级');
+      var subjectHtml = buildChips(allSubjects, tplSelectedSubject, 'subject', '全部科目');
+      var classHtml = buildChips(allClasses, tplSelectedClass, 'class', '全部班级');
+
+      tplWeekdayFilterChips.innerHTML = weekdayHtml;
       tplGradeFilterChips.innerHTML = gradeHtml;
+      if (tplSubjectFilterChips) tplSubjectFilterChips.innerHTML = subjectHtml;
+      if (tplClassFilterChips) tplClassFilterChips.innerHTML = classHtml;
 
-      // Show/hide filter bar
-      if (allWeekdays.length >= 2 || allGrades.length >= 2) {
-        tplFilterBar.style.display = 'flex';
-      } else {
-        tplFilterBar.style.display = 'none';
+      // Show/hide filter groups
+      var weekdayGroup = document.getElementById('weekdayFilterGroup');
+      var gradeGroup = document.getElementById('gradeFilterGroup');
+      var subjectGroup = document.getElementById('subjectFilterGroup');
+      var classGroup = document.getElementById('classFilterGroup');
+      if (weekdayGroup) weekdayGroup.style.display = allWeekdays.length >= 2 ? 'flex' : 'none';
+      if (gradeGroup) gradeGroup.style.display = allGrades.length >= 2 ? 'flex' : 'none';
+      if (subjectGroup) subjectGroup.style.display = allSubjects.length >= 2 ? 'flex' : 'none';
+      if (classGroup) classGroup.style.display = allClasses.length >= 2 ? 'flex' : 'none';
+
+      // Show/hide entire filter bar
+      var hasAnyFilter = allWeekdays.length >= 2 || allGrades.length >= 2 || allSubjects.length >= 2 || allClasses.length >= 2;
+      tplFilterBar.style.display = hasAnyFilter ? 'flex' : 'none';
+
+      // Bind chip clicks for all filters
+      function bindFilterChips(container, dataAttr, setter) {
+        if (!container) return;
+        container.querySelectorAll('.tpl-weekday-chip').forEach(function(chip) {
+          chip.addEventListener('click', function() {
+            setter(chip.dataset[dataAttr] || '');
+            renderTplActive();
+          });
+        });
       }
+      bindFilterChips(tplWeekdayFilterChips, 'wd', function(v) { tplSelectedWeekday = v; });
+      bindFilterChips(tplGradeFilterChips, 'grade', function(v) { tplSelectedGrade = v; });
+      bindFilterChips(tplSubjectFilterChips, 'subject', function(v) { tplSelectedSubject = v; });
+      bindFilterChips(tplClassFilterChips, 'class', function(v) { tplSelectedClass = v; });
 
-      // Bind chip clicks
-      tplWeekdayFilterChips.querySelectorAll('.tpl-weekday-chip').forEach(function(chip) {
-        chip.addEventListener('click', function() {
-          tplSelectedWeekday = chip.dataset.wd || '';
-          renderTplActive();
-        });
-      });
-      tplGradeFilterChips.querySelectorAll('.tpl-weekday-chip').forEach(function(chip) {
-        chip.addEventListener('click', function() {
-          tplSelectedGrade = chip.dataset.grade || '';
-          renderTplActive();
-        });
-      });
-
-      // Filter courses by selected weekday and grade
+      // Filter courses by all selected filters
       var displayCourses = active.courses.filter(function(c) {
         if (tplSelectedWeekday && (c.weekday || '周一') !== tplSelectedWeekday) return false;
         if (tplSelectedGrade && (c.grade || '').trim() !== tplSelectedGrade) return false;
+        if (tplSelectedSubject && (c.subject || '').trim() !== tplSelectedSubject) return false;
+        if (tplSelectedClass && (c.className || '').trim() !== tplSelectedClass) return false;
         return true;
       });
 
@@ -7451,8 +7551,10 @@
     var templates = getTplTemplates();
     var tpl = templates.find(function(t) { return t.id === tplId; });
     if (!tpl) { showToast('模板不存在'); return; }
-    tplSelectedGrade = ''; // reset grade filter
-    tplSelectedWeekday = ''; // reset weekday filter
+    tplSelectedGrade = '';
+    tplSelectedWeekday = '';
+    tplSelectedSubject = '';
+    tplSelectedClass = '';
     var active = {
       templateId: tpl.id,
       name: tpl.name,
@@ -7831,9 +7933,15 @@
       showToast('暂无课表可查看');
       return;
     }
+    var filtered = getFilteredCourses();
+    if (filtered.length === 0) {
+      showToast('当前筛选条件下暂无课表');
+      return;
+    }
     if (tplFullscreenTitle) tplFullscreenTitle.textContent = (active.name || '课表') + ' - 全屏查看';
-    if (tplFullscreenBody) tplFullscreenBody.innerHTML = buildScheduleHtml(active.courses, tplSelectedGrade) +
-      '<div class="tpl-schedule-scroll-hint">💡 左右滑动查看更多内容</div>';
+    // Pass filtered courses with empty grade filter (already filtered)
+    if (tplFullscreenBody) tplFullscreenBody.innerHTML = buildScheduleHtml(filtered, '') +
+      '<div class="tpl-schedule-scroll-hint">💡 左右滑动查看更多内容 · 建议横屏观看</div>';
     if (tplFullscreenOverlay) tplFullscreenOverlay.classList.add('open');
   });
 
@@ -7844,16 +7952,55 @@
     if (e.target === tplFullscreenOverlay) tplFullscreenOverlay.classList.remove('open');
   });
 
-  // Export schedule as CSV (Excel compatible)
-  var tplExportCsvBtn = document.getElementById('tplExportCsvBtn');
-  tplExportCsvBtn.addEventListener('click', function() {
+  // Export dropdown menu
+  var tplExportBtn = document.getElementById('tplExportBtn');
+  var tplExportDropdown = document.getElementById('tplExportDropdown');
+  if (tplExportBtn && tplExportDropdown) {
+    tplExportBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      tplExportDropdown.classList.toggle('show');
+    });
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+      tplExportDropdown.classList.remove('show');
+    });
+    // Export options
+    tplExportDropdown.querySelectorAll('.tpl-export-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        var type = item.dataset.type;
+        tplExportDropdown.classList.remove('show');
+        if (type === 'csv') exportScheduleCsv();
+        else if (type === 'image') exportScheduleImage();
+      });
+    });
+  }
+
+  // Get filtered courses (respects all current filters)
+  function getFilteredCourses() {
+    var active = getTplActive();
+    if (!active || !active.courses) return [];
+    return active.courses.filter(function(c) {
+      if (tplSelectedWeekday && (c.weekday || '周一') !== tplSelectedWeekday) return false;
+      if (tplSelectedGrade && (c.grade || '').trim() !== tplSelectedGrade) return false;
+      if (tplSelectedSubject && (c.subject || '').trim() !== tplSelectedSubject) return false;
+      if (tplSelectedClass && (c.className || '').trim() !== tplSelectedClass) return false;
+      return true;
+    });
+  }
+
+  // Export as CSV (Excel compatible)
+  function exportScheduleCsv() {
     var active = getTplActive();
     if (!active || !active.courses || active.courses.length === 0) {
       showToast('暂无课表可导出');
       return;
     }
-    var courses = active.courses;
-    // Build CSV grouped by weekday then grade
+    var courses = getFilteredCourses();
+    if (courses.length === 0) {
+      showToast('当前筛选条件下暂无课表');
+      return;
+    }
+    // Build CSV
     var csv = '\uFEFF'; // BOM for Excel UTF-8
     csv += '星期,年级,班级,节次,时间,科目,老师,教室\n';
     // Sort by weekday order, then grade, then period
@@ -7877,7 +8024,6 @@
         c.teacher || '',
         c.classroom || ''
       ];
-      // Escape CSV fields
       csv += row.map(function(val) {
         var s = String(val);
         if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
@@ -7886,7 +8032,6 @@
         return s;
       }).join(',') + '\n';
     });
-    // Download
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -7897,8 +8042,194 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast('课表已导出为CSV（可用Excel打开）');
-  });
+    showToast('课表已导出（可用Excel打开）');
+  }
+
+  // Export as PNG image using Canvas
+  function exportScheduleImage() {
+    var active = getTplActive();
+    if (!active || !active.courses || active.courses.length === 0) {
+      showToast('暂无课表可导出');
+      return;
+    }
+    var courses = getFilteredCourses();
+    if (courses.length === 0) {
+      showToast('当前筛选条件下暂无课表');
+      return;
+    }
+
+    // Sort courses
+    var sorted = courses.slice().sort(function(a, b) {
+      var wa = TPL_WEEKDAYS.indexOf(a.weekday || '周一');
+      var wb = TPL_WEEKDAYS.indexOf(b.weekday || '周一');
+      if (wa !== wb) return wa - wb;
+      var ga = (a.grade || '').trim();
+      var gb = (b.grade || '').trim();
+      if (ga !== gb) return ga < gb ? -1 : 1;
+      return 0;
+    });
+
+    // Group by weekday
+    var groups = {};
+    sorted.forEach(function(c) {
+      var wd = c.weekday || '周一';
+      if (!groups[wd]) groups[wd] = [];
+      groups[wd].push(c);
+    });
+
+    // Canvas setup
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext('2d');
+    var padding = 40;
+    var colWidths = [80, 90, 80, 70, 110, 80, 80, 80]; // 班级,节次,时间,科目,老师,教室 (adjusted)
+    var rowHeight = 36;
+    var headerHeight = 44;
+    var weekdayHeaderHeight = 48;
+    var gradeHeaderHeight = 32;
+    var titleHeight = 60;
+    var tableWidth = colWidths.reduce(function(a, b) { return a + b; }, 0);
+
+    // Calculate total height
+    var totalHeight = titleHeight + padding * 2;
+    TPL_WEEKDAYS.forEach(function(wd) {
+      if (!groups[wd] || groups[wd].length === 0) return;
+      totalHeight += weekdayHeaderHeight;
+      // Sub-group by grade
+      var gradeGroups = {};
+      var noGrade = [];
+      groups[wd].forEach(function(c) {
+        var g = (c.grade || '').trim();
+        if (g) { if (!gradeGroups[g]) gradeGroups[g] = []; gradeGroups[g].push(c); }
+        else { noGrade.push(c); }
+      });
+      var sortedGrades = Object.keys(gradeGroups).sort();
+      sortedGrades.forEach(function(g) {
+        totalHeight += gradeHeaderHeight + headerHeight + gradeGroups[g].length * rowHeight;
+      });
+      if (noGrade.length > 0) {
+        totalHeight += gradeHeaderHeight + headerHeight + noGrade.length * rowHeight;
+      }
+    });
+
+    canvas.width = tableWidth + padding * 2;
+    canvas.height = totalHeight;
+
+    // Background
+    ctx.fillStyle = '#f8fafb';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Title
+    ctx.fillStyle = '#2d9d78';
+    ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.fillText((active.name || '课表'), padding, padding + 8);
+
+    // Subtitle / date
+    var dateStr = new Date().toISOString().slice(0, 10);
+    ctx.fillStyle = '#888';
+    ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.fillText('生成日期：' + dateStr, padding, padding + 38);
+
+    var y = padding + titleHeight;
+    var x = padding;
+    var headers = ['班级', '节次', '时间', '科目', '老师', '教室'];
+    var headerCols = [0, 1, 2, 3, 4, 5]; // indices into colWidths (skip first 2 which were for grade/weekday)
+
+    TPL_WEEKDAYS.forEach(function(wd) {
+      if (!groups[wd] || groups[wd].length === 0) return;
+
+      // Weekday header
+      ctx.fillStyle = 'rgba(45,157,120,0.1)';
+      ctx.fillRect(x, y, tableWidth, weekdayHeaderHeight);
+      ctx.fillStyle = '#2d9d78';
+      ctx.font = 'bold 17px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+      ctx.fillText('📅 ' + wd + '  (' + groups[wd].length + '节课)', x + 12, y + 14);
+      y += weekdayHeaderHeight;
+
+      // Sub-group by grade
+      var gradeGroups = {};
+      var noGrade = [];
+      groups[wd].forEach(function(c) {
+        var g = (c.grade || '').trim();
+        if (g) { if (!gradeGroups[g]) gradeGroups[g] = []; gradeGroups[g].push(c); }
+        else { noGrade.push(c); }
+      });
+      var sortedGrades = Object.keys(gradeGroups).sort();
+
+      function drawGradeTable(title, rows) {
+        // Grade subheader
+        ctx.fillStyle = '#e8f5e9';
+        ctx.fillRect(x, y, tableWidth, gradeHeaderHeight);
+        ctx.fillStyle = '#1a8b5f';
+        ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+        ctx.fillText(title, x + 12, y + 8);
+        y += gradeHeaderHeight;
+
+        // Table header
+        ctx.fillStyle = '#2d9d78';
+        ctx.fillRect(x, y, tableWidth, headerHeight);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+        var hx = x;
+        headers.forEach(function(h, i) {
+          var w = colWidths[i + 2]; // skip first 2 col widths
+          ctx.fillText(h, hx + 10, y + 14);
+          hx += w;
+        });
+        y += headerHeight;
+
+        // Table rows
+        rows.forEach(function(c, ri) {
+          if (ri % 2 === 0) {
+            ctx.fillStyle = '#fff';
+          } else {
+            ctx.fillStyle = '#f9fafb';
+          }
+          ctx.fillRect(x, y, tableWidth, rowHeight);
+
+          ctx.fillStyle = '#333';
+          ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
+          var rx = x;
+          var values = [c.className || '-', c.period || '-', c.time || '-', c.subject || '-', c.teacher || '-', c.classroom || '-'];
+          values.forEach(function(v, i) {
+            var w = colWidths[i + 2];
+            ctx.fillText(v, rx + 10, y + 10);
+            rx += w;
+          });
+
+          // Bottom border
+          ctx.fillStyle = 'rgba(0,0,0,0.06)';
+          ctx.fillRect(x, y + rowHeight - 1, tableWidth, 1);
+          y += rowHeight;
+        });
+
+        y += 8; // spacing after table
+      }
+
+      sortedGrades.forEach(function(g) {
+        drawGradeTable('📚 ' + g + '  (' + gradeGroups[g].length + '节)', gradeGroups[g]);
+      });
+      if (noGrade.length > 0) {
+        drawGradeTable(sortedGrades.length > 0 ? '未分年级' : '课程列表', noGrade);
+      }
+      y += 10; // spacing after weekday group
+    });
+
+    // Download
+    var dateStr2 = new Date().toISOString().slice(0, 10);
+    var filename = '课表_' + (active.name || '') + '_' + dateStr2 + '.png';
+    canvas.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('课表图片已导出');
+    }, 'image/png');
+  }
 
   // Initial render
   refreshAllDatalists();
