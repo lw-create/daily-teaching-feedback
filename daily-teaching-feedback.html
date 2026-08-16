@@ -2325,6 +2325,14 @@
     padding: 14px;
     margin-bottom: 14px;
     box-shadow: 0 2px 12px rgba(45,157,120,0.12);
+    transition: all 0.25s ease;
+  }
+  .tpl-display-box.tpl-preview-collapsed {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+  .tpl-display-box.tpl-preview-collapsed .tpl-display-body {
+    display: none;
   }
   .tpl-display-header {
     display: flex;
@@ -2335,6 +2343,36 @@
     gap: 6px;
     padding-bottom: 8px;
     border-bottom: 2px solid rgba(45,157,120,0.15);
+    cursor: pointer;
+    user-select: none;
+  }
+  .tpl-display-box.tpl-preview-collapsed .tpl-display-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .tpl-preview-toggle-icon {
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-left: 4px;
+    transition: transform 0.2s;
+  }
+  .tpl-display-box.tpl-preview-collapsed .tpl-preview-toggle-icon {
+    transform: rotate(-90deg);
+  }
+  .tpl-preview-toggle-btn {
+    font-size: 0.7rem;
+    color: var(--accent);
+    background: rgba(45,157,120,0.1);
+    border: none;
+    padding: 3px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .tpl-preview-toggle-btn:hover {
+    background: rgba(45,157,120,0.2);
   }
   .tpl-display-title {
     font-size: 1.05rem;
@@ -3219,15 +3257,17 @@
       <div id="tplActiveSection" style="display:none;margin-top:12px;">
         <!-- Display mode -->
         <div id="tplDisplayBox" class="tpl-display-box">
-          <div class="tpl-display-header">
-            <span class="tpl-display-title" id="tplActiveTitle">📋 我的课表</span>
+          <div class="tpl-display-header" id="tplPreviewHeader">
+            <span class="tpl-display-title" id="tplActiveTitle">📋 我的课表 <span class="tpl-preview-toggle-icon">▼</span></span>
             <span class="tpl-display-badge" id="tplActiveBadge">当前使用</span>
-            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-left:auto;">
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-left:auto;align-items:center;">
+              <button class="tpl-preview-toggle-btn" id="tplPreviewToggleBtn" type="button">收起预览</button>
               <button class="tpl-btn tpl-btn-sm" id="tplEditBtn">✏️ 编辑</button>
               <button class="tpl-btn tpl-btn-sm" id="tplFullscreenBtn">🔍 全屏</button>
               <button class="tpl-btn tpl-btn-sm" id="tplExportCsvBtn">📊 导出</button>
             </div>
           </div>
+          <div class="tpl-display-body">
           <!-- Weekday + Grade filters -->
           <div class="tpl-display-filters" id="tplFilterBar">
             <div id="tplWeekdayFilterChips" style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;"></div>
@@ -3235,6 +3275,7 @@
           </div>
           <!-- Schedule table -->
           <div class="tpl-schedule-table" id="tplScheduleView"></div>
+          </div>
         </div>
 
         <!-- Edit mode (collapsible, hidden by default) -->
@@ -6845,6 +6886,7 @@
   var tplAddRowBtn = document.getElementById('tplAddRowBtn');
   var tplIsEditing = false;
   var tplIsRendering = false; // flag to prevent auto-save during rendering
+  var tplPreviewCollapsed = false; // preview area collapsed state
 
   // Collapsible sections
   var tplMgmtToggle = document.getElementById('tplMgmtToggle');
@@ -6878,6 +6920,37 @@
       tplEditToggle.classList.remove('active');
     }
   });
+
+  // Preview area toggle (collapse/expand)
+  function toggleTplPreview() {
+    var displayBox = document.getElementById('tplDisplayBox');
+    var toggleBtn = document.getElementById('tplPreviewToggleBtn');
+    tplPreviewCollapsed = !tplPreviewCollapsed;
+    if (tplPreviewCollapsed) {
+      displayBox.classList.add('tpl-preview-collapsed');
+      if (toggleBtn) toggleBtn.textContent = '展开预览';
+    } else {
+      displayBox.classList.remove('tpl-preview-collapsed');
+      if (toggleBtn) toggleBtn.textContent = '收起预览';
+    }
+  }
+
+  // Bind preview header click to toggle
+  var tplPreviewHeader = document.getElementById('tplPreviewHeader');
+  var tplPreviewToggleBtn = document.getElementById('tplPreviewToggleBtn');
+  if (tplPreviewHeader) {
+    tplPreviewHeader.addEventListener('click', function(e) {
+      // Don't toggle if clicking on buttons inside the header
+      if (e.target.closest('button')) return;
+      toggleTplPreview();
+    });
+  }
+  if (tplPreviewToggleBtn) {
+    tplPreviewToggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleTplPreview();
+    });
+  }
 
   // Populate the add-form selects from preset options
   function renderAddFormSelects() {
@@ -7013,6 +7086,12 @@
       tplEditToggle.classList.add('active');
       if (tplActiveBadge) tplActiveBadge.textContent = '编辑中';
       if (tplActiveBadge) tplActiveBadge.style.background = '#f59e0b';
+      // Collapse preview by default in edit mode for cleaner interface
+      tplPreviewCollapsed = true;
+      var displayBox = document.getElementById('tplDisplayBox');
+      var toggleBtn = document.getElementById('tplPreviewToggleBtn');
+      if (displayBox) displayBox.classList.add('tpl-preview-collapsed');
+      if (toggleBtn) toggleBtn.textContent = '展开预览';
       renderTplEditRows(active.courses);
     } else {
       // Hide edit section when not editing
@@ -7022,6 +7101,12 @@
       tplEditToggle.classList.remove('active');
       if (tplActiveBadge) tplActiveBadge.textContent = '当前使用';
       if (tplActiveBadge) tplActiveBadge.style.background = '';
+      // Auto-expand preview when exiting edit mode
+      tplPreviewCollapsed = false;
+      var displayBox2 = document.getElementById('tplDisplayBox');
+      var toggleBtn2 = document.getElementById('tplPreviewToggleBtn');
+      if (displayBox2) displayBox2.classList.remove('tpl-preview-collapsed');
+      if (toggleBtn2) toggleBtn2.textContent = '收起预览';
       // Auto-collapse template management when schedule is displayed
       tplMgmtContent.classList.add('collapsed');
       tplMgmtToggle.classList.remove('active');
@@ -7184,17 +7269,29 @@
     tplEditRows.innerHTML = html;
     tplIsRendering = false;
 
-    // Bind toggle (collapse/expand)
+    // Bind toggle (accordion: only one expanded at a time)
     tplEditRows.querySelectorAll('.tpl-entry-summary').forEach(function(summary) {
       summary.addEventListener('click', function() {
         var card = summary.closest('.tpl-entry-card');
-        if (card.classList.contains('collapsed')) {
+        var isCollapsed = card.classList.contains('collapsed');
+
+        // First, collapse ALL cards (accordion behavior)
+        tplEditRows.querySelectorAll('.tpl-entry-card').forEach(function(otherCard) {
+          if (!otherCard.classList.contains('collapsed')) {
+            otherCard.classList.add('collapsed');
+            var otherToggle = otherCard.querySelector('.tpl-entry-toggle');
+            if (otherToggle) otherToggle.textContent = '展开 ▼';
+            updateEntrySummary(otherCard);
+          }
+        });
+
+        // Then toggle the clicked one
+        if (isCollapsed) {
           card.classList.remove('collapsed');
           summary.querySelector('.tpl-entry-toggle').textContent = '收起 ▲';
         } else {
           card.classList.add('collapsed');
           summary.querySelector('.tpl-entry-toggle').textContent = '展开 ▼';
-          // Update summary text after editing
           updateEntrySummary(card);
         }
       });
@@ -7257,6 +7354,14 @@
       bindOptSelect(row, 'tpl-fld-teacher', function(val) { addTplOpt('teachers', val); refreshAllDatalists(); });
       bindOptSelect(row, 'tpl-fld-classroom', function(val) { addTplOpt('classrooms', val); refreshAllDatalists(); });
     });
+
+    // Auto-expand the first card by default (accordion behavior)
+    var firstCard = tplEditRows.querySelector('.tpl-entry-card');
+    if (firstCard) {
+      firstCard.classList.remove('collapsed');
+      var firstToggle = firstCard.querySelector('.tpl-entry-toggle');
+      if (firstToggle) firstToggle.textContent = '收起 ▲';
+    }
   }
 
   // Update summary text after editing
