@@ -891,6 +891,58 @@
     border: 1px solid var(--rule);
     border-radius: var(--radius-sm);
   }
+  .quick-quote-card {
+    background: linear-gradient(135deg, #fef7e6 0%, #fff5eb 50%, #fef3e6 100%);
+    border: 1.5px solid #f5c26b;
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    margin-top: 4px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+  }
+  .quick-quote-card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .quick-quote-card-icon {
+    font-size: 0.95rem;
+  }
+  .quick-quote-card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #b45309;
+  }
+  .quick-quote-card .quick-quote-bar {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(245, 158, 11, 0.3);
+    margin-bottom: 0;
+  }
+  .quick-quote-card .quick-quote-bar:hover {
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+  .quick-quote-card .quick-quote-btn {
+    color: #d97706;
+    border-color: #d97706;
+  }
+  .quick-quote-card .quick-quote-btn:hover {
+    background: rgba(217, 119, 6, 0.08);
+  }
+  .quick-quote-card .quick-quote-btn.primary {
+    background: #d97706;
+    color: #fff;
+  }
+  .quick-quote-card .quick-quote-btn.primary:hover {
+    background: #b45309;
+  }
+  .quick-quote-card .quick-quote-btn.save {
+    color: #dc2626;
+    border-color: #dc2626;
+  }
+  .quick-quote-card .quick-quote-btn.save:hover {
+    background: rgba(220, 38, 38, 0.08);
+  }
   .quick-quote-bar {
     display: flex;
     align-items: flex-start;
@@ -3175,7 +3227,7 @@
         添加到桌面
       </button>
     </div>
-    <meta name="app-version" content="20260816.02">
+    <meta name="app-version" content="20260816.03">
   </div>
 
   <!-- Tabs -->
@@ -3342,21 +3394,27 @@
       <!-- Dimensions will be rendered by JS -->
     </div>
 
-    <!-- Quick quote bar -->
-    <div class="quick-quote-bar">
-      <div class="quick-quote-text" id="quickQuoteText">点右侧「换一条」随机获取个性化评语 ✨</div>
-      <div class="quick-quote-actions">
-        <button class="quick-quote-btn" id="quickQuoteRefreshBtn" type="button" title="换一条">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="quick-quote-btn primary" id="quickQuoteInsertBtn" type="button" title="插入">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          插入
-        </button>
-        <button class="quick-quote-btn save" id="quickQuoteSaveBtn" type="button" title="保存当前内容到评语库">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          存到评语库
-        </button>
+    <!-- Quick quote card - standalone highlighted card -->
+    <div class="quick-quote-card">
+      <div class="quick-quote-card-header">
+        <span class="quick-quote-card-icon">✨</span>
+        <span class="quick-quote-card-title">选一句评语，评价学生今天的表现</span>
+      </div>
+      <div class="quick-quote-bar">
+        <div class="quick-quote-text" id="quickQuoteText">点右侧「换一条」随机获取个性化评语 ✨</div>
+        <div class="quick-quote-actions">
+          <button class="quick-quote-btn" id="quickQuoteRefreshBtn" type="button" title="换一条">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="quick-quote-btn primary" id="quickQuoteInsertBtn" type="button" title="插入">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            插入
+          </button>
+          <button class="quick-quote-btn save" id="quickQuoteSaveBtn" type="button" title="保存当前内容到评语库">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 21v-8H7v8M7 3v5h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            存到评语库
+          </button>
+        </div>
       </div>
     </div>
 
@@ -7061,9 +7119,45 @@
     catch(e) { return []; }
   }
 
-  // Get random quote from current category
+  // Subject keywords for smart filtering
+  var SUBJECT_KEYWORDS = {
+    '语文': ['语文', '作文', '文言文', '古诗词', '阅读理解', '古诗文', '现代文', '文言', '诗词', '背诵', '默写', '字音', '字形', '成语', '病句', '文学'],
+    '数学': ['数学', '函数', '几何', '导数', '方程', '立体几何', '解析几何', '概率统计', '韦达定理', '求导', '公式定理', '计算', '数学题', '代数'],
+    '英语': ['英语', '单词', '词汇', '语法', '听力', '阅读', '完形', '作文', '口语', '发音', '英文', '七选五', '完形填空', '英语听力'],
+    '物理': ['物理', '力学', '电磁', '受力分析', '实验题', '物理题', '动量', '动能', '加速度', '电场', '磁场', '物理思维'],
+    '化学': ['化学', '方程式', '配平', '元素周期', '有机化学', '官能团', '化学实验', '摩尔质量', '物质的量', '化学反应', '化学平衡'],
+    '生物': ['生物', '遗传', '细胞', '染色体', '基因', '生物实验', '内环境', '免疫调节', '光合作用', '呼吸作用', '生物课'],
+    '历史': ['历史', '史料', '时间线', '史论', '历史事件', '历史大题', '材料分析', '历史课'],
+    '地理': ['地理', '等高线', '等温线', '自然地理', '人文地理', '区域地理', '区位因素', '产业转移', '大气环流', '地球运动', '地理思维'],
+    '政治': ['政治', '哲学', '经济生活', '政治生活', '文化生活', '主观题', '原理', '方法论', '时事', '政治课']
+  };
+
+  // Check if a quote is subject-specific (belongs to a particular subject)
+  function getQuoteSubject(text) {
+    for (var subject in SUBJECT_KEYWORDS) {
+      var keywords = SUBJECT_KEYWORDS[subject];
+      for (var i = 0; i < keywords.length; i++) {
+        if (text.indexOf(keywords[i]) !== -1) {
+          return subject;
+        }
+      }
+    }
+    return null; // general-purpose quote
+  }
+
+  // Get current selected subject
+  function getCurrentSubject() {
+    try {
+      var input = document.getElementById('subjectInput');
+      if (input) return input.value.trim();
+    } catch(e) {}
+    return '';
+  }
+
+  // Get random quote from current category, with smart subject filtering
   function getRandomQuote() {
     var all = getQuotes();
+    var currentSubject = getCurrentSubject();
     var pool;
     if (quoteSelectedCategory === '全部') {
       pool = all;
@@ -7071,6 +7165,16 @@
       pool = all.filter(function(q) { return q.saved; });
     } else {
       pool = all.filter(function(q) { return q.category === quoteSelectedCategory; });
+    }
+    // Smart filtering: if a subject is selected, filter out quotes from OTHER subjects
+    if (currentSubject) {
+      pool = pool.filter(function(q) {
+        var qSubject = getQuoteSubject(q.text);
+        // If it's a general-purpose quote (no subject), keep it
+        // If it's from the current subject, keep it
+        // If it's from another subject, filter it out
+        return !qSubject || qSubject === currentSubject;
+      });
     }
     if (pool.length === 0) return null;
     // Pick a random one, try not to repeat the current one
